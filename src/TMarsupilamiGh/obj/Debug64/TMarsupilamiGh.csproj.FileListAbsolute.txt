@@ -1,0 +1,5 @@
+Z:\Public\GitHub\TMarsupilami2\src\TMarsupilamiGh\bin\TMarsupilamiGh.dll
+Z:\Public\GitHub\TMarsupilami2\src\TMarsupilamiGh\bin\TMarsupilamiGh.pdb
+Z:\Public\GitHub\TMarsupilami2\src\TMarsupilamiGh\obj\Debug64\TMarsupilamiGh.csprojResolveAssemblyReference.cache
+Z:\Public\GitHub\TMarsupilami2\src\TMarsupilamiGh\obj\Debug64\TMarsupilamiGh.dll
+Z:\Public\GitHub\TMarsupilami2\src\TMarsupilamiGh\obj\Debug64\TMarsupilamiGh.pdb
