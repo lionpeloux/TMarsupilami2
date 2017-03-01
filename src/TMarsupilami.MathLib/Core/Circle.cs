@@ -384,12 +384,13 @@ namespace TMarsupilami.MathLib
             double l_2 = e_x * e_x + e_y * e_y + e_z * e_z;
             double l = Math.Sqrt(l_2);
 
-            // κb = 2 / (|e|^2) * ts x e 
-            // add :  0 | sub :  3 | mul :  9 | div :  0 | sqrt :  0
-            double d = 2 / l_2;
+            // κb = 2/|e| * (ts x e)/(ts.e) 
+            // add :  2 | sub :  3 | mul :  13 | div :  2 | sqrt :  0     
             double ts_x = ts.X;
             double ts_y = ts.Y;
             double ts_z = ts.Z;
+            double c = (ts_x * e_x + ts_y * e_y + ts_z * e_z) / l;
+            double d = 2 / (c * l_2);
             double κb_x = d * (ts_y * e_z - ts_z * e_y);
             double κb_y = d * (ts_z * e_x - ts_x * e_z);
             double κb_z = d * (ts_x * e_y - ts_y * e_x);
@@ -398,9 +399,54 @@ namespace TMarsupilami.MathLib
             // κ = |κb|
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1
             double κ_2 = κb_x * κb_x + κb_y * κb_y + κb_z * κb_z;
+            κ = Math.Sqrt(κ_2);
+
+            // turning angle (very costly)
+            // add :  0 | sub :  0 | mul :  0 | div :  0 | sqrt :  0
+            // cos :  0 | sin :  0 | tan :  0 | acos : 1 | asin :  0 | atan :  0
+            fs = Math.Acos(c);
+        }
+        public static void InscribedCircle_End(Point p, Point pe, Vector te, out double κ, out Vector κb, out double fe)
+        {
+            /*
+             *  TOTAL COST (without turning angles)
+             *      add : 16 | sub :  15 | mul : 46 | div :  3 | sqrt :  2
+             * 
+             *  TOTAL COST (for the turning angles)
+             *      add :  5 | sub :  0 | mul :  6 | div :  2 | sqrt :  2
+             *      acos : 2
+             *     
+             */
+
+            //e = pe - p
+            // add :  2 | sub :  3 | mul :  3 | div : 0 | sqrt :  1
+            double e_x = pe.X - p.X;
+            double e_y = pe.Y - p.Y;
+            double e_z = pe.Z - p.Z;
+            double l_2 = e_x * e_x + e_y * e_y + e_z * e_z;
+            double l = Math.Sqrt(l_2);
+
+            // κb = 2/|e| * (e x te)/(e.te) 
+            // add :  2 | sub :  3 | mul :  13 | div :  2 | sqrt :  0     
+            double te_x = te.X;
+            double te_y = te.Y;
+            double te_z = te.Z;
+            double c = (te_x * e_x + te_y * e_y + te_z * e_z) / l;
+            double d = 2 / (c * l_2);
+            double κb_x = d * (e_y * te_z - e_z * te_y);
+            double κb_y = d * (e_z * te_x - e_x * te_z);
+            double κb_z = d * (e_x * te_y - e_y * te_x);
+            κb = new Vector(κb_x, κb_y, κb_z);
+
+            // κ = |κb|
+            // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1
+            double κ_2 = κb_x * κb_x + κb_y * κb_y + κb_z * κb_z;
             κ = System.Math.Sqrt(κ_2);
 
-            fs = Math.Acos((ts_x * e_x + ts_y * e_y + ts_z * e_z) / l);
+            // turning angle (very costly)
+            // add :  0 | sub :  0 | mul :  0 | div :  0 | sqrt :  0
+            // cos :  0 | sin :  0 | tan :  0 | acos : 1 | asin :  0 | atan :  0
+            fe = Math.Acos(c);
         }
 
 

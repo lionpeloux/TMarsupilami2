@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
+using TMarsupilami.Gh.Properties;
 
 namespace TMarsupilami.Gh
 {
@@ -9,7 +10,7 @@ namespace TMarsupilami.Gh
     {
 
         public Comp_InscribedCircleCurrent()
-          : base("Inscribed Circle - Current", "Circle Current",
+          : base("Inscribed Circle - Current", "Inscribed Circle (C)",
               "Circle tangent to two edges.",
               "TMarsupilami", "Math")
         {
@@ -22,7 +23,13 @@ namespace TMarsupilami.Gh
                 return GH_Exposure.secondary;
             }
         }
-
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                return Resources.InscribedCircleCurrent;
+            }
+        }
         public override Guid ComponentGuid
         {
             get { return new Guid("{2409612D-18F1-4B37-895F-4F4A091BEDFE}"); }

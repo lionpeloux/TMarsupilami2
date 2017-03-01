@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
+using TMarsupilami.Gh.Properties;
 
 namespace TMarsupilami.Gh
 {
@@ -9,7 +10,7 @@ namespace TMarsupilami.Gh
     {
 
         public Comp_InscribedCircleStart()
-          : base("Inscribed Circle - Start", "Circle Current",
+          : base("Inscribed Circle - Start", "Inscribed Circle (S)",
               "Circle tangent to two edges.",
               "TMarsupilami", "Math")
         {
@@ -22,7 +23,13 @@ namespace TMarsupilami.Gh
                 return GH_Exposure.secondary;
             }
         }
-
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                return Resources.InscribedCircleStart;
+            }
+        }
         public override Guid ComponentGuid
         {
             get { return new Guid("{58D4E950-6C6D-4F6F-91D0-3407219D4EDA}"); }
@@ -66,6 +73,7 @@ namespace TMarsupilami.Gh
             }
             else
             {
+                ts.Unitize();
                 MathLib.Circle.InscribedCircle_Start(ts.Cast(), ps.Cast(), p.Cast(), out κ, out κb, out fs);
 
                 if (κ == 0) // it's a line

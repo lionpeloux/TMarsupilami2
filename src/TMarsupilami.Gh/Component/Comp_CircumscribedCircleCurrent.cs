@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
+using TMarsupilami.Gh.Properties;
 
 namespace TMarsupilami.Gh
 {
@@ -9,7 +10,7 @@ namespace TMarsupilami.Gh
     {
 
         public Comp_CircumscribedCircleCurrent()
-          : base("Circumscribed Circle - Current", "Circle Current",
+          : base("Circumscribed Circle - Current", "Circumscribed Circle (C)",
               "Circle passing through 3 points.",
               "TMarsupilami", "Math")
         {
@@ -22,7 +23,13 @@ namespace TMarsupilami.Gh
                 return GH_Exposure.primary;
             }
         }
-
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                return Resources.CircumscribedCircleCurrent;
+            }
+        }
         public override Guid ComponentGuid
         {
             get { return new Guid("{7735c658-cb3a-4615-a2d3-e87077fcc1f9}"); }

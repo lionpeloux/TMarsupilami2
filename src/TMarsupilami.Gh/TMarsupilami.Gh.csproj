@@ -63,11 +63,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Component\Comp_InscribedCirclePolyline.cs" />
+    <Compile Include="Component\Comp_CircumscribedCirclePolyline.cs" />
+    <Compile Include="Component\Comp_InscribedCircleEnd.cs" />
     <Compile Include="Component\Comp_InscribedCircleStart.cs" />
     <Compile Include="Component\Comp_InscribedCircleCurrent.cs" />
     <Compile Include="Component\Comp_CircumscribedCircleEnd.cs" />
     <Compile Include="Component\Comp_CircumscribedCircleStart.cs" />
     <Compile Include="Component\Comp_CircumscribedCircleCurrent.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="TMarsupilamiGhInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Type\Convert.cs" />
@@ -81,6 +89,36 @@
       <Name>TMarsupilami.MathLib</Name>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CircumscribedCircleCurrent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CircumscribedCircleEnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CircumscribedCirclePolyline.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CircumscribedCircleStart.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InscribedCircleCurrent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InscribedCircleEnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InscribedCirclePolyline.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InscribedCircleStart.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
