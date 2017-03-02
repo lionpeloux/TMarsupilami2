@@ -103,6 +103,16 @@ namespace TMarsupilami.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DisplayPlane {
+            get {
+                object obj = ResourceManager.GetObject("DisplayPlane", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap InscribedCircleCurrent {
             get {
                 object obj = ResourceManager.GetObject("InscribedCircleCurrent", resourceCulture);

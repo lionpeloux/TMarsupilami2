@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.MathLib
 {
-    public struct Vector : IEquatable<Vector>
+    public struct MVector : IEquatable<MVector>
     {
         #region FIELDS
         
@@ -35,7 +35,7 @@ namespace TMarsupilami.MathLib
         /// <param name="x">The X component.</param>
         /// <param name="y">The Y component.</param>
         /// <param name="z">The Z component.</param>
-        public Vector(double x, double y, double z)
+        public MVector(double x, double y, double z)
         {
             this.x = x;
             this.y = y;
@@ -46,13 +46,13 @@ namespace TMarsupilami.MathLib
         /// Constructs a vector whose elements are all the single specified value.
         /// </summary>
         /// <param name="value">The element to fill the vector with.</param>
-        public Vector(double value) : this(value, value, value) { }
+        public MVector(double value) : this(value, value, value) { }
         
         /// <summary>
         /// Constructs a new vector with the given vector.
         /// </summary>
         /// <param name="v">The given vector.</param>
-        public Vector(Vector v)
+        public MVector(MVector v)
         {
             x = v.x;
             y = v.y;
@@ -63,7 +63,7 @@ namespace TMarsupilami.MathLib
         /// Constructs a vector with the given array.
         /// </summary>
         /// <param name="xyz">An array with the [x,y,z] components.</param>
-        public Vector(double[] xyz)
+        public MVector(double[] xyz)
         {
             if (xyz.Length == 3)
             {
@@ -207,7 +207,7 @@ namespace TMarsupilami.MathLib
         /// <param name="normal">The normal of the surface being reflected off.</param>
         /// <returns>true on success, false on failure.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Reflect(Vector normal)
+        public bool Reflect(MVector normal)
         {
             double l2 = normal.LengthSquared();
             if (l2 == 0) { return false; }
@@ -228,7 +228,7 @@ namespace TMarsupilami.MathLib
         /// <param name="axis">Axis of rotation.</param>
         /// <returns>True on success, false on failure.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Rotate(double angle, Vector axis)
+        public void Rotate(double angle, MVector axis)
         {
             axis.Normalize();
 
@@ -259,7 +259,7 @@ namespace TMarsupilami.MathLib
         /// <param name="other">The Vector to compare this instance to.</param>
         /// <returns>True if the other Vector is equal to this instance; False otherwise.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Vector other)
+        public bool Equals(MVector other)
         {
             return this.x == other.X &&
                    this.Y == other.Y &&
@@ -274,9 +274,9 @@ namespace TMarsupilami.MathLib
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
         {
-            if (!(obj is Vector))
+            if (!(obj is MVector))
                 return false;
-            return Equals((Vector)obj);
+            return Equals((MVector)obj);
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace TMarsupilami.MathLib
         /// <param name="other"></param>
         /// <param name="epsilon"></param>
         /// <returns></returns>
-        public bool Equals(Vector other, double epsilon)
+        public bool Equals(MVector other, double epsilon)
         {
             return
                     System.Math.Abs(x - other.x) < epsilon &&
@@ -322,9 +322,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second source vector.</param>
         /// <returns>The summed vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector operator +(Vector v1, Vector v2)
+        public static MVector operator +(MVector v1, MVector v2)
         {
-            return new Vector(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
+            return new MVector(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
         }
 
         /// <summary>
@@ -334,9 +334,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second source vector.</param>
         /// <returns>The difference vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector operator -(Vector v1, Vector v2)
+        public static MVector operator -(MVector v1, MVector v2)
         {
-            return new Vector(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
+            return new MVector(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
         }
 
         /// <summary>
@@ -346,9 +346,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second source vector.</param>
         /// <returns>The product vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector operator *(Vector v1, Vector v2)
+        public static MVector operator *(MVector v1, MVector v2)
         {
-            return new Vector(v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z);
+            return new MVector(v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z);
         }
 
         /// <summary>
@@ -358,9 +358,9 @@ namespace TMarsupilami.MathLib
         /// <param name="λ">The scalar value.</param>
         /// <returns>The scaled vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector operator *(Vector v, double λ)
+        public static MVector operator *(MVector v, double λ)
         {
-            return new Vector(λ * v.X, λ * v.Y, λ * v.Z);
+            return new MVector(λ * v.X, λ * v.Y, λ * v.Z);
         }
 
         /// <summary>
@@ -370,9 +370,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v">The source vector.</param>
         /// <returns>The scaled vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector operator *(double λ, Vector v)
+        public static MVector operator *(double λ, MVector v)
         {
-            return new Vector(λ * v.X, λ * v.Y, λ * v.Z);
+            return new MVector(λ * v.X, λ * v.Y, λ * v.Z);
         }
 
         /// <summary>
@@ -382,9 +382,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second source vector.</param>
         /// <returns>The vector resulting from the division.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector operator /(Vector v1, Vector v2)
+        public static MVector operator /(MVector v1, MVector v2)
         {
-            return new Vector(v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z);
+            return new MVector(v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z);
         }
 
         /// <summary>
@@ -394,9 +394,9 @@ namespace TMarsupilami.MathLib
         /// <param name="λ">The scalar value.</param>
         /// <returns>The result of the division.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector operator /(Vector v, double λ)
+        public static MVector operator /(MVector v, double λ)
         {
-            return new Vector(v.X / λ, v.Y / λ, v.Z / λ);
+            return new MVector(v.X / λ, v.Y / λ, v.Z / λ);
         }
 
         /// <summary>
@@ -405,9 +405,9 @@ namespace TMarsupilami.MathLib
         /// <param name="vector">The source vector.</param>
         /// <returns>The negated vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector operator -(Vector vector)
+        public static MVector operator -(MVector vector)
         {
-            return new Vector(-vector.X, -vector.Y, -vector.Z);
+            return new MVector(-vector.X, -vector.Y, -vector.Z);
         }
 
         /// <summary>
@@ -417,7 +417,7 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second vector to compare.</param>
         /// <returns>True if the vectors are equal; False otherwise.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Vector v1, Vector v2)
+        public static bool operator ==(MVector v1, MVector v2)
         {
             return
                     v1.X == v2.X &&
@@ -433,7 +433,7 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second vector to compare.</param>
         /// <returns>True if the vectors are not equal; False if they are equal.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Vector v1, Vector v2)
+        public static bool operator !=(MVector v1, MVector v2)
         {
             return
                     v1.X != v2.X ||
@@ -447,41 +447,41 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Gets the value of the vector with components 0,0,0.
         /// </summary>
-        public static Vector Zero
+        public static MVector Zero
         {
-            get { return new Vector(); }
+            get { return new MVector(); }
         }
 
         /// <summary>
         /// Gets the value of the vector with components 1,1,1.
         /// </summary>
-        public static Vector One
+        public static MVector One
         {
-            get { return new Vector(1.0, 1.0, 1.0); }
+            get { return new MVector(1.0, 1.0, 1.0); }
         }
 
         /// <summary>
         /// Gets the value of the vector with components (1,0,0).
         /// </summary>
-        public static Vector XAxis
+        public static MVector XAxis
         {
-            get { return new Vector(1.0, 0.0, 0.0); }
+            get { return new MVector(1.0, 0.0, 0.0); }
         }
 
         /// <summary>
         /// Gets the value of the vector with components (0,1,0).
         /// </summary>
-        public static Vector YAxis
+        public static MVector YAxis
         {
-            get { return new Vector(0.0, 1.0, 0.0); }
+            get { return new MVector(0.0, 1.0, 0.0); }
         }
 
         /// <summary>
         /// Gets the value of the vector with components (0,0,1).
         /// </summary>
-        public static Vector ZAxis
+        public static MVector ZAxis
         {
-            get { return new Vector(0.0, 0.0, 1.0); }
+            get { return new MVector(0.0, 0.0, 1.0); }
         }
         #endregion
 
@@ -490,7 +490,7 @@ namespace TMarsupilami.MathLib
         /// Returns the length of a vector |v|.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Length(Vector v)
+        public static double Length(MVector v)
         {
             return System.Math.Sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
         }
@@ -499,7 +499,7 @@ namespace TMarsupilami.MathLib
         /// Computes the squared length of a vector |v|^2.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double LengthSquared(Vector v)
+        public static double LengthSquared(MVector v)
         {
             return (v.x * v.x) + (v.y * v.y) + (v.z * v.z);
         }
@@ -510,14 +510,14 @@ namespace TMarsupilami.MathLib
         /// <param name="value">The vector to normalize.</param>
         /// <returns>The normalized vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector Normalize(Vector v)
+        public static MVector Normalize(MVector v)
         {
             double l = v.Length();
-            if (l == 0) { return Vector.Zero; }
+            if (l == 0) { return MVector.Zero; }
             else
             {
                 l = 1 / l;
-                return new Vector
+                return new MVector
                 (
                     v.x * l,
                     v.y * l,
@@ -530,9 +530,9 @@ namespace TMarsupilami.MathLib
         /// Return the reversed vector v = -v.
         ///</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector Reverse(Vector v)
+        public static MVector Reverse(MVector v)
         {
-            return new Vector
+            return new MVector
                 (
                     v.x = -v.x,
                     v.y = -v.y,
@@ -547,7 +547,7 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second point.</param>
         /// <returns>The distance |v2-v1|.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Distance(Vector v1, Vector v2)
+        public static double Distance(MVector v1, MVector v2)
         {
             return System.Math.Sqrt
                 (
@@ -564,7 +564,7 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second point.</param>
         /// <returns>The distance squared |v2-v1|^2..</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double DistanceSquared(Vector v1, Vector v2)
+        public static double DistanceSquared(MVector v1, MVector v2)
         {
             return
                 (v2.x - v1.x) * (v2.x - v1.x) +
@@ -579,9 +579,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v">The source vector.</param>
         /// <returns>The absolute value vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector Abs(Vector v)
+        public static MVector Abs(MVector v)
         {
-            return new Vector(System.Math.Abs(v.X), System.Math.Abs(v.Y), System.Math.Abs(v.Z));
+            return new MVector(System.Math.Abs(v.X), System.Math.Abs(v.Y), System.Math.Abs(v.Z));
         }
 
         /// <summary>
@@ -590,9 +590,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v">The source vector.</param>
         /// <returns>The square root vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector SquareRoot(Vector v)
+        public static MVector SquareRoot(MVector v)
         {
-            return new Vector(System.Math.Sqrt(v.X), System.Math.Sqrt(v.Y), System.Math.Sqrt(v.Z));
+            return new MVector(System.Math.Sqrt(v.X), System.Math.Sqrt(v.Y), System.Math.Sqrt(v.Z));
         }
 
         /// <summary>
@@ -602,7 +602,7 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second vector.</param>
         /// <returns>The dot product.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double DotProduct(Vector v1, Vector v2)
+        public static double DotProduct(MVector v1, MVector v2)
         {
             return v1.X * v2.X +
                    v1.Y * v2.Y +
@@ -616,9 +616,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second vector.</param>
         /// <returns>The cross product.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector CrossProduct(Vector v1, Vector v2)
+        public static MVector CrossProduct(MVector v1, MVector v2)
         {
-            return new Vector(
+            return new MVector(
                 v1.Y * v2.Z - v1.Z * v2.Y,
                 v1.Z * v2.X - v1.X * v2.Z,
                 v1.X * v2.Y - v1.Y * v2.X);
@@ -632,11 +632,11 @@ namespace TMarsupilami.MathLib
         /// <param name="v3">The second vector.</param>
         /// <returns>The cross product v1 x (v2 x v3).</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector CrossProduct(Vector v1, Vector v2, Vector v3)
+        public static MVector CrossProduct(MVector v1, MVector v2, MVector v3)
         {
             double ac = v1.x * v3.x + v1.y * v3.y + v1.z * v3.z;
             double ab = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-            return new Vector(
+            return new MVector(
                 ac * v2.x + ab * v3.x,
                 ac * v2.y + ab * v3.y,
                 ac * v2.z + ab * v3.z
@@ -651,7 +651,7 @@ namespace TMarsupilami.MathLib
         /// <param name="v3">The third vector.</param>
         /// <returns>The triple (or mixed) product v = v1 . (v2 x v3).</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double TripleProduct(Vector v1, Vector v2, Vector v3)
+        public static double TripleProduct(MVector v1, MVector v2, MVector v3)
         {
             return
                 v1.x * (v2.y * v2.z - v2.z * v3.y) +
@@ -667,9 +667,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second vector.</param>
         /// <returns>The linear combinaison v = λ1 * v1 + v2</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector LinearComb(double λ1, Vector v1, Vector v2)
+        public static MVector LinearComb(double λ1, MVector v1, MVector v2)
         {
-            return new Vector(
+            return new MVector(
                 λ1 * v1.X + v2.X,
                 λ1 * v1.Y + v2.Y,
                 λ1 * v1.Z + v2.Z);
@@ -683,9 +683,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second vector.</param>
         /// <returns>The linear combinaison v = v1 + λ2 * v2</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector LinearComb(Vector v1, double λ2, Vector v2)
+        public static MVector LinearComb(MVector v1, double λ2, MVector v2)
         {
-            return new Vector(
+            return new MVector(
                 v1.X + λ2 * v2.X,
                 v1.Y + λ2 * v2.Y,
                 v1.Z + λ2 * v2.Z);
@@ -700,9 +700,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second vector.</param>
         /// <returns>The linear combinaison v = λ2 * v1 + λ2 * v2</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector LinearComb(double λ1, Vector v1, double λ2, Vector v2)
+        public static MVector LinearComb(double λ1, MVector v1, double λ2, MVector v2)
         {
-            return new Vector(
+            return new MVector(
                 λ1 * v1.X + λ2 * v2.X,
                 λ1 * v1.Y + λ2 * v2.Y,
                 λ1 * v1.Z + λ2 * v2.Z);
@@ -719,9 +719,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v3">The third vector.</param>
         /// <returns>The linear combinaison v = λ2 * v1 + λ2 * v2 + λ3 * v3.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector LinearComb(double λ1, Vector v1, double λ2, Vector v2, double λ3, Vector v3)
+        public static MVector LinearComb(double λ1, MVector v1, double λ2, MVector v2, double λ3, MVector v3)
         {
-            return new Vector
+            return new MVector
                 (
                 λ1 * v1.x + λ2 * v2.x + λ3 * v3.x,
                 λ1 * v1.y + λ2 * v2.y + λ3 * v3.y,
@@ -737,15 +737,15 @@ namespace TMarsupilami.MathLib
         /// <param name="normal">The normal of the plane being reflected off.</param>
         /// <returns>The reflected vector v = v - (2(v.n)/|n|^2)n.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector Reflect(Vector v, Vector normal)
+        public static MVector Reflect(MVector v, MVector normal)
         {
             double l2 = normal.LengthSquared();
 
-            if (l2 == 0) { return new Vector(); }
+            if (l2 == 0) { return new MVector(); }
             else
             {
                 double alpha = 2 * (v.x * normal.x + v.y * normal.y + v.z * normal.z) / l2;
-                return new Vector
+                return new MVector
                     (
                     v.x - alpha * normal.x,
                     v.y - alpha * normal.y,
@@ -763,15 +763,15 @@ namespace TMarsupilami.MathLib
         /// <param name="normal">The normal of the plane being projected on.</param>
         /// <returns>The projected vector v = v - ((v.n)/|n|^2)n.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector ProjectPerpendicular(Vector v, Vector normal)
+        public static MVector ProjectPerpendicular(MVector v, MVector normal)
         {
             double l2 = normal.LengthSquared();
 
-            if (l2 == 0) { return new Vector(); }
+            if (l2 == 0) { return new MVector(); }
             else
             {
                 double alpha = (v.x * normal.x + v.y * normal.y + v.z * normal.z) / l2;
-                return new Vector
+                return new MVector
                     (
                     v.x - alpha * normal.x,
                     v.y - alpha * normal.y,
@@ -788,15 +788,15 @@ namespace TMarsupilami.MathLib
         /// <param name="direction">The direction of the plane being projected on.</param>
         /// <returns>The projected vector v = (v.n/|n|^2)n.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector ProjectParallel(Vector v, Vector direction)
+        public static MVector ProjectParallel(MVector v, MVector direction)
         {
             double l2 = direction.LengthSquared();
 
-            if (l2 == 0) { return new Vector(); }
+            if (l2 == 0) { return new MVector(); }
             else
             {
                 double alpha = (v.x * direction.x + v.y * direction.y + v.z * direction.z) / l2;
-                return new Vector
+                return new MVector
                     (
                         alpha * direction.x,
                         alpha * direction.y,
@@ -816,26 +816,26 @@ namespace TMarsupilami.MathLib
         /// <param name="vpar">The parallel component.</param>
         /// <param name="vperp">The perpendicular component.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Project(Vector v, Vector normal, out Vector vpar, out Vector vperp)
+        public static bool Project(MVector v, MVector normal, out MVector vpar, out MVector vperp)
         {
             double l2 = normal.LengthSquared();
 
             if (l2 == 0)
             {
-                vpar = new Vector();
-                vperp = new Vector();
+                vpar = new MVector();
+                vperp = new MVector();
                 return false;
             }
             else
             {
                 double alpha = (v.x * normal.x + v.y * normal.y + v.z * normal.z) / l2;
-                vpar = new Vector
+                vpar = new MVector
                     (
                         alpha * normal.x,
                         alpha * normal.y,
                         alpha * normal.z
                     );
-                vperp = new Vector
+                vperp = new MVector
                     (
                         v.x - vpar.x,
                         v.y - vpar.y,
@@ -853,7 +853,7 @@ namespace TMarsupilami.MathLib
         /// <param name="axis">Axis of rotation.</param>
         /// <returns>The rotated vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector Rotate(Vector v, double angle, Vector axis)
+        public static MVector Rotate(MVector v, double angle, MVector axis)
         {
             axis.Normalize();
 
@@ -864,7 +864,7 @@ namespace TMarsupilami.MathLib
             double ay = (1 - c) * v.y * axis.y;
             double az = (1 - c) * v.z * axis.z;
 
-            return new Vector(
+            return new MVector(
                 v.x * c + ax * axis.x + ay * axis.x + az * axis.x + s * (axis.y * v.z - axis.z * v.y),
                 v.y * c + ax * axis.y + ay * axis.y + az * axis.y + s * (axis.z * v.x - axis.x * v.z),
                 v.z * c + ax * axis.z + ay * axis.z + az * axis.z + s * (axis.x * v.y - axis.y * v.x)
@@ -885,14 +885,14 @@ namespace TMarsupilami.MathLib
         /// <param name="axis">Axis of rotation.</param>
         /// <returns>The rotated vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector Rotate(Vector v, double sin, double cos, Vector axis)
+        public static MVector Rotate(MVector v, double sin, double cos, MVector axis)
         {
             // warning : axis must be of unit length
             double ax = (1 - cos) * v.x * axis.x;
             double ay = (1 - cos) * v.y * axis.y;
             double az = (1 - cos) * v.z * axis.z;
 
-            return new Vector(
+            return new MVector(
                 v.x * cos + ax * axis.x + ay * axis.x + az * axis.x + sin * (axis.y * v.z - axis.z * v.y),
                 v.y * cos + ax * axis.y + ay * axis.y + az * axis.y + sin * (axis.z * v.x - axis.x * v.z),
                 v.z * cos + ax * axis.z + ay * axis.z + az * axis.z + sin * (axis.x * v.y - axis.y * v.x)
@@ -913,7 +913,7 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">Second vector for angle.</param>
         /// <returns>Returns α, the angle between v1 and v2 in [0,π].</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double OrientedAngle(Vector v1, Vector v2)
+        public static double OrientedAngle(MVector v1, MVector v2)
         {
             double dot = DotProduct(v1, v2);
             double l = System.Math.Sqrt(v1.LengthSquared() * v2.LengthSquared());
@@ -944,7 +944,7 @@ namespace TMarsupilami.MathLib
         /// When α = 0 or α = π, the axis could not be defined and Vector.Zero is returned.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double OrientedAngle(Vector v1, Vector v2, out Vector axis)
+        public static double OrientedAngle(MVector v1, MVector v2, out MVector axis)
         {
             double dot = DotProduct(v1, v2);
             double l = System.Math.Sqrt(v1.LengthSquared() * v2.LengthSquared());
@@ -952,12 +952,12 @@ namespace TMarsupilami.MathLib
 
             if (cos >= 1.0) // <=> cos = 1 => α = 0
             {
-                axis = Vector.Zero;
+                axis = MVector.Zero;
                 return 0;
             }
             else if (cos <= -1.0) // => cos = -1 <=> α = π
             {
-                axis = Vector.Zero;
+                axis = MVector.Zero;
                 return System.Math.PI;
             }
             else // => α = acos(v1.v2/(|v1||v2|))

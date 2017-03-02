@@ -4,7 +4,7 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 
-namespace TMarsupilami.Gh
+namespace TMarsupilami.Gh.Component
 {
     public class Comp_InscribedCircleCurrent : GH_Component
     {
@@ -66,8 +66,8 @@ namespace TMarsupilami.Gh
             if (!DA.GetData(2, ref pe)) { return; }
 
             double κ;
-            MathLib.Vector κb;
-            MathLib.Vector ts, t, te;
+            MathLib.MVector κb;
+            MathLib.MVector ts, t, te;
             double fs, f, fe;
 
             var b1 = (ps == p);
@@ -99,7 +99,7 @@ namespace TMarsupilami.Gh
                 {
                     double r = 1 / κ;
                     var b = r * κb;
-                    var n = MathLib.Vector.CrossProduct(b, t);
+                    var n = MathLib.MVector.CrossProduct(b, t);
                     var center = p.Cast() + (r/Math.Cos(f/2)) * n;
                     var plane = new Plane(center.Cast(), t.Cast(), n.Cast());
                     var circle = new Circle(plane, center.Cast(), r);

@@ -10,7 +10,7 @@ namespace TMarsupilami.MathLib
     {
         #region CIRCUMSCRIBED
 
-        public static void CircumscribedCircle_Current(Point ps, Point p, Point pe, out double κ, out Vector κb, out Vector ts, out Vector t, out Vector te, out double fs, out double f, out double fe)
+        public static void CircumscribedCircle_Current(MPoint ps, MPoint p, MPoint pe, out double κ, out MVector κb, out MVector ts, out MVector t, out MVector te, out double fs, out double f, out double fe)
         {
             /*
              *  TOTAL COST (without turning angles)
@@ -53,7 +53,7 @@ namespace TMarsupilami.MathLib
             double κb_x = d * (e1_y * e2_z - e1_z * e2_y);
             double κb_y = d * (e1_z * e2_x - e1_x * e2_z);
             double κb_z = d * (e1_x * e2_y - e1_y * e2_x);
-            κb = new Vector(κb_x, κb_y, κb_z);
+            κb = new MVector(κb_x, κb_y, κb_z);
 
             // κ = |κb|
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1
@@ -68,7 +68,7 @@ namespace TMarsupilami.MathLib
             double t_x = c1 * e1_x + c2 * e2_x;
             double t_y = c1 * e1_y + c2 * e2_y;
             double t_z = c1 * e1_z + c2 * e2_z;
-            t = new Vector(t_x, t_y, t_z);
+            t = new MVector(t_x, t_y, t_z);
 
             // t1 = 2 * (t.u1) u1 - t
             // add :  2 | sub :  3 | mul :  7 | div :  1 | sqrt :  0
@@ -76,7 +76,7 @@ namespace TMarsupilami.MathLib
             double t1_x = f1 * e1_x - t_x;
             double t1_y = f1 * e1_y - t_y;
             double t1_z = f1 * e1_z - t_z;
-            ts = new Vector(t1_x, t1_y, t1_z);
+            ts = new MVector(t1_x, t1_y, t1_z);
 
             // t1 = 2 * (t.u2) u2 - t
             // add :  2 | sub :  3 | mul :  7 | div :  1 | sqrt :  0
@@ -84,7 +84,7 @@ namespace TMarsupilami.MathLib
             double t2_x = f2 * e2_x - t_x;
             double t2_y = f2 * e2_y - t_y;
             double t2_z = f2 * e2_z - t_z;
-            te = new Vector(t2_x, t2_y, t2_z);
+            te = new MVector(t2_x, t2_y, t2_z);
 
             // turning angle (very costly)
             // add :  5 | sub :  0 | mul :  6 | div :  2 | sqrt :  2
@@ -95,7 +95,7 @@ namespace TMarsupilami.MathLib
             fe = System.Math.Acos(ce);
             f = fs + fe;
         }
-        public static void CircumscribedCircle_Current_bis(Point ps, Point p, Point pe, out double κ, out Vector κb, out Vector ts, out Vector t, out Vector te, out double fs, out double f, out double fe)
+        public static void CircumscribedCircle_Current_bis(MPoint ps, MPoint p, MPoint pe, out double κ, out MVector κb, out MVector ts, out MVector t, out MVector te, out double fs, out double f, out double fe)
         {
             /*
              *  TOTAL COST (without turning angles)
@@ -149,7 +149,7 @@ namespace TMarsupilami.MathLib
             double κb_x = d * (u1_y * u2_z - u1_z * u2_y);
             double κb_y = d * (u1_z * u2_x - u1_x * u2_z);
             double κb_z = d * (u1_x * u2_y - u1_y * u2_x);
-            κb = new Vector(κb_x, κb_y, κb_z);
+            κb = new MVector(κb_x, κb_y, κb_z);
 
             // κ = |κb|
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1
@@ -163,7 +163,7 @@ namespace TMarsupilami.MathLib
             double t_x = c1 * e1_x + c2 * e2_x;
             double t_y = c1 * e1_y + c2 * e2_y;
             double t_z = c1 * e1_z + c2 * e2_z;
-            t = new Vector(t_x, t_y, t_z);
+            t = new MVector(t_x, t_y, t_z);
 
             // t1 = 2 * (t.u1) u1 - t
             // add :  2 | sub :  3 | mul :  7 | div :  0 | sqrt :  0
@@ -171,7 +171,7 @@ namespace TMarsupilami.MathLib
             double t1_x = f1 * u1_x - t_x;
             double t1_y = f1 * u1_y - t_y;
             double t1_z = f1 * u1_z - t_z;
-            ts = new Vector(t1_x, t1_y, t1_z);
+            ts = new MVector(t1_x, t1_y, t1_z);
 
             // t1 = 2 * (t.u2) u2 - t
             // add :  2 | sub :  3 | mul :  7 | div :  0 | sqrt :  0
@@ -179,7 +179,7 @@ namespace TMarsupilami.MathLib
             double t2_x = f2 * u2_x - t_x;
             double t2_y = f2 * u2_y - t_y;
             double t2_z = f2 * u2_z - t_z;
-            te = new Vector(t2_x, t2_y, t2_z);
+            te = new MVector(t2_x, t2_y, t2_z);
 
             // turning angle (very costly)
             // add : 5 | sub : 0 | mul : 6 | div : 0 | sqrt : 0
@@ -190,7 +190,7 @@ namespace TMarsupilami.MathLib
             fe = System.Math.Acos(ce);
             f = fs + fe;
         }
-        public static void CircumscribedCircle_Start(Vector ts, Point ps, Point p, out double κ, out Vector κb, out Vector t, out double fs)
+        public static void CircumscribedCircle_Start(MVector ts, MPoint ps, MPoint p, out double κ, out MVector κb, out MVector t, out double fs)
         {
             /*
              *  TOTAL COST (without turning angles)
@@ -220,7 +220,7 @@ namespace TMarsupilami.MathLib
             double κb_x = d * (ts_y * e_z - ts_z * e_y);
             double κb_y = d * (ts_z * e_x - ts_x * e_z);
             double κb_z = d * (ts_x * e_y - ts_y * e_x);
-            κb = new Vector(κb_x, κb_y, κb_z);
+            κb = new MVector(κb_x, κb_y, κb_z);
 
             // κ = |κb|
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1
@@ -233,7 +233,7 @@ namespace TMarsupilami.MathLib
             double t_x = ds * e_x - ts_x;
             double t_y = ds * e_y - ts_y;
             double t_z = ds * e_z - ts_z;
-            t = new Vector(t_x, t_y, t_z);
+            t = new MVector(t_x, t_y, t_z);
 
             // turning angle
             // add :  2 | sub :  0 | mul :  3 | div :  1 | sqrt :  1
@@ -241,7 +241,7 @@ namespace TMarsupilami.MathLib
             double cs = (e_x * t_x + e_y * t_y + e_z * t_z) / Math.Sqrt(l_2);
             fs = Math.Acos(cs);
         }
-        public static void CircumscribedCircle_End(Point p, Point pe, Vector te, out double κ, out Vector κb, out Vector t, out double fe)
+        public static void CircumscribedCircle_End(MPoint p, MPoint pe, MVector te, out double κ, out MVector κb, out MVector t, out double fe)
         {
             /*
              *  TOTAL COST (without turning angles)
@@ -271,7 +271,7 @@ namespace TMarsupilami.MathLib
             double κb_x = d * (e_y * te_z - e_z * te_y);
             double κb_y = d * (e_z * te_x - e_x * te_z);
             double κb_z = d * (e_x * te_y - e_y * te_x);
-            κb = new Vector(κb_x, κb_y, κb_z);
+            κb = new MVector(κb_x, κb_y, κb_z);
 
             // κ = |κb|
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1
@@ -284,7 +284,7 @@ namespace TMarsupilami.MathLib
             double t_x = ds * e_x - te_x;
             double t_y = ds * e_y - te_y;
             double t_z = ds * e_z - te_z;
-            t = new Vector(t_x, t_y, t_z);
+            t = new MVector(t_x, t_y, t_z);
 
             // turning angle
             // add :  2 | sub :  0 | mul :  3 | div :  1 | sqrt :  1
@@ -297,7 +297,7 @@ namespace TMarsupilami.MathLib
 
         #region INSCRIBED
 
-        public static void InscribedCircle_Current(Point ps, Point p, Point pe, out double κ, out Vector κb, out Vector t, out double f)
+        public static void InscribedCircle_Current(MPoint ps, MPoint p, MPoint pe, out double κ, out MVector κb, out MVector t, out double f)
         {
             /*
              *  TOTAL COST (without turning angles)
@@ -347,7 +347,7 @@ namespace TMarsupilami.MathLib
             double κb_x = c * (u1_y * u2_z - u1_z * u2_y);
             double κb_y = c * (u1_z * u2_x - u1_x * u2_z);
             double κb_z = c * (u1_x * u2_y - u1_y * u2_x);
-            κb = new Vector(κb_x, κb_y, κb_z);
+            κb = new MVector(κb_x, κb_y, κb_z);
 
             // κ = |κb|
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1
@@ -360,11 +360,11 @@ namespace TMarsupilami.MathLib
             double t_x = c * (u1_x + u2_x);
             double t_y = c * (u1_y + u2_y);
             double t_z = c * (u1_z + u2_z);
-            t = new Vector(t_x, t_y, t_z);
+            t = new MVector(t_x, t_y, t_z);
 
             f = Math.Acos(u1u2);
         }
-        public static void InscribedCircle_Start(Vector ts, Point ps, Point p, out double κ, out Vector κb, out double fs)
+        public static void InscribedCircle_Start(MVector ts, MPoint ps, MPoint p, out double κ, out MVector κb, out double fs)
         {
             /*
              *  TOTAL COST (without turning angles)
@@ -394,7 +394,7 @@ namespace TMarsupilami.MathLib
             double κb_x = d * (ts_y * e_z - ts_z * e_y);
             double κb_y = d * (ts_z * e_x - ts_x * e_z);
             double κb_z = d * (ts_x * e_y - ts_y * e_x);
-            κb = new Vector(κb_x, κb_y, κb_z);
+            κb = new MVector(κb_x, κb_y, κb_z);
 
             // κ = |κb|
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1
@@ -406,7 +406,7 @@ namespace TMarsupilami.MathLib
             // cos :  0 | sin :  0 | tan :  0 | acos : 1 | asin :  0 | atan :  0
             fs = Math.Acos(c);
         }
-        public static void InscribedCircle_End(Point p, Point pe, Vector te, out double κ, out Vector κb, out double fe)
+        public static void InscribedCircle_End(MPoint p, MPoint pe, MVector te, out double κ, out MVector κb, out double fe)
         {
             /*
              *  TOTAL COST (without turning angles)
@@ -436,7 +436,7 @@ namespace TMarsupilami.MathLib
             double κb_x = d * (e_y * te_z - e_z * te_y);
             double κb_y = d * (e_z * te_x - e_x * te_z);
             double κb_z = d * (e_x * te_y - e_y * te_x);
-            κb = new Vector(κb_x, κb_y, κb_z);
+            κb = new MVector(κb_x, κb_y, κb_z);
 
             // κ = |κb|
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  1

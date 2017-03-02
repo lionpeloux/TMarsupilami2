@@ -41,10 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Circle.cs" />
-    <Compile Include="Core\Frame.cs" />
-    <Compile Include="Core\Point.cs" />
+    <Compile Include="Core\MFrame.cs" />
+    <Compile Include="Core\MPoint.cs" />
     <Compile Include="Core\Trigo.cs" />
-    <Compile Include="Core\Vector.cs" />
+    <Compile Include="Core\MVector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

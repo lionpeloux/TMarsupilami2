@@ -4,7 +4,7 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 
-namespace TMarsupilami.Gh
+namespace TMarsupilami.Gh.Component
 {
     public class Comp_InscribedCirclePolyline : GH_Component
     {
@@ -108,8 +108,8 @@ namespace TMarsupilami.Gh
             g_list = new Curve[N];
 
             double κ;
-            MathLib.Vector κb;
-            MathLib.Vector ts, t, te;
+            MathLib.MVector κb;
+            MathLib.MVector ts, t, te;
             double fs, f, fe;
 
             // START
@@ -126,7 +126,7 @@ namespace TMarsupilami.Gh
                 MathLib.Circle.InscribedCircle_Start(t_start.Cast(), polyline[0].Cast(), polyline[1].Cast(), out κ, out κb, out fs);
                 double r = 1 / κ;
                 var b = r * κb;
-                var n = MathLib.Vector.CrossProduct(b, t_start.Cast());
+                var n = MathLib.MVector.CrossProduct(b, t_start.Cast());
                 var center = polyline[0].Cast() + (r / Math.Cos(fs)) * n;
                 var plane = new Plane(center.Cast(), t_start, n.Cast());
                 var circle = new Circle(plane, center.Cast(), r);
@@ -151,7 +151,7 @@ namespace TMarsupilami.Gh
                 {
                     double r = 1 / κ;
                     var b = r * κb;
-                    var n = MathLib.Vector.CrossProduct(b, t);
+                    var n = MathLib.MVector.CrossProduct(b, t);
                     var center = polyline[i].Cast() + (r / Math.Cos(f / 2)) * n;
                     var plane = new Plane(center.Cast(), t.Cast(), n.Cast());
                     var circle = new Circle(plane, center.Cast(), r);
@@ -178,7 +178,7 @@ namespace TMarsupilami.Gh
                 MathLib.Circle.InscribedCircle_End(polyline[N - 2].Cast(), polyline[N - 1].Cast(), t_end.Cast(), out κ, out κb, out fe);
                 double r = 1 / κ;
                 var b = r * κb;
-                var n = MathLib.Vector.CrossProduct(b, t_end.Cast());
+                var n = MathLib.MVector.CrossProduct(b, t_end.Cast());
                 var center = polyline[N - 1].Cast() + (r / Math.Cos(fe)) * n;
                 var plane = new Plane(center.Cast(), t_end, n.Cast());
                 var circle = new Circle(plane, center.Cast(), r);
@@ -199,8 +199,8 @@ namespace TMarsupilami.Gh
             g_list = new Curve[N];
 
             double κ;
-            MathLib.Vector κb;
-            MathLib.Vector t;
+            MathLib.MVector κb;
+            MathLib.MVector t;
             double f;
 
             var p_list = new List<Point3d>();
@@ -221,7 +221,7 @@ namespace TMarsupilami.Gh
                 {
                     double r = 1 / κ;
                     var b = r * κb;
-                    var n = MathLib.Vector.CrossProduct(b, t);
+                    var n = MathLib.MVector.CrossProduct(b, t);
                     var center = p_list[i].Cast() + (r / Math.Cos(f / 2)) * n;
                     var plane = new Plane(center.Cast(), t.Cast(), n.Cast());
                     var circle = new Circle(plane, center.Cast(), r);

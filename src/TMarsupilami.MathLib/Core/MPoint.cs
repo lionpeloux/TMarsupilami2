@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.MathLib
 {
-    public struct Point
+    public struct MPoint
     {
         #region FIELDS
 
@@ -36,7 +36,7 @@ namespace TMarsupilami.MathLib
         /// <param name="x">The X component.</param>
         /// <param name="y">The Y component.</param>
         /// <param name="z">The Z component.</param>
-        public Point(double x, double y, double z)
+        public MPoint(double x, double y, double z)
         {
             this.x = x;
             this.y = y;
@@ -47,13 +47,13 @@ namespace TMarsupilami.MathLib
         /// Constructs a point whose elements are all the single specified value.
         /// </summary>
         /// <param name="value">The element to fill the point with.</param>
-        public Point(double value) : this(value, value, value) { }
+        public MPoint(double value) : this(value, value, value) { }
 
         /// <summary>
         /// Constructs a new point with the given point.
         /// </summary>
         /// <param name="v">The given point.</param>
-        public Point(Point p)
+        public MPoint(MPoint p)
         {
             x = p.x;
             y = p.y;
@@ -64,7 +64,7 @@ namespace TMarsupilami.MathLib
         /// Constructs a point with the given array.
         /// </summary>
         /// <param name="xyz">An array with the [x,y,z] components.</param>
-        public Point(double[] xyz)
+        public MPoint(double[] xyz)
         {
             if (xyz.Length == 3)
             {
@@ -150,9 +150,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second source point.</param>
         /// <returns>The summed point.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Point operator +(Point p1, Point p2)
+        public static MPoint operator +(MPoint p1, MPoint p2)
         {
-            return new Point(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
+            return new MPoint(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
         }
 
         /// <summary>
@@ -162,9 +162,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v">The translation vector.</param>
         /// <returns>The translated point.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Point operator +(Point p, Vector v)
+        public static MPoint operator +(MPoint p, MVector v)
         {
-            return new Point(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
+            return new MPoint(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
         }
 
         /// <summary>
@@ -174,9 +174,9 @@ namespace TMarsupilami.MathLib
         /// <param name="p">The source point.</param>
         /// <returns>The translated point.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Point operator +(Vector v, Point p)
+        public static MPoint operator +(MVector v, MPoint p)
         {
-            return new Point(v.X + p.X, v.Y + p.Y, v.Z + p.Z);
+            return new MPoint(v.X + p.X, v.Y + p.Y, v.Z + p.Z);
         }
         #endregion
 

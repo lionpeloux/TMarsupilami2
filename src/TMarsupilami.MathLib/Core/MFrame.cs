@@ -15,24 +15,24 @@ namespace TMarsupilami.MathLib
     /// The ZAxis is never stored in the datastructure to ensure lowmemory usage. 
     /// It is only computed "ondemand" when accessing the "ZAxis property.
     /// </summary>
-    public struct Frame //: IEquatable<Frame>
+    public struct MFrame //: IEquatable<Frame>
     {
         #region FIELDS
         
         /// <summary>
         /// The Origin of the frame.
         /// </summary>
-        private Point origin;
+        private MPoint origin;
 
         /// <summary>
         /// The XAxis of the frame.
         /// </summary>
-        private Vector xaxis;
+        private MVector xaxis;
         
         /// <summary>
         /// The YAxis of the frame.
         /// </summary>
-        private Vector yaxis;
+        private MVector yaxis;
         
         #endregion
 
@@ -44,7 +44,7 @@ namespace TMarsupilami.MathLib
         /// <param name="xaxis">The xaxis vector.</param>
         /// <param name="yaxis">The yaxis vector.</param>
         /// <param name="normalized">If true, frame axis will be normalized</param>
-        public Frame(Point origin, Vector xaxis, Vector yaxis, bool normalized = false)
+        public MFrame(MPoint origin, MVector xaxis, MVector yaxis, bool normalized = false)
         {
             this.origin = origin;
             this.xaxis = xaxis;
@@ -61,7 +61,7 @@ namespace TMarsupilami.MathLib
         /// Constructs a new frame with the given frame.
         /// </summary>
         /// <param name="f">The given frame.</param>
-        public Frame(Frame f)
+        public MFrame(MFrame f)
         {
             origin = f.origin;
             xaxis = f.xaxis;
@@ -75,7 +75,7 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Gets or sets the origin point of the frame.
         /// </summary>
-        public Point Origin
+        public MPoint Origin
         {
             get { return origin; }
             set { origin = value; }
@@ -84,7 +84,7 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Gets or sets the X axis vector of the frame.
         /// </summary>
-        public Vector XAxis
+        public MVector XAxis
         {
             get { return xaxis; }
             set { xaxis = value; }
@@ -93,7 +93,7 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Gets or sets the Y axis vector of the frame.
         /// </summary>
-        public Vector YAxis
+        public MVector YAxis
         {
             get { return yaxis; }
             set { yaxis = value; }
@@ -102,11 +102,11 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Gets the Z axis or Normal vector of the frame.
         /// </summary>
-        public Vector ZAxis
+        public MVector ZAxis
         {
             get
             {
-                return Vector.CrossProduct(this.xaxis, this.yaxis);
+                return MVector.CrossProduct(this.xaxis, this.yaxis);
             }
         }
 
@@ -127,11 +127,11 @@ namespace TMarsupilami.MathLib
             this.XAxis.Normalize();
 
             // get a normalized ZAxis
-            Vector vz = this.ZAxis;
+            MVector vz = this.ZAxis;
             vz.Normalize();
 
             // compute a new YAxis
-            this.YAxis = Vector.CrossProduct(vz, this.XAxis);
+            this.YAxis = MVector.CrossProduct(vz, this.XAxis);
 #endif
         }
 
@@ -191,6 +191,11 @@ namespace TMarsupilami.MathLib
             xaxis.Z = vz;
         }
 
+        public MFrame ParallelTransport(MVector fromDir, MPoint toPoint, MVector toDir)
+        {
+            return ParallelTransport(this, fromDir, toPoint, toDir);
+        }
+
         #endregion
 
         #region STATIC PROPERTIES
@@ -198,25 +203,25 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Gets the world XY plane.
         /// </summary>
-        public static Frame XY
+        public static MFrame XY
         {
-            get { return new Frame(new Point(0, 0, 0), Vector.XAxis, Vector.YAxis); }
+            get { return new MFrame(new MPoint(0, 0, 0), MVector.XAxis, MVector.YAxis); }
         }
 
         /// <summary>
         /// Gets the world YZ plane.
         /// </summary>
-        public static Frame YZ
+        public static MFrame YZ
         {
-            get { return new Frame(new Point(0, 0, 0), Vector.YAxis, Vector.ZAxis); }
+            get { return new MFrame(new MPoint(0, 0, 0), MVector.YAxis, MVector.ZAxis); }
         }
 
         /// <summary>
         /// Gets the world ZX plane.
         /// </summary>
-        public static Frame ZX
+        public static MFrame ZX
         {
-            get { return new Frame(new Point(0, 0, 0), Vector.ZAxis, Vector.XAxis); }
+            get { return new MFrame(new MPoint(0, 0, 0), MVector.ZAxis, MVector.XAxis); }
         }
 
         #endregion
@@ -228,16 +233,16 @@ namespace TMarsupilami.MathLib
         /// </summary>
         /// <param name="angle">Angle of rotation (in radians).</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Frame ZRotate(Frame f, double angle)
+        public static MFrame ZRotate(MFrame f, double angle)
         {
             // fast sin & cos computation
             double s, c;
             Trigo.SinCos(angle, out s, out c);
 
             // rotate XAxis and store the results in a tmp vector
-            Vector xaxis = Vector.LinearComb(c, f.XAxis, s, f.YAxis);
-            Vector yaxis = Vector.LinearComb(-s, f.XAxis, c, f.YAxis);
-            return new Frame(f.Origin, xaxis, yaxis);
+            MVector xaxis = MVector.LinearComb(c, f.XAxis, s, f.YAxis);
+            MVector yaxis = MVector.LinearComb(-s, f.XAxis, c, f.YAxis);
+            return new MFrame(f.Origin, xaxis, yaxis);
         }
 
         /// <summary>
@@ -245,48 +250,69 @@ namespace TMarsupilami.MathLib
         /// </summary>
         /// <param name="angle">Angle of rotation (in radians).</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Frame ZRotate(Frame f, double sin, double cos)
+        public static MFrame ZRotate(MFrame f, double sin, double cos)
         {
             // rotate XAxis and store the results in a tmp vector
-            Vector xaxis = Vector.LinearComb(cos, f.XAxis, sin, f.YAxis);
-            Vector yaxis = Vector.LinearComb(-sin, f.XAxis, cos, f.YAxis);
-            return new Frame(f.Origin, xaxis, yaxis);
+            MVector xaxis = MVector.LinearComb(cos, f.XAxis, sin, f.YAxis);
+            MVector yaxis = MVector.LinearComb(-sin, f.XAxis, cos, f.YAxis);
+            return new MFrame(f.Origin, xaxis, yaxis);
         }
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double ZAngle(Frame f1, Frame f2)
+        public static double ZAngle(MFrame f1, MFrame f2)
         {
             return 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Frame ParallelTransport(Frame f, Point p, Vector vz)
+        public static MFrame ParallelTransport(MFrame f, MVector fromDir, MPoint toPoint, MVector toDir)
         {
-            // aligning vref to v requiers a rotation of alpha in [0,pi] around v1 x v2
-            // warning : v and vref must be of unit length.
+            /*
+             * WARNING : fromDir and toDir must be of unit length
+             * 
+             * aligning t1 to t2 requiers a rotation of alpha in [0, pi] around t1 x t2
+             * 
+             * Rodrigues' Formula with θ = α, where :
+             * α : angle between t1 and t2(sin(α) = |t1 x t2| where |t1|=1 |t2|=1)
+             * θ : rotation angle to apply around k = t1 x t2
+             * b : k/|k| unit vector of rotation axis
+             * v' = v.cos(θ) +  (b x v).sin(θ) + b(b.v).(1-cos(θ))
+             * v' = v + (b x v).sin(θ) + b x (b x v).(1-cos(θ))
+             * 
+             * this is written as (c = cos(θ)) where c <> -1 :
+             * v' = c.v + (k x v) + (k.v)/(1+c) k
+             * 
+             * TOTAL COST
+             * add  :  6 
+             * sub  :  6
+             * mul  : 22
+             * div  :  1
+             * sqrt :  0
+             *     
+             */
 
-            Vector vzref = f.ZAxis;
-            Vector axis = Vector.CrossProduct(vzref, vz);
+            // 3sub 6mul
+            var k = MVector.CrossProduct(fromDir, toDir);
 
-            double c = Vector.DotProduct(vzref, vz); // |vzref| = |vz| = 1
-            double s = axis.Length(); // |vzref| = |vz| = 1 and alpha in [0,pi] => s in [0,1]
+            // 2add 3mul
+            var c = MVector.DotProduct(fromDir, toDir);
 
-            if (axis.Normalize()) // ensure |axis| = 1
-            {
-                Vector vx = Vector.Rotate(f.XAxis, s, c, axis); // parallel transport the xaxis
-                Vector vy = Vector.CrossProduct(vz, vx); // vy = vz x vx
-                return new Frame(p, vx, vy);
-            }
-            else if (c == 1) // c = 1 <=> vzref = vz
-            {
-                return new Frame(p, f.XAxis, f.YAxis);
-            }
-            else  // c = -1 <=> vzref = -vz
-            {
-                return new Frame(p, f.XAxis, -f.YAxis);
-            }
+            // 3add 3mul 1div
+            var d1 = f.XAxis;
+            var m = MVector.DotProduct(k, d1) / (1 + c);
 
+            // 6add 3sub 12mul
+            var d1_para = c * d1; // 3mul
+            d1_para += MVector.CrossProduct(k, d1); // 3add 3sub 6mul
+            d1_para += m * k; // 3add + 3mul
+
+            // 3sub 6mul
+            var d2 = f.yaxis;
+            var d2_para = MVector.CrossProduct(toDir, d1_para);
+
+            var f_para = new MFrame(toPoint, d1_para, d2_para);
+            return f_para;
         }
 
         #endregion
