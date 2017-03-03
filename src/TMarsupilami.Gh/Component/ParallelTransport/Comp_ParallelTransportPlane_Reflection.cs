@@ -7,11 +7,11 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ParallelTransportPlane_Rotation : GH_Component
+    public class Comp_ParallelTransportPlane_Reflection : GH_Component
     {
 
-        public Comp_ParallelTransportPlane_Rotation()
-          : base("Parallel Transport a Plane (Rotation)", "PT (Rot)",
+        public Comp_ParallelTransportPlane_Reflection()
+          : base("Parallel Transport a Plane (Reflection)", "PT (Ref)",
               "Parallel transport a plane through a list of (P,t) tuples.",
               "TMarsupilami", "Parallel Transport")
         {
@@ -33,7 +33,7 @@ namespace TMarsupilami.Gh.Component
         }
         public override Guid ComponentGuid
         {
-            get { return new Guid("{971D1601-FF8F-48DE-945F-A33916C45E03}"); }
+            get { return new Guid("{A62F17CD-49F1-4759-BB9F-F59CE5824A7D}"); }
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -42,6 +42,7 @@ namespace TMarsupilami.Gh.Component
             pManager.AddPointParameter("Target Point(s)", "P", "Points to parallel transport to.", GH_ParamAccess.list);
             pManager.AddVectorParameter("Target Direction(s)", "t", "Vectors to parallel transport to.", GH_ParamAccess.list);
         }
+
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddPlaneParameter("Planes", "Pl", "The parallel transported planes.", GH_ParamAccess.list);
@@ -78,7 +79,7 @@ namespace TMarsupilami.Gh.Component
             for (int i = 1; i < point_list.Count; i++)
             {
                 direction_list[i].Unitize();
-                frame = frame.ParallelTransport_Rotation(direction_list[i-1].Cast(), point_list[i].Cast(), direction_list[i].Cast());
+                frame = frame.ParallelTransport_Reflection(direction_list[i-1].Cast(), point_list[i].Cast(), direction_list[i].Cast());
                 planes_pt[i] = frame.Cast();
             }
             

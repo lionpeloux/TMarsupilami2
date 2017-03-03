@@ -20,7 +20,7 @@ namespace TMarsupilami.Gh.Parameter
         private bool m_hidden;
 
         public Param_MFrame()
-          : base("Frame", "MFrame", "A coolection of 3d frames.", "TMarsupilami", "Params", GH_ParamAccess.item)
+          : base("Frame", "MFrame", "Contains a collection of 3d frames.", "TMarsupilami", "Params", GH_ParamAccess.item)
         {
             this.m_hidden = false;
         }
@@ -110,7 +110,7 @@ namespace TMarsupilami.Gh.Parameter
                         var frame = branch[i];
                         if (frame != null)
                         {
-                            frame.DrawMFrame(args.Display, frame, CentralSettings.PreviewPlaneRadius, zColor, xColor, yColor);
+                            frame.DrawMFrame(args.Display, CentralSettings.PreviewPlaneRadius, zColor, xColor, yColor);
                         }
                     }
                 }

@@ -7,12 +7,12 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ParallelTransportPlane_Rotation : GH_Component
+    public class Comp_ZParallelTransportPlane_Rotation : GH_Component
     {
 
-        public Comp_ParallelTransportPlane_Rotation()
-          : base("Parallel Transport a Plane (Rotation)", "PT (Rot)",
-              "Parallel transport a plane through a list of (P,t) tuples.",
+        public Comp_ZParallelTransportPlane_Rotation()
+          : base("Z Parallel Transport a Plane (Rotation)", "ZPT (Rot)",
+              "Parallel transport a plane from it's origin and Z vector through a list of (P,t) tuples.",
               "TMarsupilami", "Parallel Transport")
         {
         }
@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.secondary;
+                return GH_Exposure.primary;
             }
         }
         protected override System.Drawing.Bitmap Icon
@@ -33,7 +33,7 @@ namespace TMarsupilami.Gh.Component
         }
         public override Guid ComponentGuid
         {
-            get { return new Guid("{971D1601-FF8F-48DE-945F-A33916C45E03}"); }
+            get { return new Guid("{02A24AE6-1F21-43EB-A25A-5FD9E9C6D53F}"); }
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -72,13 +72,15 @@ namespace TMarsupilami.Gh.Component
             // First frame
             frame = plane.Cast();
             direction_list[0].Unitize();
+            frame = frame.ParallelTransport_Rotation(frame.ZAxis, point_list[0].Cast(), direction_list[0].Cast());
             planes_pt[0] = frame.Cast();
+
 
             // Next frames
             for (int i = 1; i < point_list.Count; i++)
             {
                 direction_list[i].Unitize();
-                frame = frame.ParallelTransport_Rotation(direction_list[i-1].Cast(), point_list[i].Cast(), direction_list[i].Cast());
+                frame = frame.ParallelTransport_Rotation(planes_pt[i-1].ZAxis.Cast(), point_list[i].Cast(), direction_list[i].Cast());
                 planes_pt[i] = frame.Cast();
             }
             

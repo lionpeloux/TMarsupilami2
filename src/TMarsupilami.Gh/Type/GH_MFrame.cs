@@ -63,6 +63,10 @@ namespace TMarsupilami.Gh.Type
         {
             return new GH_MFrame(this);
         }
+        public GH_MFrame DuplicateMFrame()
+        {
+            return new GH_MFrame(this);
+        }
 
         public override bool CastFrom(object source)
         {
@@ -75,9 +79,6 @@ namespace TMarsupilami.Gh.Type
             }
             return false;
         }
-
-        // This function is called when Grasshopper needs to convert this 
-        // instance of GH_MPoint into some other type T.
         public override bool CastTo<T>(ref T target)
         {
             //First, see if T is similar to the Point3d primitive.
@@ -122,11 +123,11 @@ namespace TMarsupilami.Gh.Type
         public void DrawViewportWires(GH_PreviewWireArgs args)
         {
             // this is used to draw parameter input/ouput data in the viewport 
-            DrawMFrame(args.Pipeline, this, CentralSettings.PreviewPlaneRadius, args.Color, Color.DarkRed, Color.DarkGreen);
+            DrawMFrame(args.Pipeline, CentralSettings.PreviewPlaneRadius, args.Color, Color.DarkRed, Color.DarkGreen);
         }
-        public void DrawMFrame(DisplayPipeline display, GH_MFrame frame_gh, double size, Color zColor, Color xColor, Color yColor)
+        public void DrawMFrame(DisplayPipeline display, double size, Color zColor, Color xColor, Color yColor)
         {
-            var frame = frame_gh.Value;
+            var frame = this.Value;
             double l = size;
             var Origin = frame.Origin.Cast();
             var t_line = new Line(Origin, frame.ZAxis.Cast(), l);

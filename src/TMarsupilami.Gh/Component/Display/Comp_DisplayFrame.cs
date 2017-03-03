@@ -6,17 +6,19 @@ using TMarsupilami.Gh.Properties;
 using System.Drawing;
 using GH_IO.Types;
 using Grasshopper;
+using TMarsupilami.Gh.Parameter;
+using TMarsupilami.MathLib;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_DisplayPlane : GH_Component
+    public class Comp_DisplayFrame : GH_Component
     {
         private Plane plane;
         private bool isNull;
 
-        public Comp_DisplayPlane()
-          : base("Plane Display", "PDis",
-              "Preview a plane in the viewport.",
+        public Comp_DisplayFrame()
+          : base("Frame Display", "FDis",
+              "Preview a frame in the viewport.",
               "TMarsupilami", "Display")
         {
             isNull = true;
@@ -43,7 +45,7 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("P", "P", "Plane to preview.", GH_ParamAccess.item);
+            pManager.AddGenericParameter("F", "F", "The frame to preview.", GH_ParamAccess.item);
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -58,7 +60,9 @@ namespace TMarsupilami.Gh.Component
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            if (DA.GetData(0, ref plane)) { isNull = false; }
+            var frame = new MFrame();
+            if (DA.GetData(0, ref frame)) { isNull = false; }
+            plane = frame.Cast();
         }
 
         public override void DrawViewportWires(IGH_PreviewArgs args)

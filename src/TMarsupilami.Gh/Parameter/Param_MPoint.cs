@@ -20,7 +20,7 @@ namespace TMarsupilami.Gh.Parameter
         private bool m_hidden;
 
         public Param_MPoint()
-          : base("Point", "MPoint", "A collection of 3d points.", "TMarsupilami", "Params", GH_ParamAccess.item)
+          : base("Point", "MPoint", "Contains a collection of 3d points.", "TMarsupilami", "Params", GH_ParamAccess.item)
         {
             this.m_hidden = false;
         }
@@ -106,20 +106,11 @@ namespace TMarsupilami.Gh.Parameter
                         var point = branch[i];
                         if (point != null)
                         {
-                            //m_draw_list.Add(item);
-                            DrawMPoint(args, point, color);
+                            point.DrawMPoint(args.Display, 5, color);
                         }
                     }
                 }
             }
-
         }
-        public void DrawMPoint(IGH_PreviewArgs args, GH_MPoint point_gh, Color color)
-        {
-            PointStyle previewPointStyle = CentralSettings.PreviewPointStyle;
-            args.Display.DrawPoint(point_gh.Value.Cast(), previewPointStyle, 5, color);      
-        }
-
-        
     }
 }

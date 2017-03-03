@@ -156,6 +156,18 @@ namespace TMarsupilami.MathLib
         }
 
         /// <summary>
+        /// Substract two points.
+        /// </summary>
+        /// <param name="p1">The first source point.</param>
+        /// <param name="p2">The second source point.</param>
+        /// <returns>The point p1-p2.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MPoint operator -(MPoint p1, MPoint p2)
+        {
+            return new MPoint(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z);
+        }
+
+        /// <summary>
         /// Add a vector to a point.
         /// </summary>
         /// <param name="p">The source point.</param>

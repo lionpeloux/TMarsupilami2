@@ -7,12 +7,12 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ParallelTransportPlane_Rotation : GH_Component
+    public class Comp_ZParallelTransportPlane_Reflection : GH_Component
     {
 
-        public Comp_ParallelTransportPlane_Rotation()
-          : base("Parallel Transport a Plane (Rotation)", "PT (Rot)",
-              "Parallel transport a plane through a list of (P,t) tuples.",
+        public Comp_ZParallelTransportPlane_Reflection()
+          : base("Z Parallel Transport a Plane (Reflection)", "ZPT (Ref)",
+              "Parallel transport a plane from it's origin and Z vector through a list of (P,t) tuples.",
               "TMarsupilami", "Parallel Transport")
         {
         }
@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.secondary;
+                return GH_Exposure.primary;
             }
         }
         protected override System.Drawing.Bitmap Icon
@@ -33,7 +33,7 @@ namespace TMarsupilami.Gh.Component
         }
         public override Guid ComponentGuid
         {
-            get { return new Guid("{971D1601-FF8F-48DE-945F-A33916C45E03}"); }
+            get { return new Guid("{8ACD41AD-B9DE-4CB4-99D5-2CAC70355D35}"); }
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -42,6 +42,7 @@ namespace TMarsupilami.Gh.Component
             pManager.AddPointParameter("Target Point(s)", "P", "Points to parallel transport to.", GH_ParamAccess.list);
             pManager.AddVectorParameter("Target Direction(s)", "t", "Vectors to parallel transport to.", GH_ParamAccess.list);
         }
+
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddPlaneParameter("Planes", "Pl", "The parallel transported planes.", GH_ParamAccess.list);
@@ -72,13 +73,14 @@ namespace TMarsupilami.Gh.Component
             // First frame
             frame = plane.Cast();
             direction_list[0].Unitize();
+            frame = frame.ParallelTransport_Reflection(frame.ZAxis, point_list[0].Cast(), direction_list[0].Cast());
             planes_pt[0] = frame.Cast();
 
             // Next frames
             for (int i = 1; i < point_list.Count; i++)
             {
                 direction_list[i].Unitize();
-                frame = frame.ParallelTransport_Rotation(direction_list[i-1].Cast(), point_list[i].Cast(), direction_list[i].Cast());
+                frame = frame.ParallelTransport_Reflection(planes_pt[i-1].ZAxis.Cast(), point_list[i].Cast(), direction_list[i].Cast());
                 planes_pt[i] = frame.Cast();
             }
             

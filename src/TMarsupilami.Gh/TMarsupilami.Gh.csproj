@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Component\Display\Comp_DisplayVector.cs" />
     <Compile Include="Component\OsculatingCircle\Comp_InscribedCirclePolyline.cs" />
     <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCirclePolyline.cs" />
     <Compile Include="Component\OsculatingCircle\Comp_InscribedCircleEnd.cs" />
@@ -71,9 +72,13 @@
     <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleEnd.cs" />
     <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleStart.cs" />
     <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleCurrent.cs" />
-    <Compile Include="Component\Display\Comp_DisplayPlane.cs" />
+    <Compile Include="Component\Display\Comp_DisplayFrame.cs" />
+    <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Reflection.cs" />
+    <Compile Include="Component\ParallelTransport\Comp_ZParallelTransportPlane_Reflection.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Rotation.cs" />
+    <Compile Include="Component\ParallelTransport\Comp_ZParallelTransportPlane_Rotation.cs" />
     <Compile Include="Parameter\Param_MFrame.cs" />
+    <Compile Include="Parameter\Param_MVector.cs" />
     <Compile Include="Parameter\Param_MPoint.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -89,9 +94,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Type\Convert.cs" />
     <Compile Include="Type\GH_MFrame.cs" />
+    <Compile Include="Type\GH_MVector.cs" />
     <Compile Include="Type\GH_MPoint.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\Normalise_16x16.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TMarsupilami.MathLib\TMarsupilami.MathLib.csproj">
       <Project>{716ab6ea-8f46-443f-b6de-a0bc33022739}</Project>

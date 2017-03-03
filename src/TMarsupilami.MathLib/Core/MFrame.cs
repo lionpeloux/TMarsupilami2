@@ -191,11 +191,22 @@ namespace TMarsupilami.MathLib
             xaxis.Z = vz;
         }
 
-        public MFrame ParallelTransport(MVector fromDir, MPoint toPoint, MVector toDir)
+        public MFrame ZParallelTransport_Rotation(MPoint toPoint, MVector toDir)
         {
-            return ParallelTransport(this, fromDir, toPoint, toDir);
+            return ZParallelTransport_Rotation(this, toPoint, toDir);
         }
-
+        public MFrame ZParallelTransport_Reflection(MPoint toPoint, MVector toZDir)
+        {
+            return ZParallelTransport_Reflection(this, toPoint, toZDir);
+        }
+        public MFrame ParallelTransport_Rotation(MVector fromDir, MPoint toPoint, MVector toDir)
+        {
+            return ParallelTransport_Rotation(this, fromDir, toPoint, toDir);
+        }
+        public MFrame ParallelTransport_Reflection(MVector fromDir, MPoint toPoint, MVector toDir)
+        {
+            return ParallelTransport_Reflection(this, fromDir, toPoint, toDir);
+        }
         #endregion
 
         #region STATIC PROPERTIES
@@ -265,8 +276,113 @@ namespace TMarsupilami.MathLib
             return 0;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MFrame ParallelTransport(MFrame f, MVector fromDir, MPoint toPoint, MVector toDir)
+        public static MFrame ZParallelTransport_Rotation(MFrame frame, MPoint toPoint, MVector toZDir)
+        {
+            /*
+             * WARNING : fromDir and toDir must be of unit length
+             * 
+             * aligning t1 to t2 requiers a rotation of alpha in [0, pi] around t1 x t2
+             * 
+             * Rodrigues' Formula with θ = α, where :
+             * α : angle between t1 and t2(sin(α) = |t1 x t2| where |t1|=1 |t2|=1)
+             * θ : rotation angle to apply around k = t1 x t2
+             * b : k/|k| unit vector of rotation axis
+             * v' = v.cos(θ) +  (b x v).sin(θ) + b(b.v).(1-cos(θ))
+             * v' = v + (b x v).sin(θ) + b x (b x v).(1-cos(θ))
+             * 
+             * this is written as (c = cos(θ)) where c <> -1 :
+             * v' = c.v + (k x v) + (k.v)/(1+c) k
+             * 
+             * TOTAL COST
+             * add  :  6 
+             * sub  :  6
+             * mul  : 22
+             * div  :  1
+             * sqrt :  0
+             *     
+             */
+
+            // 3sub 6mul
+            var t1 = frame.ZAxis;
+            var k = MVector.CrossProduct(t1, toZDir);
+
+            // 2add 3mul
+            var c = MVector.DotProduct(t1, toZDir);
+
+            // 3add 3mul 1div
+            var d1 = frame.XAxis;
+            var m = MVector.DotProduct(k, d1) / (1 + c);
+
+            // 6add 3sub 12mul
+            var d1_para = c * d1; // 3mul
+            d1_para += MVector.CrossProduct(k, d1); // 3add 3sub 6mul
+            d1_para += m * k; // 3add + 3mul
+
+            // 3sub 6mul
+            var d2_para = MVector.CrossProduct(toZDir, d1_para);
+
+            var f_para = new MFrame(toPoint, d1_para, d2_para);
+            return f_para;
+        }
+        public static MFrame ZParallelTransport_Reflection(MFrame frame, MPoint toPoint, MVector toZDir)
+        {
+            /*
+             * WARNING : fromDir and toDir must be of unit length
+             * 
+             * Double Reflection Method
+             * 
+             * TOTAL COST
+             * add  :  6 
+             * sub  :  6
+             * mul  : 22
+             * div  :  1
+             * sqrt :  0
+             *     
+             */
+
+            MVector d1_star, d1_para, d2_para;
+            MVector t_star;
+
+            // 2add 3sub 3mul
+            var e1 = new MVector(toPoint.X - frame.Origin.X, toPoint.Y - frame.Origin.Y, toPoint.Z - frame.Origin.Z);
+            double l1_2 = MVector.DotProduct(e1, e1);
+
+            var t1 = frame.ZAxis;
+            var d1 = frame.XAxis;
+            if (l1_2 == 0)
+            {
+                d1_star = d1;
+                t_star = t1;
+            }
+            else
+            {
+                // 2add 3sub 7mul 1diuv
+                double c1 = 2 / l1_2;
+                d1_star = d1 - (c1 * MVector.DotProduct(d1, e1)) * e1;
+
+                // 2add 3sub 7mul
+                t_star = t1 - (c1 * MVector.DotProduct(t1, e1)) * e1;
+            }
+
+            // 1add 3sub 3mul
+            var e2 = toZDir - t_star;
+            double l2_2 = MVector.DotProduct(e2, e2);
+            if (l1_2 == 0)
+            {
+                d1_para = d1_star;
+            }
+            else
+            {
+                // 2add 3sub 7mul 1div 
+                double c2 = 2 / l2_2;
+                d1_para = d1_star - (c2 * MVector.DotProduct(d1_star, e2)) * e2;
+            }
+                
+            d2_para = MVector.CrossProduct(toZDir, d1_para);
+            var f_para = new MFrame(toPoint, d1_para, d2_para);
+            return f_para;
+        }
+        public static MFrame ParallelTransport_Rotation(MFrame frame, MVector fromDir, MPoint toPoint, MVector toDir)
         {
             /*
              * WARNING : fromDir and toDir must be of unit length
@@ -299,21 +415,86 @@ namespace TMarsupilami.MathLib
             var c = MVector.DotProduct(fromDir, toDir);
 
             // 3add 3mul 1div
-            var d1 = f.XAxis;
-            var m = MVector.DotProduct(k, d1) / (1 + c);
+            var d1 = frame.XAxis;
+            var m1 = MVector.DotProduct(k, d1) / (1 + c);
 
             // 6add 3sub 12mul
             var d1_para = c * d1; // 3mul
             d1_para += MVector.CrossProduct(k, d1); // 3add 3sub 6mul
-            d1_para += m * k; // 3add + 3mul
+            d1_para += m1 * k; // 3add + 3mul
 
-            // 3sub 6mul
-            var d2 = f.yaxis;
-            var d2_para = MVector.CrossProduct(toDir, d1_para);
+            // 3add 3mul 1div
+            var d2 = frame.YAxis;
+            var m2 = MVector.DotProduct(k, d2) / (1 + c);
+
+            // 6add 3sub 12mul
+            var d2_para = c * d2; // 3mul
+            d2_para += MVector.CrossProduct(k, d2); // 3add 3sub 6mul
+            d2_para += m2 * k; // 3add + 3mul
 
             var f_para = new MFrame(toPoint, d1_para, d2_para);
             return f_para;
         }
+        public static MFrame ParallelTransport_Reflection(MFrame frame, MVector fromDir, MPoint toPoint, MVector toDir)
+        {
+            /*
+             * WARNING : fromDir and toDir must be of unit length
+             * 
+             * Double Reflection Method
+             * 
+             * TOTAL COST
+             * add  :  6 
+             * sub  :  6
+             * mul  : 22
+             * div  :  1
+             * sqrt :  0
+             *     
+             */
+
+            MVector d1_star, d1_para, d2_star, d2_para;
+            MVector t_star;
+
+            // 2add 3sub 3mul
+            var e1 = new MVector(toPoint.X - frame.Origin.X, toPoint.Y - frame.Origin.Y, toPoint.Z - frame.Origin.Z);
+            double l1_2 = MVector.DotProduct(e1, e1);
+
+            var d1 = frame.XAxis;
+            var d2 = frame.YAxis;
+            if (l1_2 == 0)
+            {
+                d1_star = d1;
+                d2_star = d2;
+                t_star = fromDir;
+            }
+            else
+            {
+                // 6add 9sub 21mul 1div
+                double c1 = 2 / l1_2;
+                d1_star = d1 - (c1 * MVector.DotProduct(d1, e1)) * e1;
+                d2_star = d2 - (c1 * MVector.DotProduct(d2, e1)) * e1;
+                t_star = fromDir - (c1 * MVector.DotProduct(fromDir, e1)) * e1;
+            }
+
+            // 1add 3sub 3mul
+            var e2 = toDir - t_star;
+            double l2_2 = MVector.DotProduct(e2, e2);
+            if (l1_2 == 0)
+            {
+                d1_para = d1_star;
+                d2_para = d2_star;
+            }
+            else
+            {
+                // 2add 3sub 7mul 1div 
+                double c2 = 2 / l2_2;
+                d1_para = d1_star - (c2 * MVector.DotProduct(d1_star, e2)) * e2;
+                d2_para = d2_star - (c2 * MVector.DotProduct(d2_star, e2)) * e2;
+            }
+
+            var f_para = new MFrame(toPoint, d1_para, d2_para);
+            return f_para;
+        }
+
 
         #endregion
 

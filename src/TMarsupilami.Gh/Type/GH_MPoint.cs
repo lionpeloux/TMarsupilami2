@@ -1,9 +1,11 @@
 ﻿using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
+using Rhino.Display;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,6 +61,10 @@ namespace TMarsupilami.Gh.Type
         {
             return new GH_MPoint(this);
         }
+        public GH_MPoint DuplicateMPoint()
+        {
+            return new GH_MPoint(this);
+        }
 
         public override bool CastFrom(object source)
         {
@@ -111,14 +117,18 @@ namespace TMarsupilami.Gh.Type
             }
 
         }
-        public void DrawViewportWires(GH_PreviewWireArgs args)
-        {
-            args.Pipeline.DrawPoint(this.Value.Cast(), CentralSettings.PreviewPointStyle, 5, args.Color);
-        }
         public void DrawViewportMeshes(GH_PreviewMeshArgs args)
         {
         }
-
+        public void DrawViewportWires(GH_PreviewWireArgs args)
+        {
+            DrawMPoint(args.Pipeline, 5, args.Color);
+        }
+        public void DrawMPoint(DisplayPipeline display, int radius, Color color)
+        {
+            PointStyle previewPointStyle = CentralSettings.PreviewPointStyle;
+            display.DrawPoint(this.Value.Cast(), previewPointStyle, radius, color);
+        }
         #endregion
 
     }
