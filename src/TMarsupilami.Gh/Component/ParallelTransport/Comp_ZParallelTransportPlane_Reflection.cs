@@ -28,7 +28,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return Resources.DisplayPlane;
+                return Resources.ZParallelTransport_Reflection;
             }
         }
         public override Guid ComponentGuid

@@ -159,5 +159,25 @@ namespace TMarsupilami.Gh.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZParallelTransport_Reflection {
+            get {
+                object obj = ResourceManager.GetObject("ZParallelTransport_Reflection", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZParallelTransport_Rotation {
+            get {
+                object obj = ResourceManager.GetObject("ZParallelTransport_Rotation", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

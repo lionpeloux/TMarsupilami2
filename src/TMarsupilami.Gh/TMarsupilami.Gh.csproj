@@ -98,9 +98,6 @@
     <Compile Include="Type\GH_MPoint.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Normalise_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\TMarsupilami.MathLib\TMarsupilami.MathLib.csproj">
       <Project>{716ab6ea-8f46-443f-b6de-a0bc33022739}</Project>
       <Name>TMarsupilami.MathLib</Name>
@@ -144,6 +141,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\DisplayPlane.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Normalise_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ZParallelTransport_Reflection.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ZParallelTransport_Rotation.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
