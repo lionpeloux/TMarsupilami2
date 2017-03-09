@@ -13,7 +13,7 @@ namespace TMarsupilami.Gh.Component
         public Comp_ZRotatePlan()
           : base("Z Rotate a Plane", "RZ",
               "Rotates a plane around its ZAxis.",
-              "TMarsupilami", "Rotation")
+              "TMarsupilami", "Math")
         {
         }
 
@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.secondary;
+                return GH_Exposure.quinary;
             }
         }
         protected override System.Drawing.Bitmap Icon

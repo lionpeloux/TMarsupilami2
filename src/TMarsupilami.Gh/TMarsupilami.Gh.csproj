@@ -102,6 +102,7 @@
     <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleCurrent.cs" />
     <Compile Include="Component\Display\Comp_DisplayFrame.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Reflection.cs" />
+    <Compile Include="Component\Rotation\Comp_ZAnglePlane.cs" />
     <Compile Include="Component\Rotation\Comp_ZRotatePlane_Diff.cs" />
     <Compile Include="Component\Rotation\Comp_ZRotatePlane.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ZParallelTransportPlane_Reflection.cs" />

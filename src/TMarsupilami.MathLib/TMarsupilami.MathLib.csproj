@@ -59,13 +59,13 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Circle.cs" />
-    <Compile Include="Core\MFrame.cs" />
-    <Compile Include="Core\MPoint.cs" />
-    <Compile Include="Core\ParallelTransport.cs" />
-    <Compile Include="Core\Rotation.cs" />
-    <Compile Include="Core\Trigo.cs" />
-    <Compile Include="Core\MVector.cs" />
+    <Compile Include="Math\Circle.cs" />
+    <Compile Include="Type\MFrame.cs" />
+    <Compile Include="Type\MPoint.cs" />
+    <Compile Include="Math\ParallelTransport.cs" />
+    <Compile Include="Math\Rotation.cs" />
+    <Compile Include="Math\Trigo.cs" />
+    <Compile Include="Type\MVector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

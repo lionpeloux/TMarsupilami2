@@ -11,9 +11,9 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ZRotatePlane_Diff()
-          : base("Z Rotate a Plane (Diff)", "DRZ",
+          : base("Z Rotate a Plane - Diff Taylor 3", "DRZ",
               "Rotates a plane around its ZAxis. Assumes the rotation angle is closed to zero. Use a Taylor developement of order 3.",
-              "TMarsupilami", "Rotation")
+              "TMarsupilami", "Math")
         {
         }
 
@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.secondary;
+                return GH_Exposure.quinary;
             }
         }
         protected override System.Drawing.Bitmap Icon

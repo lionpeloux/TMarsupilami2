@@ -119,5 +119,90 @@ namespace TMarsupilami.MathLib
             frameROT.XAxis = d1_rot;
             frameROT.YAxis = d2_rot;
         }
+
+        /// <summary>
+        /// Gets the Z angle (θz) to align two frames (f1 and f2)
+        /// Firstly, f1 is parallel transported on f2 such that f1_para and f2 share the same ZAxis.
+        /// Secondly, f1_para is rotated around its ZAxis by an angle θz to perfectly align with f2.
+        /// </summary>
+        /// <param name="fromFrame">The frame to align.</param>
+        /// <param name="toFrame">The target frame to align to.</param>
+        /// <returns>The Oriented Z angle (θz) between the frames in ]-π,π].</returns>
+        public static double ZAngle(MFrame fromFrame, MFrame toFrame)
+        {
+            /* ------------------------------------
+             * WARNING
+             * ------------------------------------
+             * - XAxis and YAxis musrt be of unit length
+             *  
+             * ------------------------------------
+             * TOTAL COST
+             * ------------------------------------
+             * add  | sub   | mul   | div   | sqrt
+             * 10   | 18    | 33    | 2     | 0
+             * ------------------------------------          
+             */
+
+            MFrame ptFrame = new MFrame();
+            fromFrame.ZParallelTransport_Rotation(toFrame.Origin, toFrame.ZAxis, ref ptFrame); // warning : toFrame.ZAxis is expensive
+
+            double dot_1 = MVector.DotProduct(ptFrame.XAxis, toFrame.XAxis);
+            double dot_2 = MVector.DotProduct(ptFrame.YAxis, toFrame.XAxis);
+            
+            if (dot_2 >= 0) // θz in ]-π, 0]
+            {
+                return Math.Acos(dot_1);
+            }
+            else // θz in ]0, π]
+            {
+                return -Math.Acos(dot_1);
+            }
+        }
+
+        ///// <summary>
+        ///// Computes the angle on a plane between two vectors.
+        ///// </summary>
+        ///// <param name="v1">First vector.</param>
+        ///// <param name="v2">Second vector.</param>
+        ///// <param name="plane">Two-dimensional plane on which to perform the angle measurement.</param>
+        ///// <returns>On success, the angle (in radians) between a and b as projected onto the plane; RhinoMath.UnsetValue on failure.</returns>
+        //public static double VectorAngle(MVector v1, MVector v2, MFrame frame)
+        //{
+
+        //    { // Project vectors onto plane.
+        //        Point3d pA = frame.Origin + v1;
+        //        Point3d pB = frame.Origin + v2;
+
+        //        pA = plane.ClosestPoint(pA);
+        //        pB = plane.ClosestPoint(pB);
+
+        //        v1 = pA - plane.Origin;
+        //        v2 = pB - plane.Origin;
+        //    }
+
+        //    // Abort on invalid cases.
+        //    if (!v1.Unitize()) { return RhinoMath.UnsetValue; }
+        //    if (!v2.Unitize()) { return RhinoMath.UnsetValue; }
+
+        //    double dot = v1 * v2;
+        //    { // Limit dot product to valid range.
+        //        if (dot >= 1.0)
+        //        { dot = 1.0; }
+        //        else if (dot < -1.0)
+        //        { dot = -1.0; }
+        //    }
+
+        //    double angle = Math.Acos(dot);
+        //    { // Special case (anti)parallel vectors.
+        //        if (Math.Abs(angle) < 1e-64) { return 0.0; }
+        //        if (Math.Abs(angle - Math.PI) < 1e-64) { return Math.PI; }
+        //    }
+
+        //    Vector3d cross = Vector3d.CrossProduct(v1, v2);
+        //    if (plane.ZAxis.IsParallelTo(cross) == +1)
+        //        return angle;
+        //    return 2.0 * Math.PI - angle;
+        //}
+
     }
 }
