@@ -142,6 +142,19 @@ namespace TMarsupilami.MathLib
 
         #endregion
 
+        #region INSTANCE METHODS
+
+        /// <summary>
+        /// Returns the string representation of the current point, in the form X,Y,Z.
+        /// </summary>
+        /// <returns>A string with the current location of the point.</returns>
+        public override string ToString()
+        {
+            return String.Format("{0:F6},{1:F6},{2:F6}", x, y, z);
+        }
+
+        #endregion  
+
         #region STATIC OPERATORS
         /// <summary>
         /// Adds two points together.

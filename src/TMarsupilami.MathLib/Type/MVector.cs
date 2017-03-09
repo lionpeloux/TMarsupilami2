@@ -307,7 +307,7 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Returns the string representation of the current vector, in the form X,Y,Z.
         /// </summary>
-        /// <returns>A string with the current location of the point.</returns>
+        /// <returns>A string with the current coordinates of the vector.</returns>
         public override string ToString()
         {
             return String.Format("{0:F6},{1:F6},{2:F6}", x, y, z);
