@@ -39,6 +39,13 @@ namespace TMarsupilami.Gh.Parameter
         {
             get { return GH_Exposure.primary; }
         }
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                return Resources.MVector;
+            }
+        }
 
         public override void AppendAdditionalMenuItems(ToolStripDropDown menu)
         {
@@ -76,7 +83,6 @@ namespace TMarsupilami.Gh.Parameter
                 }
             }
         }
-
 
         public override GH_StateTagList StateTags
         {

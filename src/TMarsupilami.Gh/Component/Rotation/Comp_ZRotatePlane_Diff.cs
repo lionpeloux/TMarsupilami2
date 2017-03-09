@@ -7,12 +7,12 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ZDiffRotatePlan : GH_Component
+    public class Comp_ZRotatePlane_Diff : GH_Component
     {
 
-        public Comp_ZDiffRotatePlan()
-          : base("Z Diff Rotate a Plane", "RZ",
-              "Rotates a plane around its ZAxis assuming the rotation angle is closed to zero. Use a Taylor developement at order 3.",
+        public Comp_ZRotatePlane_Diff()
+          : base("Z Rotate a Plane (Diff)", "DRZ",
+              "Rotates a plane around its ZAxis. Assumes the rotation angle is closed to zero. Use a Taylor developement of order 3.",
               "TMarsupilami", "Rotation")
         {
         }
@@ -28,7 +28,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return Resources.ParallelTransportPlane_Rotation;
+                return Resources.ZRotatePlane_Diff;
             }
         }
         public override Guid ComponentGuid

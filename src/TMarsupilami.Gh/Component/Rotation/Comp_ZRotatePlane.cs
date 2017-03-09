@@ -28,7 +28,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return Resources.ParallelTransportPlane_Rotation;
+                return Resources.ZRotatePlane;
             }
         }
         public override Guid ComponentGuid

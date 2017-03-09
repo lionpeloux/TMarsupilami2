@@ -153,6 +153,36 @@ namespace TMarsupilami.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MFrame {
+            get {
+                object obj = ResourceManager.GetObject("MFrame", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MPoint {
+            get {
+                object obj = ResourceManager.GetObject("MPoint", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MVector {
+            get {
+                object obj = ResourceManager.GetObject("MVector", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Normalise_16x16 {
             get {
                 object obj = ResourceManager.GetObject("Normalise_16x16", resourceCulture);
@@ -196,6 +226,26 @@ namespace TMarsupilami.Gh.Properties {
         internal static System.Drawing.Bitmap ZParallelTransportPlane_Rotation {
             get {
                 object obj = ResourceManager.GetObject("ZParallelTransportPlane_Rotation", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZRotatePlane {
+            get {
+                object obj = ResourceManager.GetObject("ZRotatePlane", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZRotatePlane_Diff {
+            get {
+                object obj = ResourceManager.GetObject("ZRotatePlane_Diff", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

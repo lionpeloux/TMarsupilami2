@@ -10,6 +10,7 @@ using Rhino.Collections;
 using Grasshopper;
 using Rhino.Display;
 using System.Drawing;
+using TMarsupilami.Gh.Properties;
 
 namespace TMarsupilami.Gh.Parameter
 {
@@ -33,6 +34,14 @@ namespace TMarsupilami.Gh.Parameter
         {
             get { return GH_Exposure.primary; }
         }
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                return Resources.MFrame;
+            }
+        }
+
         public override bool Locked
         {
             get
