@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("TMarsupilami.MathLib.Benchmark")]
-[assembly: AssemblyCopyright("Copyright © Lionel du Peloux 2017")]
+[assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2375f32c-a695-4c5b-a6e5-564edbce3ca4")]
+[assembly: Guid("e71c6d27-3532-49d9-822a-c55bca364b54")]
 
 // Version information for an assembly consists of the following four values:
 //

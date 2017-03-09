@@ -4,16 +4,16 @@ using BenchmarkDotNet.Attributes.Jobs;
 using System;
 using System.Collections.Generic;
 
-namespace TMarsupilamiMath.Benchmark
+namespace TMarsupilami.MathLib.Benchmark
 {
        //[MarkdownExporter, AsciiDocExporter, HtmlExporter, CsvExporter, LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
     [HtmlExporter, CsvExporter, RyuJitX64Job]
-    public class Arithmetic_loop
+    public class Bench_Arithmetic
     {
         int n;
         double a, b, c;
 
-        public Arithmetic_loop()
+        public Bench_Arithmetic()
         {
             n = 10*1000*1000;
             a = Math.Sqrt(Math.E*Math.Log(7));

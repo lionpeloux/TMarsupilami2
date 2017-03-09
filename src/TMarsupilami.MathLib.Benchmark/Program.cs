@@ -1,18 +1,25 @@
-﻿using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using TMarsupilami.MathLib.Benchmark;
 
-namespace TMarsupilamiMath.Benchmark
+namespace TMarsupilami.MathLib.Benchmark
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<Arithmetic_noloop>();
+            Summary sum;
+            //var summary = BenchmarkRunner.Run<Arithmetic_noloop>();
+            //var summary = BenchmarkRunner.Run<Bench_Rotation>();
+            //sum = BenchmarkRunner.Run<Bench_Rotation>();
+            sum = BenchmarkRunner.Run<Bench_ParallelTransport>();
+
             //var summary = BenchmarkRunner.Run<Arithmetic_loop>();
 
             //Console.WriteLine("IsHardwareAccelerated = " + Vector.IsHardwareAccelerated);

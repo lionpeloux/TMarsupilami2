@@ -42,6 +42,34 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug32|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug32\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug64|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug64\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="RhinoCommon">
       <HintPath>C:\Program Files\Rhinoceros 5 (64-bit)\System\RhinoCommon.dll</HintPath>
@@ -74,7 +102,7 @@
     <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleCurrent.cs" />
     <Compile Include="Component\Display\Comp_DisplayFrame.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Reflection.cs" />
-    <Compile Include="Component\Rotation\Comp_ZDiffRotatePlane.cs" />
+    <Compile Include="Component\Rotation\Comp_ZRotatePlane_Diff.cs" />
     <Compile Include="Component\Rotation\Comp_ZRotatePlane.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ZParallelTransportPlane_Reflection.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Rotation.cs" />
@@ -147,7 +175,6 @@
   <ItemGroup>
     <None Include="Resources\Normalise_16x16.png" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="Resources\ZParallelTransportPlane_Reflection.png" />
   </ItemGroup>
@@ -160,6 +187,21 @@
   <ItemGroup>
     <None Include="Resources\ParallelTransportPlane_Rotation.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ZRotatePlane.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ZRotatePlane_Diff.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MFrame.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MPoint.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MVector.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -169,8 +211,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"
-Erase "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug32|AnyCPU' ">
     <StartArguments>
