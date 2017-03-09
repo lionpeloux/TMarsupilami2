@@ -17,6 +17,8 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Parallel transports a frame from its origin point and ZAxis to a target point and a target direction.
         /// Use the rotation method.
+        /// WARNING : seems unable to preserve the frame orthonormality after few iterations unless t=d1xd2 is properly normalized after each iteration.
+        /// The double reflection method does not suffer from this problem.
         /// ------------------------------------
         /// add  | sub   | mul   | div   | sqrt
         /// 11   | 9     | 30    | 1     | 0
@@ -61,8 +63,15 @@ namespace TMarsupilami.MathLib
              * ------------------------------------          
              */
 
+            var t1 = frame.ZAxis; // Warning, this operation hiddes a CrossProduct.
+
+            // This is necessary to not propagate numerical errors
+            // if ommitted, after few recursive iterations the parallel transported frame is no more orthonormal and 
+            // things get wierd
+            // the double reflection method seems to be a lot more stable regarding this problem.
+            t1.Normalize();
+            
             // add :  0 | sub :  3 | mul :  6 | div :  0 | sqrt :  0
-            var t1 = frame.ZAxis;
             var k = MVector.CrossProduct(t1, toZDir);
 
             // add :  2 | sub :  0 | mul :  3 | div :  0 | sqrt :  0
@@ -143,7 +152,7 @@ namespace TMarsupilami.MathLib
             double l1_2 = MVector.DotProduct(e1, e1);
 
             // add :  4 | sub :  6 | mul :  14 | div :  1 | sqrt :  0
-            var t1 = frame.ZAxis;
+            var t1 = frame.ZAxis; // Warning, this operation hiddes a CrossProduct.
             var d1 = frame.XAxis;
             double c1 = 2 / l1_2; // 1div
             d1_star = d1 - (c1 * MVector.DotProduct(d1, e1)) * e1; // 2add 3sub 7mul

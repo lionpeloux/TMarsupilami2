@@ -11,9 +11,9 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ZParallelTransportPlane_Rotation()
-          : base("Z Parallel Transport a Plane (Rotation)", "ZPT (Rot)",
+          : base("Z Parallel Transport a Plane - Rotation", "ZPT (Rot)",
               "Parallel transports a plane from it's origin and Z vector through a list of (P,t) tuples. Use the rotation method.",
-              "TMarsupilami", "Parallel Transport")
+              "TMarsupilami", "Math")
         {
         }
 
@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.primary;
+                return GH_Exposure.tertiary;
             }
         }
         protected override System.Drawing.Bitmap Icon

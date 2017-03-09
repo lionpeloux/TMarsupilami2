@@ -11,9 +11,9 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ParallelTransportPlane_Rotation()
-          : base("Parallel Transport a Plane (Rotation)", "PT (Rot)",
+          : base("Parallel Transport a Plane - Rotation", "PT (Rot)",
               "Parallel transports a plane through a list of (P,t) tuples. Use the rotation method.",
-              "TMarsupilami", "Parallel Transport")
+              "TMarsupilami", "Math")
         {
         }
 
@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.secondary;
+                return GH_Exposure.quarternary;
             }
         }
         protected override System.Drawing.Bitmap Icon

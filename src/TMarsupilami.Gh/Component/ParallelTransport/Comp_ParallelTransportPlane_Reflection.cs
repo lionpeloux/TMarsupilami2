@@ -11,9 +11,9 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ParallelTransportPlane_Reflection()
-          : base("Parallel Transport a Plane (Reflection)", "PT (Ref)",
+          : base("Parallel Transport a Plane - Reflection", "PT (Ref)",
               "Parallel transports a plane through a list of (P,t) tuples. Use the double reflection method.",
-              "TMarsupilami", "Parallel Transport")
+              "TMarsupilami", "Math")
         {
         }
 
@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.secondary;
+                return GH_Exposure.quarternary;
             }
         }
         protected override System.Drawing.Bitmap Icon
