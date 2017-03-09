@@ -43,6 +43,8 @@
     <Compile Include="Core\Circle.cs" />
     <Compile Include="Core\MFrame.cs" />
     <Compile Include="Core\MPoint.cs" />
+    <Compile Include="Core\ParallelTransport.cs" />
+    <Compile Include="Core\Rotation.cs" />
     <Compile Include="Core\Trigo.cs" />
     <Compile Include="Core\MVector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

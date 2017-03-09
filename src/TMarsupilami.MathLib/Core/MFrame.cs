@@ -135,77 +135,58 @@ namespace TMarsupilami.MathLib
 #endif
         }
 
-        /// <summary>
-        /// Rotates this frame in place, off a given angle around its z-axis.
-        /// </summary>
-        /// <param name="angle">Angle of rotation (in radians).</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ZRotate(double angle)
-        {    
-#if FAST
-            // sin & cos computation
-            double s = Trigo.Sin(angle);
-            double c = Math.Sqrt(1-s*s); // ensure c^2 + s^2 = 1 and c > 0 over [-pi/2;pi/2]
-#else
-            // sin & cos computation
-            double c = System.Math.Cos(angle);
-            double s = System.Math.Sin(angle);
-#endif
-
-            // rotate XAxis and store the results in a tmp vector
-            double vx = c * xaxis.X + s * yaxis.X;
-            double vy = c * xaxis.Y + s * yaxis.Y;
-            double vz = c * xaxis.Z + s * yaxis.Z;
-
-            // in-place rotation of YAxis
-            yaxis.X = -s * xaxis.X + c * yaxis.X;
-            yaxis.Y = -s * xaxis.Y + c * yaxis.Y;
-            yaxis.Z = -s * xaxis.Z + c * yaxis.Z;
-
-            // in-place rotation of XAyxis
-            xaxis.X = vx;
-            xaxis.Y = vy;
-            xaxis.Z = vz;
+        public void ZRotate(double θ, ref MFrame frameROT)
+        {
+            Rotation.ZRotate(this, θ, ref frameROT);
+        }
+        public void ZRotate(double θ)
+        {
+            Rotation.ZRotate(this, θ, ref this);
         }
 
-        /// <summary>
-        /// Rotates this frame in place, off a given tuple {sin(x), cos(x)} around its z-axis.
-        /// </summary>
-        /// <param name="angle">Angle of rotation (in radians).</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ZRotate(double sin, double cos)
+        public void ZDiffRotate(double θ, ref MFrame frameROT)
         {
-            // rotate XAxis and store the results in a tmp vector
-            double vx = cos * xaxis.X + sin * yaxis.X;
-            double vy = cos * xaxis.Y + sin * yaxis.Y;
-            double vz = cos * xaxis.Z + sin * yaxis.Z;
-
-            // in-place rotation of YAxis
-            yaxis.X = -sin * xaxis.X + cos * yaxis.X;
-            yaxis.Y = -sin * xaxis.Y + cos * yaxis.Y;
-            yaxis.Z = -sin * xaxis.Z + cos * yaxis.Z;
-
-            // in-place rotation of XAyxis
-            xaxis.X = vx;
-            xaxis.Y = vy;
-            xaxis.Z = vz;
+            Rotation.ZDiffRotate_Taylor_3(this, θ, ref frameROT);
+        }
+        public void ZDiffRotate(double θ)
+        {
+            Rotation.ZDiffRotate_Taylor_3(this, θ, ref this);
         }
 
-        public MFrame ZParallelTransport_Rotation(MPoint toPoint, MVector toDir)
+        public void ZParallelTransport_Rotation(MPoint toPoint, MVector toZDir, ref MFrame framePT)
         {
-            return ZParallelTransport_Rotation(this, toPoint, toDir);
+            ParallelTransport.ZPT_Rotation(this, toPoint, toZDir, ref framePT);
         }
-        public MFrame ZParallelTransport_Reflection(MPoint toPoint, MVector toZDir)
+        public void ZParallelTransport_Rotation(MPoint toPoint, MVector toZDir)
         {
-            return ZParallelTransport_Reflection(this, toPoint, toZDir);
+            ParallelTransport.ZPT_Rotation(this, toPoint, toZDir, ref this);
         }
-        public MFrame ParallelTransport_Rotation(MVector fromDir, MPoint toPoint, MVector toDir)
+
+        public void ZParallelTransport_Reflection(MPoint toPoint, MVector toZDir, ref MFrame framePT)
         {
-            return ParallelTransport_Rotation(this, fromDir, toPoint, toDir);
+            ParallelTransport.ZPT_Reflection(this, toPoint, toZDir, ref framePT);
         }
-        public MFrame ParallelTransport_Reflection(MVector fromDir, MPoint toPoint, MVector toDir)
+        public void ZParallelTransport_Reflection(MPoint toPoint, MVector toZDir)
         {
-            return ParallelTransport_Reflection(this, fromDir, toPoint, toDir);
+            ParallelTransport.ZPT_Reflection(this, toPoint, toZDir, ref this);
+        }
+
+        public void ParallelTransport_Rotation(MVector fromDir, MPoint toPoint, MVector toDir, ref MFrame framePT)
+        {
+            ParallelTransport.PT_Rotation(this, fromDir, toPoint, toDir, ref framePT);
+        }
+        public void ParallelTransport_Rotation(MVector fromDir, MPoint toPoint, MVector toDir)
+        {
+            ParallelTransport.PT_Rotation(this, fromDir, toPoint, toDir, ref this);
+        }
+
+        public void ParallelTransport_Reflection(MVector fromDir, MPoint toPoint, MVector toDir, ref MFrame framePT)
+        {
+            ParallelTransport.PT_Reflection(this, fromDir, toPoint, toDir, ref framePT);
+        }
+        public void ParallelTransport_Reflection(MVector fromDir, MPoint toPoint, MVector toDir)
+        {
+            ParallelTransport.PT_Reflection(this, fromDir, toPoint, toDir, ref this);
         }
         #endregion
 
@@ -276,224 +257,225 @@ namespace TMarsupilami.MathLib
             return 0;
         }
 
-        public static MFrame ZParallelTransport_Rotation(MFrame frame, MPoint toPoint, MVector toZDir)
-        {
-            /*
-             * WARNING : fromDir and toDir must be of unit length
-             * 
-             * aligning t1 to t2 requiers a rotation of alpha in [0, pi] around t1 x t2
-             * 
-             * Rodrigues' Formula with θ = α, where :
-             * α : angle between t1 and t2(sin(α) = |t1 x t2| where |t1|=1 |t2|=1)
-             * θ : rotation angle to apply around k = t1 x t2
-             * b : k/|k| unit vector of rotation axis
-             * v' = v.cos(θ) +  (b x v).sin(θ) + b(b.v).(1-cos(θ))
-             * v' = v + (b x v).sin(θ) + b x (b x v).(1-cos(θ))
-             * 
-             * this is written as (c = cos(θ)) where c <> -1 :
-             * v' = c.v + (k x v) + (k.v)/(1+c) k
-             * 
-             * TOTAL COST
-             * add  :  6 
-             * sub  :  6
-             * mul  : 22
-             * div  :  1
-             * sqrt :  0
-             *     
-             */
 
-            // 3sub 6mul
-            var t1 = frame.ZAxis;
-            var k = MVector.CrossProduct(t1, toZDir);
+        //public static MFrame ZParallelTransport_Rotation(MFrame frame, MPoint toPoint, MVector toZDir)
+        //{
+        //    /*
+        //     * WARNING : fromDir and toDir must be of unit length
+        //     * 
+        //     * aligning t1 to t2 requiers a rotation of alpha in [0, pi] around t1 x t2
+        //     * 
+        //     * Rodrigues' Formula with θ = α, where :
+        //     * α : angle between t1 and t2(sin(α) = |t1 x t2| where |t1|=1 |t2|=1)
+        //     * θ : rotation angle to apply around k = t1 x t2
+        //     * b : k/|k| unit vector of rotation axis
+        //     * v' = v.cos(θ) +  (b x v).sin(θ) + b(b.v).(1-cos(θ))
+        //     * v' = v + (b x v).sin(θ) + b x (b x v).(1-cos(θ))
+        //     * 
+        //     * this is written as (c = cos(θ)) where c <> -1 :
+        //     * v' = c.v + (k x v) + (k.v)/(1+c) k
+        //     * 
+        //     * TOTAL COST
+        //     * add  :  6 
+        //     * sub  :  6
+        //     * mul  : 22
+        //     * div  :  1
+        //     * sqrt :  0
+        //     *     
+        //     */
 
-            // 2add 3mul
-            var c = MVector.DotProduct(t1, toZDir);
+        //    // 3sub 6mul
+        //    var t1 = frame.ZAxis;
+        //    var k = MVector.CrossProduct(t1, toZDir);
 
-            // 3add 3mul 1div
-            var d1 = frame.XAxis;
-            var m = MVector.DotProduct(k, d1) / (1 + c);
+        //    // 2add 3mul
+        //    var c = MVector.DotProduct(t1, toZDir);
 
-            // 6add 3sub 12mul
-            var d1_para = c * d1; // 3mul
-            d1_para += MVector.CrossProduct(k, d1); // 3add 3sub 6mul
-            d1_para += m * k; // 3add + 3mul
+        //    // 3add 3mul 1div
+        //    var d1 = frame.XAxis;
+        //    var m = MVector.DotProduct(k, d1) / (1 + c);
 
-            // 3sub 6mul
-            var d2_para = MVector.CrossProduct(toZDir, d1_para);
+        //    // 6add 3sub 12mul
+        //    var d1_para = c * d1; // 3mul
+        //    d1_para += MVector.CrossProduct(k, d1); // 3add 3sub 6mul
+        //    d1_para += m * k; // 3add + 3mul
 
-            var f_para = new MFrame(toPoint, d1_para, d2_para);
-            return f_para;
-        }
-        public static MFrame ZParallelTransport_Reflection(MFrame frame, MPoint toPoint, MVector toZDir)
-        {
-            /*
-             * WARNING : fromDir and toDir must be of unit length
-             * 
-             * Double Reflection Method
-             * 
-             * TOTAL COST
-             * add  :  6 
-             * sub  :  6
-             * mul  : 22
-             * div  :  1
-             * sqrt :  0
-             *     
-             */
+        //    // 3sub 6mul
+        //    var d2_para = MVector.CrossProduct(toZDir, d1_para);
 
-            MVector d1_star, d1_para, d2_para;
-            MVector t_star;
+        //    var f_para = new MFrame(toPoint, d1_para, d2_para);
+        //    return f_para;
+        //}
+        //public static MFrame ZParallelTransport_Reflection(MFrame frame, MPoint toPoint, MVector toZDir)
+        //{
+        //    /*
+        //     * WARNING : fromDir and toDir must be of unit length
+        //     * 
+        //     * Double Reflection Method
+        //     * 
+        //     * TOTAL COST
+        //     * add  :  6 
+        //     * sub  :  6
+        //     * mul  : 22
+        //     * div  :  1
+        //     * sqrt :  0
+        //     *     
+        //     */
 
-            // 2add 3sub 3mul
-            var e1 = new MVector(toPoint.X - frame.Origin.X, toPoint.Y - frame.Origin.Y, toPoint.Z - frame.Origin.Z);
-            double l1_2 = MVector.DotProduct(e1, e1);
+        //    MVector d1_star, d1_para, d2_para;
+        //    MVector t_star;
 
-            var t1 = frame.ZAxis;
-            var d1 = frame.XAxis;
-            if (l1_2 == 0)
-            {
-                d1_star = d1;
-                t_star = t1;
-            }
-            else
-            {
-                // 2add 3sub 7mul 1diuv
-                double c1 = 2 / l1_2;
-                d1_star = d1 - (c1 * MVector.DotProduct(d1, e1)) * e1;
+        //    // 2add 3sub 3mul
+        //    var e1 = new MVector(toPoint.X - frame.Origin.X, toPoint.Y - frame.Origin.Y, toPoint.Z - frame.Origin.Z);
+        //    double l1_2 = MVector.DotProduct(e1, e1);
 
-                // 2add 3sub 7mul
-                t_star = t1 - (c1 * MVector.DotProduct(t1, e1)) * e1;
-            }
+        //    var t1 = frame.ZAxis;
+        //    var d1 = frame.XAxis;
+        //    if (l1_2 == 0)
+        //    {
+        //        d1_star = d1;
+        //        t_star = t1;
+        //    }
+        //    else
+        //    {
+        //        // 2add 3sub 7mul 1diuv
+        //        double c1 = 2 / l1_2;
+        //        d1_star = d1 - (c1 * MVector.DotProduct(d1, e1)) * e1;
 
-            // 1add 3sub 3mul
-            var e2 = toZDir - t_star;
-            double l2_2 = MVector.DotProduct(e2, e2);
-            if (l1_2 == 0)
-            {
-                d1_para = d1_star;
-            }
-            else
-            {
-                // 2add 3sub 7mul 1div 
-                double c2 = 2 / l2_2;
-                d1_para = d1_star - (c2 * MVector.DotProduct(d1_star, e2)) * e2;
-            }
+        //        // 2add 3sub 7mul
+        //        t_star = t1 - (c1 * MVector.DotProduct(t1, e1)) * e1;
+        //    }
+
+        //    // 1add 3sub 3mul
+        //    var e2 = toZDir - t_star;
+        //    double l2_2 = MVector.DotProduct(e2, e2);
+        //    if (l1_2 == 0)
+        //    {
+        //        d1_para = d1_star;
+        //    }
+        //    else
+        //    {
+        //        // 2add 3sub 7mul 1div 
+        //        double c2 = 2 / l2_2;
+        //        d1_para = d1_star - (c2 * MVector.DotProduct(d1_star, e2)) * e2;
+        //    }
                 
-            d2_para = MVector.CrossProduct(toZDir, d1_para);
-            var f_para = new MFrame(toPoint, d1_para, d2_para);
-            return f_para;
-        }
-        public static MFrame ParallelTransport_Rotation(MFrame frame, MVector fromDir, MPoint toPoint, MVector toDir)
-        {
-            /*
-             * WARNING : fromDir and toDir must be of unit length
-             * 
-             * aligning t1 to t2 requiers a rotation of alpha in [0, pi] around t1 x t2
-             * 
-             * Rodrigues' Formula with θ = α, where :
-             * α : angle between t1 and t2(sin(α) = |t1 x t2| where |t1|=1 |t2|=1)
-             * θ : rotation angle to apply around k = t1 x t2
-             * b : k/|k| unit vector of rotation axis
-             * v' = v.cos(θ) +  (b x v).sin(θ) + b(b.v).(1-cos(θ))
-             * v' = v + (b x v).sin(θ) + b x (b x v).(1-cos(θ))
-             * 
-             * this is written as (c = cos(θ)) where c <> -1 :
-             * v' = c.v + (k x v) + (k.v)/(1+c) k
-             * 
-             * TOTAL COST
-             * add  :  6 
-             * sub  :  6
-             * mul  : 22
-             * div  :  1
-             * sqrt :  0
-             *     
-             */
+        //    d2_para = MVector.CrossProduct(toZDir, d1_para);
+        //    var f_para = new MFrame(toPoint, d1_para, d2_para);
+        //    return f_para;
+        //}
+        //public static MFrame ParallelTransport_Rotation(MFrame frame, MVector fromDir, MPoint toPoint, MVector toDir)
+        //{
+        //    /*
+        //     * WARNING : fromDir and toDir must be of unit length
+        //     * 
+        //     * aligning t1 to t2 requiers a rotation of alpha in [0, pi] around t1 x t2
+        //     * 
+        //     * Rodrigues' Formula with θ = α, where :
+        //     * α : angle between t1 and t2(sin(α) = |t1 x t2| where |t1|=1 |t2|=1)
+        //     * θ : rotation angle to apply around k = t1 x t2
+        //     * b : k/|k| unit vector of rotation axis
+        //     * v' = v.cos(θ) +  (b x v).sin(θ) + b(b.v).(1-cos(θ))
+        //     * v' = v + (b x v).sin(θ) + b x (b x v).(1-cos(θ))
+        //     * 
+        //     * this is written as (c = cos(θ)) where c <> -1 :
+        //     * v' = c.v + (k x v) + (k.v)/(1+c) k
+        //     * 
+        //     * TOTAL COST
+        //     * add  :  6 
+        //     * sub  :  6
+        //     * mul  : 22
+        //     * div  :  1
+        //     * sqrt :  0
+        //     *     
+        //     */
 
-            // 3sub 6mul
-            var k = MVector.CrossProduct(fromDir, toDir);
+        //    // 3sub 6mul
+        //    var k = MVector.CrossProduct(fromDir, toDir);
 
-            // 2add 3mul
-            var c = MVector.DotProduct(fromDir, toDir);
+        //    // 2add 3mul
+        //    var c = MVector.DotProduct(fromDir, toDir);
 
-            // 3add 3mul 1div
-            var d1 = frame.XAxis;
-            var m1 = MVector.DotProduct(k, d1) / (1 + c);
+        //    // 3add 3mul 1div
+        //    var d1 = frame.XAxis;
+        //    var m1 = MVector.DotProduct(k, d1) / (1 + c);
 
-            // 6add 3sub 12mul
-            var d1_para = c * d1; // 3mul
-            d1_para += MVector.CrossProduct(k, d1); // 3add 3sub 6mul
-            d1_para += m1 * k; // 3add + 3mul
+        //    // 6add 3sub 12mul
+        //    var d1_para = c * d1; // 3mul
+        //    d1_para += MVector.CrossProduct(k, d1); // 3add 3sub 6mul
+        //    d1_para += m1 * k; // 3add + 3mul
 
-            // 3add 3mul 1div
-            var d2 = frame.YAxis;
-            var m2 = MVector.DotProduct(k, d2) / (1 + c);
+        //    // 3add 3mul 1div
+        //    var d2 = frame.YAxis;
+        //    var m2 = MVector.DotProduct(k, d2) / (1 + c);
 
-            // 6add 3sub 12mul
-            var d2_para = c * d2; // 3mul
-            d2_para += MVector.CrossProduct(k, d2); // 3add 3sub 6mul
-            d2_para += m2 * k; // 3add + 3mul
+        //    // 6add 3sub 12mul
+        //    var d2_para = c * d2; // 3mul
+        //    d2_para += MVector.CrossProduct(k, d2); // 3add 3sub 6mul
+        //    d2_para += m2 * k; // 3add + 3mul
 
-            var f_para = new MFrame(toPoint, d1_para, d2_para);
-            return f_para;
-        }
-        public static MFrame ParallelTransport_Reflection(MFrame frame, MVector fromDir, MPoint toPoint, MVector toDir)
-        {
-            /*
-             * WARNING : fromDir and toDir must be of unit length
-             * 
-             * Double Reflection Method
-             * 
-             * TOTAL COST
-             * add  :  6 
-             * sub  :  6
-             * mul  : 22
-             * div  :  1
-             * sqrt :  0
-             *     
-             */
+        //    var f_para = new MFrame(toPoint, d1_para, d2_para);
+        //    return f_para;
+        //}
+        //public static MFrame ParallelTransport_Reflection(MFrame frame, MVector fromDir, MPoint toPoint, MVector toDir)
+        //{
+        //    /*
+        //     * WARNING : fromDir and toDir must be of unit length
+        //     * 
+        //     * Double Reflection Method
+        //     * 
+        //     * TOTAL COST
+        //     * add  :  6 
+        //     * sub  :  6
+        //     * mul  : 22
+        //     * div  :  1
+        //     * sqrt :  0
+        //     *     
+        //     */
 
-            MVector d1_star, d1_para, d2_star, d2_para;
-            MVector t_star;
+        //    MVector d1_star, d1_para, d2_star, d2_para;
+        //    MVector t_star;
 
-            // 2add 3sub 3mul
-            var e1 = new MVector(toPoint.X - frame.Origin.X, toPoint.Y - frame.Origin.Y, toPoint.Z - frame.Origin.Z);
-            double l1_2 = MVector.DotProduct(e1, e1);
+        //    // 2add 3sub 3mul
+        //    var e1 = new MVector(toPoint.X - frame.Origin.X, toPoint.Y - frame.Origin.Y, toPoint.Z - frame.Origin.Z);
+        //    double l1_2 = MVector.DotProduct(e1, e1);
 
-            var d1 = frame.XAxis;
-            var d2 = frame.YAxis;
-            if (l1_2 == 0)
-            {
-                d1_star = d1;
-                d2_star = d2;
-                t_star = fromDir;
-            }
-            else
-            {
-                // 6add 9sub 21mul 1div
-                double c1 = 2 / l1_2;
-                d1_star = d1 - (c1 * MVector.DotProduct(d1, e1)) * e1;
-                d2_star = d2 - (c1 * MVector.DotProduct(d2, e1)) * e1;
-                t_star = fromDir - (c1 * MVector.DotProduct(fromDir, e1)) * e1;
-            }
+        //    var d1 = frame.XAxis;
+        //    var d2 = frame.YAxis;
+        //    if (l1_2 == 0)
+        //    {
+        //        d1_star = d1;
+        //        d2_star = d2;
+        //        t_star = fromDir;
+        //    }
+        //    else
+        //    {
+        //        // 6add 9sub 21mul 1div
+        //        double c1 = 2 / l1_2;
+        //        d1_star = d1 - (c1 * MVector.DotProduct(d1, e1)) * e1;
+        //        d2_star = d2 - (c1 * MVector.DotProduct(d2, e1)) * e1;
+        //        t_star = fromDir - (c1 * MVector.DotProduct(fromDir, e1)) * e1;
+        //    }
 
-            // 1add 3sub 3mul
-            var e2 = toDir - t_star;
-            double l2_2 = MVector.DotProduct(e2, e2);
-            if (l1_2 == 0)
-            {
-                d1_para = d1_star;
-                d2_para = d2_star;
-            }
-            else
-            {
-                // 2add 3sub 7mul 1div 
-                double c2 = 2 / l2_2;
-                d1_para = d1_star - (c2 * MVector.DotProduct(d1_star, e2)) * e2;
-                d2_para = d2_star - (c2 * MVector.DotProduct(d2_star, e2)) * e2;
-            }
+        //    // 1add 3sub 3mul
+        //    var e2 = toDir - t_star;
+        //    double l2_2 = MVector.DotProduct(e2, e2);
+        //    if (l1_2 == 0)
+        //    {
+        //        d1_para = d1_star;
+        //        d2_para = d2_star;
+        //    }
+        //    else
+        //    {
+        //        // 2add 3sub 7mul 1div 
+        //        double c2 = 2 / l2_2;
+        //        d1_para = d1_star - (c2 * MVector.DotProduct(d1_star, e2)) * e2;
+        //        d2_para = d2_star - (c2 * MVector.DotProduct(d2_star, e2)) * e2;
+        //    }
 
-            var f_para = new MFrame(toPoint, d1_para, d2_para);
-            return f_para;
-        }
+        //    var f_para = new MFrame(toPoint, d1_para, d2_para);
+        //    return f_para;
+        //}
 
 
         #endregion

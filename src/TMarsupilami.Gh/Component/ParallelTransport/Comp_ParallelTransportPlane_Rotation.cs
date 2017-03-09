@@ -12,7 +12,7 @@ namespace TMarsupilami.Gh.Component
 
         public Comp_ParallelTransportPlane_Rotation()
           : base("Parallel Transport a Plane (Rotation)", "PT (Rot)",
-              "Parallel transport a plane through a list of (P,t) tuples.",
+              "Parallel transports a plane through a list of (P,t) tuples. Use the rotation method.",
               "TMarsupilami", "Parallel Transport")
         {
         }
@@ -28,7 +28,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return Resources.DisplayPlane;
+                return Resources.ParallelTransportPlane_Rotation;
             }
         }
         public override Guid ComponentGuid
@@ -40,7 +40,7 @@ namespace TMarsupilami.Gh.Component
         {
             pManager.AddPlaneParameter("Plane", "Pl", "Initial plane to parallel transport.", GH_ParamAccess.item);
             pManager.AddPointParameter("Target Point(s)", "P", "Points to parallel transport to.", GH_ParamAccess.list);
-            pManager.AddVectorParameter("Target Direction(s)", "t", "Vectors to parallel transport to.", GH_ParamAccess.list);
+            pManager.AddVectorParameter("Target Direction(s)", "v", "Vectors to parallel transport to.", GH_ParamAccess.list);
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
@@ -66,10 +66,17 @@ namespace TMarsupilami.Gh.Component
                 return;
             }
 
+            if (n < 2) // we move 
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Points and Directions lists must have at least 2 items.");
+                return;
+            }
+           
             var planes_pt = new Plane[n];
             MFrame frame;
 
             // First frame
+            plane.Origin = point_list[0]; // ensure that the initial plane is located at P[0]
             frame = plane.Cast();
             direction_list[0].Unitize();
             planes_pt[0] = frame.Cast();
@@ -78,10 +85,10 @@ namespace TMarsupilami.Gh.Component
             for (int i = 1; i < point_list.Count; i++)
             {
                 direction_list[i].Unitize();
-                frame = frame.ParallelTransport_Rotation(direction_list[i-1].Cast(), point_list[i].Cast(), direction_list[i].Cast());
+                frame.ParallelTransport_Rotation(direction_list[i - 1].Cast(), point_list[i].Cast(), direction_list[i].Cast());
                 planes_pt[i] = frame.Cast();
             }
-            
+
             DA.SetDataList(0, planes_pt);
         }
     }

@@ -163,9 +163,9 @@ namespace TMarsupilami.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ZParallelTransport_Reflection {
+        internal static System.Drawing.Bitmap ParallelTransportPlane_Reflection {
             get {
-                object obj = ResourceManager.GetObject("ZParallelTransport_Reflection", resourceCulture);
+                object obj = ResourceManager.GetObject("ParallelTransportPlane_Reflection", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -173,9 +173,29 @@ namespace TMarsupilami.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ZParallelTransport_Rotation {
+        internal static System.Drawing.Bitmap ParallelTransportPlane_Rotation {
             get {
-                object obj = ResourceManager.GetObject("ZParallelTransport_Rotation", resourceCulture);
+                object obj = ResourceManager.GetObject("ParallelTransportPlane_Rotation", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZParallelTransportPlane_Reflection {
+            get {
+                object obj = ResourceManager.GetObject("ZParallelTransportPlane_Reflection", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZParallelTransportPlane_Rotation {
+            get {
+                object obj = ResourceManager.GetObject("ZParallelTransportPlane_Rotation", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

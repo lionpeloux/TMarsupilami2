@@ -74,6 +74,8 @@
     <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleCurrent.cs" />
     <Compile Include="Component\Display\Comp_DisplayFrame.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Reflection.cs" />
+    <Compile Include="Component\Rotation\Comp_ZDiffRotatePlane.cs" />
+    <Compile Include="Component\Rotation\Comp_ZRotatePlane.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ZParallelTransportPlane_Reflection.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Rotation.cs" />
     <Compile Include="Component\ParallelTransport\Comp_ZParallelTransportPlane_Rotation.cs" />
@@ -145,11 +147,18 @@
   <ItemGroup>
     <None Include="Resources\Normalise_16x16.png" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <None Include="Resources\ZParallelTransport_Reflection.png" />
+    <None Include="Resources\ZParallelTransportPlane_Reflection.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ZParallelTransport_Rotation.png" />
+    <None Include="Resources\ZParallelTransportPlane_Rotation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ParallelTransportPlane_Reflection.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ParallelTransportPlane_Rotation.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

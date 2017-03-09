@@ -12,7 +12,7 @@ namespace TMarsupilami.Gh.Component
 
         public Comp_ZParallelTransportPlane_Reflection()
           : base("Z Parallel Transport a Plane (Reflection)", "ZPT (Ref)",
-              "Parallel transport a plane from it's origin and Z vector through a list of (P,t) tuples.",
+              "Parallel transports a plane from it's origin and Z vector through a list of (P,t) tuples. Use the double reflection method.",
               "TMarsupilami", "Parallel Transport")
         {
         }
@@ -28,7 +28,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return Resources.ZParallelTransport_Reflection;
+                return Resources.ZParallelTransportPlane_Reflection;
             }
         }
         public override Guid ComponentGuid
@@ -40,9 +40,10 @@ namespace TMarsupilami.Gh.Component
         {
             pManager.AddPlaneParameter("Plane", "Pl", "Initial plane to parallel transport.", GH_ParamAccess.item);
             pManager.AddPointParameter("Target Point(s)", "P", "Points to parallel transport to.", GH_ParamAccess.list);
-            pManager.AddVectorParameter("Target Direction(s)", "t", "Vectors to parallel transport to.", GH_ParamAccess.list);
-        }
+            pManager.AddVectorParameter("Target Direction(s)", "v", "Vectors to parallel transport to.", GH_ParamAccess.list);
+            pManager.AddBooleanParameter("Include", "inc", "If True, includes the initial plane in the output list.", GH_ParamAccess.item, false);
 
+        }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddPlaneParameter("Planes", "Pl", "The parallel transported planes.", GH_ParamAccess.list);
@@ -50,6 +51,7 @@ namespace TMarsupilami.Gh.Component
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            bool isIncluded = false;
             var plane = new Plane();
             List<Point3d> point_list = new List<Point3d>();
             List<Vector3d> direction_list = new List<Vector3d>();
@@ -57,6 +59,7 @@ namespace TMarsupilami.Gh.Component
             if (!DA.GetData(0, ref plane)) { return; }
             if (!DA.GetDataList(1, point_list)) { return; }
             if (!DA.GetDataList(2, direction_list)) { return; }
+            if (!DA.GetData(3, ref isIncluded)) { return; }
 
 
             int n = point_list.Count;
@@ -67,23 +70,41 @@ namespace TMarsupilami.Gh.Component
                 return;
             }
 
-            var planes_pt = new Plane[n];
+            Plane[] planes_pt;
             MFrame frame;
 
-            // First frame
-            frame = plane.Cast();
-            direction_list[0].Unitize();
-            frame = frame.ParallelTransport_Reflection(frame.ZAxis, point_list[0].Cast(), direction_list[0].Cast());
-            planes_pt[0] = frame.Cast();
-
-            // Next frames
-            for (int i = 1; i < point_list.Count; i++)
+            if (isIncluded)
             {
-                direction_list[i].Unitize();
-                frame = frame.ParallelTransport_Reflection(planes_pt[i-1].ZAxis.Cast(), point_list[i].Cast(), direction_list[i].Cast());
-                planes_pt[i] = frame.Cast();
+                planes_pt = new Plane[n + 1];
+
+                // First frame
+                frame = plane.Cast();
+                planes_pt[0] = frame.Cast();
+
+                // Next frames
+                for (int i = 0; i < point_list.Count; i++)
+                {
+                    direction_list[i].Unitize();
+                    frame.ZParallelTransport_Reflection(point_list[i].Cast(), direction_list[i].Cast());
+                    planes_pt[i + 1] = frame.Cast();
+                }
             }
-            
+            else
+            {
+                planes_pt = new Plane[n];
+
+                // First frame
+                frame = plane.Cast();
+
+                // Next frames
+                for (int i = 0; i < point_list.Count; i++)
+                {
+                    direction_list[i].Unitize();
+                    frame.ZParallelTransport_Reflection(point_list[i].Cast(), direction_list[i].Cast());
+                    planes_pt[i] = frame.Cast();
+                }
+            }
+
             DA.SetDataList(0, planes_pt);
         }
     }
