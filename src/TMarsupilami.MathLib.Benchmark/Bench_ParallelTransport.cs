@@ -15,7 +15,7 @@ namespace TMarsupilami.MathLib.Benchmark
         private readonly MFrame[] frames, resFrames;
         private readonly double[] angles;
         private readonly MPoint[] toPoints;
-        private readonly MVector[] toDirs;
+        private readonly MVector[] fromDirs, toDirs;
         private MVector fromDir;
 
 
@@ -27,6 +27,7 @@ namespace TMarsupilami.MathLib.Benchmark
             angles = new double[N];
             toPoints = new MPoint[N];
             toDirs = new MVector[N];
+            fromDirs = new MVector[N];
             fromDir = new MVector(0, 0, 1);
 
             var rdm = new Random();
@@ -36,6 +37,7 @@ namespace TMarsupilami.MathLib.Benchmark
                 var c = Math.Cos(angle);
                 var s = Math.Sin(angle);
                 frames[i] = new MFrame(new MPoint(0, 0, 0), new MVector(c, s, 0), new MVector(-s, c, 0));
+                fromDirs[i] = frames[i].ZAxis;
                 angles[i] = -angle;
 
                 toPoints[i] = new MPoint(rdm.NextDouble());
@@ -48,7 +50,7 @@ namespace TMarsupilami.MathLib.Benchmark
         {
             for (int i = 0; i < N; i++)
             {
-                ParallelTransport.ZPT_Reflection(frames[i], toPoints[i], toDirs[i], ref resFrames[i]);
+                ParallelTransport.ZPT_Reflection(frames[i], frames[i].Origin, frames[i].ZAxis, toPoints[i], toDirs[i], ref resFrames[i]);
             }
             return resFrames;
         }
@@ -58,7 +60,7 @@ namespace TMarsupilami.MathLib.Benchmark
         {
             for (int i = 0; i < N; i++)
             {
-                ParallelTransport.ZPT_Rotation(frames[i], toPoints[i], toDirs[i], ref resFrames[i]);
+                ParallelTransport.ZPT_Rotation(frames[i], fromDirs[i], toPoints[i], toDirs[i], ref resFrames[i]);
             }
             return resFrames;
         }
@@ -68,7 +70,7 @@ namespace TMarsupilami.MathLib.Benchmark
         {
             for (int i = 0; i < N; i++)
             {
-                ParallelTransport.PT_Reflection(frames[i], fromDir, toPoints[i], toDirs[i], ref resFrames[i]);
+                ParallelTransport.PT_Reflection(frames[i], frames[i].Origin, fromDir, toPoints[i], toDirs[i], ref resFrames[i]);
             }
             return resFrames;
         }

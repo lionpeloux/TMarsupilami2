@@ -4,6 +4,7 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
+using System.Diagnostics;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -63,30 +64,29 @@ namespace TMarsupilami.Gh.Component
                 return;
             }
 
-            var planes_rot = new Plane[n];
-            MFrame frame;
+            var frames = plane_list.Cast();
+
+            var watch = Stopwatch.StartNew();
 
             if (angle_list.Count == 1) // apply the same rotation angle to every frames
             {
                 double dθ = angle_list[0];
                 for (int i = 0; i < plane_list.Count; i++)
                 {
-                    frame = plane_list[i].Cast();
-                    frame.ZDiffRotate(dθ);
-                    planes_rot[i] = frame.Cast();
+                    frames[i].ZDiffRotate(dθ);
                 }
             }
             else
             {
                 for (int i = 0; i < plane_list.Count; i++)
                 {
-                    frame = plane_list[i].Cast();
-                    frame.ZDiffRotate(angle_list[i]);
-                    planes_rot[i] = frame.Cast();
+                    frames[i].ZDiffRotate(angle_list[i]);
                 }
             }
-           
-            DA.SetDataList(0, planes_rot);
+            watch.Stop();
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
+
+            DA.SetDataList(0, frames.Cast());
         }
     }
 }

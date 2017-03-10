@@ -4,6 +4,7 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
+using System.Diagnostics;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -68,43 +69,54 @@ namespace TMarsupilami.Gh.Component
                 return;
             }
 
-            Plane[] planes_pt;
-            MFrame frame;
+            // Cast from GH to Marsupilami types
+            var frame = plane.Cast();
+            var points = new MPoint[n];
+            var directions = new MVector[n];
+            for (int i = 0; i < n; i++)
+            {
+                points[i] = point_list[i].Cast();
+                direction_list[i].Unitize(); // make sure vertors are of unit length
+                directions[i] = direction_list[i].Cast();
+                Rhino.RhinoApp.WriteLine("" + directions[i].LengthSquared());
+            }
+
+            MFrame[] frames;
+            var watch = Stopwatch.StartNew();
 
             if (isIncluded)
             {
-                planes_pt = new Plane[n+1];
+                frames = new MFrame[n + 1];
 
                 // First frame
-                frame = plane.Cast();
-                planes_pt[0] = frame.Cast();
+                frames[0] = frame;
 
+                // Second frame
+                frames[0].ZParallelTransport_Rotation(frame.ZAxis, points[0], directions[0], ref frames[1]);
 
                 // Next frames
-                for (int i = 0; i < point_list.Count; i++)
+                for (int i = 1; i < point_list.Count; i++)
                 {
-                    direction_list[i].Unitize();
-                    frame.ZParallelTransport_Rotation(point_list[i].Cast(), direction_list[i].Cast());
-                    planes_pt[i+1] = frame.Cast();
+                    frames[i].ZParallelTransport_Rotation(directions[i - 1], points[i], directions[i], ref frames[i + 1]);
                 }
             }
             else
             {
-                planes_pt = new Plane[n];
+                frames = new MFrame[n];
 
                 // First frame
-                frame = plane.Cast();
+                frame.ZParallelTransport_Rotation(frame.ZAxis, points[0], directions[0], ref frames[0]);
 
                 // Next frames
-                for (int i = 0; i < point_list.Count; i++)
+                for (int i = 1; i < point_list.Count; i++)
                 {
-                    direction_list[i].Unitize();
-                    frame.ZParallelTransport_Rotation(point_list[i].Cast(), direction_list[i].Cast());
-                    planes_pt[i] = frame.Cast();
+                    frames[i - 1].ZParallelTransport_Rotation(directions[i - 1], points[i], directions[i], ref frames[i]);
                 }
             }
-                    
-            DA.SetDataList(0, planes_pt);
+            watch.Stop();
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
+
+            DA.SetDataList(0, frames.Cast());
         }
     }
 }

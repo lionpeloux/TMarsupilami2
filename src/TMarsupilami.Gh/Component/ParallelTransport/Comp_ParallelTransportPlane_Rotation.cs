@@ -4,6 +4,7 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
+using System.Diagnostics;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -71,25 +72,35 @@ namespace TMarsupilami.Gh.Component
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Points and Directions lists must have at least 2 items.");
                 return;
             }
-           
-            var planes_pt = new Plane[n];
-            MFrame frame;
+
+            // Cast from GH to Marsupilami types
+            var frame = plane.Cast();
+            var points = new MPoint[n];
+            var directions = new MVector[n];
+            for (int i = 0; i < n; i++)
+            {
+                points[i] = point_list[i].Cast();
+                direction_list[i].Unitize(); // make sure vectors are of unit length
+                directions[i] = direction_list[i].Cast();
+            }
+
+            var frames = new MFrame[n];
+
+            var watch = Stopwatch.StartNew();
+
 
             // First frame
-            plane.Origin = point_list[0]; // ensure that the initial plane is located at P[0]
-            frame = plane.Cast();
-            direction_list[0].Unitize();
-            planes_pt[0] = frame.Cast();
+            frames[0] = frame;
 
             // Next frames
             for (int i = 1; i < point_list.Count; i++)
             {
-                direction_list[i].Unitize();
-                frame.ParallelTransport_Rotation(direction_list[i - 1].Cast(), point_list[i].Cast(), direction_list[i].Cast());
-                planes_pt[i] = frame.Cast();
+                frames[i - 1].ParallelTransport_Rotation(directions[i - 1], points[i], directions[i], ref frames[i]);
             }
+            watch.Stop();
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
 
-            DA.SetDataList(0, planes_pt);
+            DA.SetDataList(0, frames.Cast());
         }
     }
 }
