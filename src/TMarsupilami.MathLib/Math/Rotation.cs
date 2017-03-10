@@ -9,18 +9,13 @@ namespace TMarsupilami.MathLib
     public static class Rotation
     {
         /// <summary>
-        /// Rotates a frame by an angle θ around its ZAxis.
-        /// ------------------------------------
-        /// add  | sub   | mul   | div   | sqrt
-        /// 3    | 6     | 12    | 0     | 0
-        /// ------------------------------------
-        /// cos  | sin   | tan   | acos  | asin
-        /// 1    | 1     | 0     | 0     | 0
-        /// ------------------------------------
-        /// cost = 177
+        /// Rotates a frame by an angle θ around its ZAxis (cost index = 177).
         /// </summary>
+        /// <remarks>
+        /// Requires expensive cos(θ) and sin(θ) computation.
+        /// </remarks>
         /// <param name="frame">The frame to be rotated.</param>
-        /// <param name="θ">The oriented angle of rotation (around the ZAxis).</param>
+        /// <param name="θ">The oriented angle of rotation, around the ZAxis.</param>
         /// <param name="frameROT">The rotated frame.</param>
         public static void ZRotate(MFrame frame, double θ, ref MFrame frameROT)
         {
@@ -52,20 +47,14 @@ namespace TMarsupilami.MathLib
         }
 
         /// <summary>
-        /// Rotates a frame by an angle dθ around its ZAxis. 
+        /// Rotates a frame by a small angle dθ around its ZAxis (cost index = 101).
+        /// </summary>
+        /// <remarks>
         /// dθ is assumed to be very small so that tan is approximated with the Taylor developpement of order 3 :
         /// tan(dθ/2) = (dθ/2) + 1/3*(dθ/2)^3 + o(dθ^3)
-        /// ------------------------------------
-        /// add  | sub   | mul   | div   | sqrt
-        /// 3    | 6     | 12    | 0     | 0
-        /// ------------------------------------
-        /// cos  | sin   | tan   | acos  | asin
-        /// 1    | 1     | 0     | 0     | 0
-        /// ------------------------------------
-        /// cost = 177
-        /// </summary>
+        /// </remarks>
         /// <param name="frame">The frame to be rotated.</param>
-        /// <param name="dθ">The oriented small angle of rotation (around the ZAxis).</param>
+        /// <param name="dθ">The oriented small angle of rotation, around the frame ZAxis.</param>
         /// <param name="frameROT">The rotated frame.</param>
         public static void ZDiffRotate_Taylor_3(MFrame frame, double dθ, ref MFrame frameROT)
         {
@@ -89,7 +78,7 @@ namespace TMarsupilami.MathLib
              * TOTAL COST
              * ------------------------------------
              * add  | sub   | mul   | div   | sqrt
-             * 5    | 4     | 19    | 1     | 0
+             * 5    | 4     | 18    | 2     | 0
              * ------------------------------------          
              * cos  | sin   | tan   | acos  | asin
              * 0    | 0     | 0     | 0     | 0
@@ -101,13 +90,12 @@ namespace TMarsupilami.MathLib
             // 1/2 and 1/12 are donne at compile time
             double t = dθ * (0.5 + (1 / 18) * dθ * dθ);
 
-            // add :  1 | sub :  0 | mul :  1 | div :  1 | sqrt :  0
+            // add :  1 | sub :  0 | mul :  1 | div :  0 | sqrt :  0
             double t2 = t * t;
-            double _d = 1 / (1 + t2);
 
-            // add :  0 | sub :  1 | mul :  3 | div :  0 | sqrt :  0
-            double s = 2 * t * _d;
-            double c = (1 - t2) * _d;
+            // add :  0 | sub :  1 | mul :  3 | div :  2 | sqrt :  0
+            double s = 2 * t / (1 + t2);
+            double c = (1 - t2) / (1 + t2);
 
             // add :  3 | sub :  3 | mul :  12 | div :  0 | sqrt :  0
             var d1 = frame.XAxis;
@@ -121,88 +109,161 @@ namespace TMarsupilami.MathLib
         }
 
         /// <summary>
-        /// Gets the Z angle (θz) to align two frames (f1 and f2)
-        /// Firstly, f1 is parallel transported on f2 such that f1_para and f2 share the same ZAxis.
-        /// Secondly, f1_para is rotated around its ZAxis by an angle θz to perfectly align with f2.
+        /// Gets the Z angle (θz) to align two frames using the rotation method (cost index = 182 + acos).
         /// </summary>
+        /// <remarks>
+        /// Firstly, fromFrame is parallel transported, with the rotation method, on toFrame such that fromFramePT and toFrame share the same ZAxis.
+        /// Secondly, fromFramePT is rotated around its ZAxis by an angle θz to perfectly align with toFrame.
+        /// </remarks>
         /// <param name="fromFrame">The frame to align.</param>
+        /// <param name="fromZAxis">The ZAxis of the initial frame. Must be of unit length.</param>
         /// <param name="toFrame">The target frame to align to.</param>
-        /// <returns>The Oriented Z angle (θz) between the frames in ]-π,π].</returns>
-        public static double ZAngle(MFrame fromFrame, MFrame toFrame)
+        /// <param name="toZAxis">The ZAxis of the target frame. Must be of unit length.</param>
+        /// <returns>The Oriented Z angle (θz) between the frames in ]-π,π] around toZAxis.</returns>
+        public static double ZAngle_Rotation(MFrame fromFrame, MVector fromZAxis, MFrame toFrame, MVector toZAxis)
         {
             /* ------------------------------------
              * WARNING
              * ------------------------------------
-             * - XAxis and YAxis musrt be of unit length
+             * - Frame axis must be of unit length
              *  
              * ------------------------------------
              * TOTAL COST
              * ------------------------------------
              * add  | sub   | mul   | div   | sqrt
-             * 10   | 18    | 33    | 2     | 0
+             * 15   | 9     | 37    | 1     | 0
              * ------------------------------------          
+             * cos  | sin   | tan   | acos  | asin
+             * 0    | 0     | 0     | 1     | 0
+             * ------------------------------------   
              */
 
-            MFrame ptFrame = new MFrame();
-            fromFrame.ZParallelTransport_Rotation(toFrame.Origin, toFrame.ZAxis, ref ptFrame); // warning : toFrame.ZAxis is expensive
+            MFrame framePT = new MFrame();
 
-            double dot_1 = MVector.DotProduct(ptFrame.XAxis, toFrame.XAxis);
-            double dot_2 = MVector.DotProduct(ptFrame.YAxis, toFrame.XAxis);
-            
-            if (dot_2 >= 0) // θz in ]-π, 0]
+            // add : 11 | sub :  9 | mul : 30 | div :  1 | sqrt :  0
+            fromFrame.ZParallelTransport_Rotation(fromZAxis, toFrame.Origin, toZAxis, ref framePT);
+
+            // add :  4 | sub :  0 | mul :  6 | div :  0 | sqrt :  0
+            double dot_1 = MVector.DotProduct(framePT.XAxis, toFrame.XAxis);
+            double dot_2 = MVector.DotProduct(framePT.YAxis, toFrame.XAxis);
+
+            if (dot_1 > 1)
             {
-                return Math.Acos(dot_1);
+                return 0;
             }
-            else // θz in ]0, π]
+            if (dot_1 < -1)
             {
-                return -Math.Acos(dot_1);
+                return Math.PI;
+            }
+
+            if (Math.Abs(dot_1) <= Math.Sqrt(2)/2) // => better if XAxis and YAxis are nearly perpendicular
+            {
+                if (dot_2 >= 0) // θz in [π/4, 3π/4]
+                {
+                    return Math.Acos(dot_1);      
+                }
+                else // θz in [-3π/4, -π/4]
+                {
+                    return -Math.Acos(dot_1);     
+                }
+            }
+            else // => better if XAxis and YAxis are nearly colinear
+            {
+                if (dot_1 >= 0) // θz in ]-π/4, π/4[
+                {
+                    return Math.Asin(dot_2);       
+                }
+                else // θz in ]0, π]
+                {
+                    if (dot_2 >= 0) // θz in ]3π/4, π]
+                    {
+                        return (Math.PI) - Math.Asin(dot_2);
+                    }
+                    else // θz in ]-π, -3π/4]
+                    {
+                        return (-Math.PI) - Math.Asin(dot_2);
+                    }
+                }
             }
         }
 
-        ///// <summary>
-        ///// Computes the angle on a plane between two vectors.
-        ///// </summary>
-        ///// <param name="v1">First vector.</param>
-        ///// <param name="v2">Second vector.</param>
-        ///// <param name="plane">Two-dimensional plane on which to perform the angle measurement.</param>
-        ///// <returns>On success, the angle (in radians) between a and b as projected onto the plane; RhinoMath.UnsetValue on failure.</returns>
-        //public static double VectorAngle(MVector v1, MVector v2, MFrame frame)
-        //{
+        /// <summary>
+        /// Gets the Z angle (θz) to align two frames using the double reflection method (cost index = 182 + acos).
+        /// </summary>
+        /// <remarks>
+        /// Firstly, fromFrame is parallel transported, with the double reflection method, on toFrame such that fromFramePT and toFrame share the same ZAxis.
+        /// Secondly, fromFramePT is rotated around its ZAxis by an angle θz to perfectly align with toFrame.
+        /// </remarks>
+        /// <param name="fromFrame">The frame to align.</param>
+        /// <param name="fromZAxis">The ZAxis of the initial frame. Must be of unit length.</param>
+        /// <param name="toFrame">The target frame to align to.</param>
+        /// <param name="toZAxis">The ZAxis of the target frame. Must be of unit length.</param>
+        /// <returns>The Oriented Z angle (θz) between the frames in ]-π,π] around toZAxis.</returns>
+        public static double ZAngle_Reflection(MFrame fromFrame, MVector fromZAxis, MFrame toFrame, MVector toZAxis)
+        {
+            /* ------------------------------------
+             * WARNING
+             * ------------------------------------
+             * - Frame axis must be of unit length
+             *  
+             * ------------------------------------
+             * TOTAL COST
+             * ------------------------------------
+             * add  | sub   | mul   | div   | sqrt
+             * 14   | 18    | 39   | 2     | 0
+             * ------------------------------------          
+             * cos  | sin   | tan   | acos  | asin
+             * 0    | 0     | 0     | 1     | 0
+             * ------------------------------------   
+             */
 
-        //    { // Project vectors onto plane.
-        //        Point3d pA = frame.Origin + v1;
-        //        Point3d pB = frame.Origin + v2;
+            MFrame framePT = new MFrame();
 
-        //        pA = plane.ClosestPoint(pA);
-        //        pB = plane.ClosestPoint(pB);
+            // add : 10 | sub : 18 | mul : 33 | div :  2 | sqrt :  0
+            fromFrame.ZParallelTransport_Reflection(fromFrame.Origin, fromZAxis, toFrame.Origin, toZAxis, ref framePT);
 
-        //        v1 = pA - plane.Origin;
-        //        v2 = pB - plane.Origin;
-        //    }
+            // add :  4 | sub :  0 | mul :  6 | div :  0 | sqrt :  0
+            double dot_1 = MVector.DotProduct(framePT.XAxis, toFrame.XAxis);
+            double dot_2 = MVector.DotProduct(framePT.YAxis, toFrame.XAxis);
 
-        //    // Abort on invalid cases.
-        //    if (!v1.Unitize()) { return RhinoMath.UnsetValue; }
-        //    if (!v2.Unitize()) { return RhinoMath.UnsetValue; }
+            if (dot_1 > 1)
+            {
+                return 0;
+            }
+            if (dot_1 < -1)
+            {
+                return Math.PI;
+            }
 
-        //    double dot = v1 * v2;
-        //    { // Limit dot product to valid range.
-        //        if (dot >= 1.0)
-        //        { dot = 1.0; }
-        //        else if (dot < -1.0)
-        //        { dot = -1.0; }
-        //    }
-
-        //    double angle = Math.Acos(dot);
-        //    { // Special case (anti)parallel vectors.
-        //        if (Math.Abs(angle) < 1e-64) { return 0.0; }
-        //        if (Math.Abs(angle - Math.PI) < 1e-64) { return Math.PI; }
-        //    }
-
-        //    Vector3d cross = Vector3d.CrossProduct(v1, v2);
-        //    if (plane.ZAxis.IsParallelTo(cross) == +1)
-        //        return angle;
-        //    return 2.0 * Math.PI - angle;
-        //}
-
+            if (Math.Abs(dot_1) <= Math.Sqrt(2) / 2) // => better if XAxis and YAxis are nearly perpendicular
+            {
+                if (dot_2 >= 0) // θz in [π/4, 3π/4]
+                {
+                    return Math.Acos(dot_1);
+                }
+                else // θz in [-3π/4, -π/4]
+                {
+                    return -Math.Acos(dot_1);
+                }
+            }
+            else // => better if XAxis and YAxis are nearly colinear
+            {
+                if (dot_1 >= 0) // θz in ]-π/4, π/4[
+                {
+                    return Math.Asin(dot_2);
+                }
+                else // θz in ]0, π]
+                {
+                    if (dot_2 >= 0) // θz in ]3π/4, π]
+                    {
+                        return (Math.PI) - Math.Asin(dot_2);
+                    }
+                    else // θz in ]-π, -3π/4]
+                    {
+                        return (-Math.PI) - Math.Asin(dot_2);
+                    }
+                }
+            }
+        }
     }
 }
