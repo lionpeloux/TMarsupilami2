@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,6 +9,9 @@ namespace TMarsupilami.MathLib
 {
     public static class Rotation
     {
+
+        #region FRAME
+
         /// <summary>
         /// Rotates a frame by an angle θ around its ZAxis (cost index = 177).
         /// </summary>
@@ -56,7 +60,7 @@ namespace TMarsupilami.MathLib
         /// <param name="frame">The frame to be rotated.</param>
         /// <param name="dθ">The oriented small angle of rotation, around the frame ZAxis.</param>
         /// <param name="frameROT">The rotated frame.</param>
-        public static void ZDiffRotate_Taylor_3(MFrame frame, double dθ, ref MFrame frameROT)
+        public static void ZDiffRotate_T3(MFrame frame, double dθ, ref MFrame frameROT)
         {
             /* ------------------------------------
              * NOTES : fast rotation
@@ -142,49 +146,7 @@ namespace TMarsupilami.MathLib
 
             // add : 11 | sub :  9 | mul : 30 | div :  1 | sqrt :  0
             fromFrame.ZParallelTransport_Rotation(fromZAxis, toFrame.Origin, toZAxis, ref framePT);
-
-            // add :  4 | sub :  0 | mul :  6 | div :  0 | sqrt :  0
-            double dot_1 = MVector.DotProduct(framePT.XAxis, toFrame.XAxis);
-            double dot_2 = MVector.DotProduct(framePT.YAxis, toFrame.XAxis);
-
-            if (dot_1 > 1)
-            {
-                return 0;
-            }
-            if (dot_1 < -1)
-            {
-                return Math.PI;
-            }
-
-            if (Math.Abs(dot_1) <= Math.Sqrt(2)/2) // => better if XAxis and YAxis are nearly perpendicular
-            {
-                if (dot_2 >= 0) // θz in [π/4, 3π/4]
-                {
-                    return Math.Acos(dot_1);      
-                }
-                else // θz in [-3π/4, -π/4]
-                {
-                    return -Math.Acos(dot_1);     
-                }
-            }
-            else // => better if XAxis and YAxis are nearly colinear
-            {
-                if (dot_1 >= 0) // θz in ]-π/4, π/4[
-                {
-                    return Math.Asin(dot_2);       
-                }
-                else // θz in ]0, π]
-                {
-                    if (dot_2 >= 0) // θz in ]3π/4, π]
-                    {
-                        return (Math.PI) - Math.Asin(dot_2);
-                    }
-                    else // θz in ]-π, -3π/4]
-                    {
-                        return (-Math.PI) - Math.Asin(dot_2);
-                    }
-                }
-            }
+            return ZAngle(framePT.XAxis, framePT.YAxis, toFrame.XAxis);
         }
 
         /// <summary>
@@ -221,49 +183,95 @@ namespace TMarsupilami.MathLib
 
             // add : 10 | sub : 18 | mul : 33 | div :  2 | sqrt :  0
             fromFrame.ZParallelTransport_Reflection(fromFrame.Origin, fromZAxis, toFrame.Origin, toZAxis, ref framePT);
+            return ZAngle(framePT.XAxis, framePT.YAxis, toFrame.XAxis);
+        }
 
-            // add :  4 | sub :  0 | mul :  6 | div :  0 | sqrt :  0
-            double dot_1 = MVector.DotProduct(framePT.XAxis, toFrame.XAxis);
-            double dot_2 = MVector.DotProduct(framePT.YAxis, toFrame.XAxis);
+        /// <summary>
+        /// Returns the angle in ]-pi,pi] between two frames (t,d1,d2) and (t,d1*,d2*) that share the same ZAxis.
+        /// </summary>
+        /// <param name="d1"></param>
+        /// <param name="d2"></param>
+        /// <param name="d1_star"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double ZAngle(MVector d1, MVector d2, MVector d1_star)
+        {
+            double dot_1 = MVector.DotProduct(d1_star, d1);
+            double dot_2 = MVector.DotProduct(d1_star, d2);
 
             if (dot_1 > 1)
-            {
                 return 0;
-            }
-            if (dot_1 < -1)
-            {
-                return Math.PI;
-            }
+            
+            if (dot_1 >= Math.Sqrt(2)/2)
+                return -Math.Asin(dot_2);
+            
+            if (dot_1 > - Math.Sqrt(2)/2)
+                return Math.Sign(dot_2) * (Math.Asin(dot_1) - (Math.PI / 2));
+            
+            if (dot_1 > -1)
+                return Math.Asin(dot_2) - Math.Sign(dot_2) * Math.PI;
 
-            if (Math.Abs(dot_1) <= Math.Sqrt(2) / 2) // => better if XAxis and YAxis are nearly perpendicular
-            {
-                if (dot_2 >= 0) // θz in [π/4, 3π/4]
-                {
-                    return Math.Acos(dot_1);
-                }
-                else // θz in [-3π/4, -π/4]
-                {
-                    return -Math.Acos(dot_1);
-                }
-            }
-            else // => better if XAxis and YAxis are nearly colinear
-            {
-                if (dot_1 >= 0) // θz in ]-π/4, π/4[
-                {
-                    return Math.Asin(dot_2);
-                }
-                else // θz in ]0, π]
-                {
-                    if (dot_2 >= 0) // θz in ]3π/4, π]
-                    {
-                        return (Math.PI) - Math.Asin(dot_2);
-                    }
-                    else // θz in ]-π, -3π/4]
-                    {
-                        return (-Math.PI) - Math.Asin(dot_2);
-                    }
-                }
-            }
+            return Math.PI;
         }
+
+        #endregion
+
+        #region VECTOR
+
+        /// <summary>
+        /// Returns a vector rotated around a given axis.
+        /// </summary>
+        /// <param name="vector">The source vector to rotate.</param>
+        /// <param name="angle">Angle of rotation (in radians).</param>
+        /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
+        /// <returns>The rotated vector.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MVector Rotate(MVector vector, double angle, MVector axis)
+        {
+            // warning : axis must be of unit length
+
+            double cos = Math.Cos(angle);
+            double sin = Math.Sin(angle);
+            return Rotate(vector, sin, cos, axis);
+        }
+
+        /// <summary>
+        /// Returns a vector rotated around a given axis.
+        /// </summary>
+        /// <param name="vector">The source vector to rotate.</param>
+        /// <param name="angle">Angle of rotation (in radians).</param>
+        /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
+        /// <returns>The rotated vector.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MVector Rotate(MVector vector, double sin, double cos, MVector axis)
+        {
+            // warning : axis must be of unit length
+
+            double vx = vector.X;
+            double vy = vector.Y;
+            double vz = vector.Z;
+
+            double ax = axis.X;
+            double ay = axis.Y;
+            double az = axis.Z;
+
+            double kx = (1 - cos) * vx * ax;
+            double ky = (1 - cos) * vy * ay;
+            double kz = (1 - cos) * vz * az;
+
+            return new MVector(
+                vx * cos + kx * ax + ky * ax + kz * ax + sin * (ay * vz - az * vy),
+                vy * cos + kx * ay + ky * ay + kz * ay + sin * (az * vx - ax * vz),
+                vz * cos + kx * az + ky * az + kz * az + sin * (ax * vy - ay * vx)
+                );
+
+            //return new Vector(
+            //    vx * c + (1 - c) * (vx * ax * ax + vy * ax * ay + vz * ax * az) + s * (ay * vz - az * vy),
+            //    vy * c + (1 - c) * (vx * ax * ay + vy * ay * ay + vz * ay * az) + s * (az * vx - ax * vz),
+            //    vz * c + (1 - c) * (vx * ax * az + vy * ay * az + vz * az * az) + s * (ax * vy - ay * vx)
+            //    );
+        }
+
+        #endregion  
     }
 }

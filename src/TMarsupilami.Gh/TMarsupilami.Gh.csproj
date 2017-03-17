@@ -91,6 +91,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Component\Arithmetic\Comp_ReNormalizeVector.cs" />
+    <Compile Include="Component\Arithmetic\Comp_NormalizeVector.cs" />
     <Compile Include="Component\Display\Comp_DisplayVector.cs" />
     <Compile Include="Component\OsculatingCircle\Comp_InscribedCirclePolyline.cs" />
     <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCirclePolyline.cs" />

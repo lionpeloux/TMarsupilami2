@@ -146,47 +146,47 @@ namespace TMarsupilami.MathLib
 
         public void ZDiffRotate(double θ, ref MFrame frameROT)
         {
-            Rotation.ZDiffRotate_Taylor_3(this, θ, ref frameROT);
+            Rotation.ZDiffRotate_T3(this, θ, ref frameROT);
         }
         public void ZDiffRotate(double θ)
         {
-            Rotation.ZDiffRotate_Taylor_3(this, θ, ref this);
+            Rotation.ZDiffRotate_T3(this, θ, ref this);
         }
 
         public void ZParallelTransport_Rotation(MVector fromZUDir, MPoint toPoint, MVector toZUDir, ref MFrame framePT)
         {
-            ParallelTransport.ZPT_Rotation(this, fromZUDir, toPoint, toZUDir, ref framePT);
+            ParallelTransportation.ZPT_Rotation(this, fromZUDir, toPoint, toZUDir, ref framePT);
         }
         public void ZParallelTransport_Rotation(MVector fromZUDir, MPoint toPoint, MVector toZUDir)
         {
-            ParallelTransport.ZPT_Rotation(this, fromZUDir, toPoint, toZUDir, ref this);
+            ParallelTransportation.ZPT_Rotation(this, fromZUDir, toPoint, toZUDir, ref this);
         }
 
         public void ZParallelTransport_Reflection(MPoint fromPoint, MVector fromZUDir, MPoint toPoint, MVector toZUDir, ref MFrame framePT)
         {
-            ParallelTransport.ZPT_Reflection(this, fromPoint, fromZUDir, toPoint, toZUDir, ref framePT);
+            ParallelTransportation.ZPT_Reflection(this, fromPoint, fromZUDir, toPoint, toZUDir, ref framePT);
         }
         public void ZParallelTransport_Reflection(MPoint fromPoint, MVector fromZUDir, MPoint toPoint, MVector toZUDir)
         {
-            ParallelTransport.ZPT_Reflection(this, fromPoint, fromZUDir, toPoint, toZUDir, ref this);
+            ParallelTransportation.ZPT_Reflection(this, fromPoint, fromZUDir, toPoint, toZUDir, ref this);
         }
 
         public void ParallelTransport_Rotation(MVector fromUDir, MPoint toPoint, MVector toUDir, ref MFrame framePT)
         {
-            ParallelTransport.PT_Rotation(this, fromUDir, toPoint, toUDir, ref framePT);
+            ParallelTransportation.PT_Rotation(this, fromUDir, toPoint, toUDir, ref framePT);
         }
         public void ParallelTransport_Rotation(MVector fromUDir, MPoint toPoint, MVector toUDir)
         {
-            ParallelTransport.PT_Rotation(this, fromUDir, toPoint, toUDir, ref this);
+            ParallelTransportation.PT_Rotation(this, fromUDir, toPoint, toUDir, ref this);
         }
 
         public void ParallelTransport_Reflection(MPoint fromPoint, MVector fromUDir, MPoint toPoint, MVector toUDir, ref MFrame framePT)
         {
-            ParallelTransport.PT_Reflection(this, fromPoint, fromUDir, toPoint, toUDir, ref framePT);
+            ParallelTransportation.PT_Reflection(this, fromPoint, fromUDir, toPoint, toUDir, ref framePT);
         }
         public void ParallelTransport_Reflection(MPoint fromPoint, MVector fromUDir, MPoint toPoint, MVector toUDir)
         {
-            ParallelTransport.PT_Reflection(this, fromPoint, fromUDir, toPoint, toUDir, ref this);
+            ParallelTransportation.PT_Reflection(this, fromPoint, fromUDir, toPoint, toUDir, ref this);
         }
         #endregion
 

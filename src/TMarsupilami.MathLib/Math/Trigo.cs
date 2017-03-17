@@ -74,5 +74,122 @@ namespace TMarsupilami.MathLib
 #endif
         }
 
+        #region TAYLOR
+        public static double Sin_T1(double x)
+        {
+            // add :  0
+            // mul :  0
+
+            double p1 = 1;
+            return x * p1;
+        }
+        public static double Sin_T3(double x)
+        {
+            // add :  1
+            // mul :  3
+
+            double p1 = 1;
+            double p3 = -1 / 6;
+
+            double x2 = x * x;
+            return x * (p1 + x2 * p3);
+        }
+        public static double Sin_T5(double x)
+        {
+            // add :  1
+            // mul :  3
+
+            double p1 = 1;
+            double p3 = -1 / 6;
+            double p5 = 1 / 120;
+
+            double x2 = x * x;
+            return x * (p1 + x2 * (p3 + x2 * p5));
+        }
+        public static double Sin_T7(double x)
+        {
+            // add :  1
+            // mul :  3
+
+            double p1 = 1;
+            double p3 = -1 / 6;
+            double p5 = 1 / 120;
+            double p7 = -1 / 5040;
+
+            double x2 = x * x;
+            return x * (p1 + x2 * (p3 + x2 * (p5 + x2 * p7)));
+        }
+        public static double Sin_T9(double x)
+        {
+            // add :  1
+            // mul :  3
+
+            double p1 = 1;
+            double p3 = -1 / 6;
+            double p5 = 1 / 120;
+            double p7 = -1 / 5040;
+            double p9 = 1 / 362880;
+
+            double x2 = x * x;
+            return x * (p1 + x2 * (p3 + x2 * (p5 + x2 * (p7 + x2 * p9))));
+        }
+        #endregion
+
+        #region REMEZ
+        public static double Sin_R3(double x)
+        {
+            // optimization over [-pi/4, pi/4] 
+            // add :  1
+            // mul :  3
+
+            double p1 = 1;
+            double p3 = -0.16662833806923272476;
+
+            double x2 = x * x;
+            return x * (p1 + x2 * p3);
+        }
+        public static double Sin_R5(double x)
+        {
+            // optimization over [-pi/4, pi/4] 
+            // add :  2
+            // mul :  4
+
+            double p1 = 1;
+            double p3 = -0.16662833806923272476;
+            double p5 = 8.15299234169417208e-3;
+
+            double x2 = x * x;
+            return x*(p1+ x2*(p3 + x2*p5));
+        }
+        public static double Sin_R7(double x)
+        {
+            // optimization over [-pi/4, pi/4] 
+            // add :  3
+            // mul :  5
+
+            double p1 = 1;
+            double p3 = -0.1666665066929876438;
+            double p5 = 8.331978663399449201e-3;
+            double p7 = -1.9495636264301826503e-4;
+
+            double x2 = x * x;
+            return x * (p1 + x2 * (p3 + x2 * (p5 + x2 * p7)));
+        }
+        public static double Sin_R9(double x)
+        {
+            // optimization over [-pi/4, pi/4] 
+            // add :  4
+            // mul :  6
+
+            double p1 = 1;
+            double p3 = -0.166666666279990720609642152324994629615;
+            double p5 = 8.33332823871530822441580014641203750665e-3;
+            double p7 = -1.98390437703319082008068095794456309537e-4;
+            double p9 = 2.716014015640842288168588815794202478e-6;
+
+            double x2 = x * x;
+            return x * (p1 + x2 * (p3 + x2 * (p5 + x2 * (p7 + x2 * p9))));
+        }
+        #endregion
     }
 }

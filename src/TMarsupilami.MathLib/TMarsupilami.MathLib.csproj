@@ -60,9 +60,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Math\Circle.cs" />
+    <Compile Include="Math\Projection.cs" />
+    <Compile Include="Math\Sqrt.cs" />
     <Compile Include="Type\MFrame.cs" />
     <Compile Include="Type\MPoint.cs" />
-    <Compile Include="Math\ParallelTransport.cs" />
+    <Compile Include="Math\ParallelTransportation.cs" />
     <Compile Include="Math\Rotation.cs" />
     <Compile Include="Math\Trigo.cs" />
     <Compile Include="Type\MVector.cs" />

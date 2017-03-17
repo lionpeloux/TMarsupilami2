@@ -492,7 +492,7 @@ namespace TMarsupilami.MathLib
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Length(MVector v)
         {
-            return System.Math.Sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+            return Math.Sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
         }
 
         /// <summary>
@@ -524,6 +524,19 @@ namespace TMarsupilami.MathLib
                     v.z * l
                 );
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MVector ReNormalize(MVector v)
+        {
+            double l2 = v.Length();
+            double _l = Sqrt.InvSqrt_R2_N1(l2); // fast inv sqrt for l2 in [0.9, 1.1]
+            return new MVector
+            (
+                v.x * _l,
+                v.y * _l,
+                v.z * _l
+            );
         }
 
         ///<summary>
@@ -754,219 +767,7 @@ namespace TMarsupilami.MathLib
             }
         }
 
-        /// <summary>
-        /// Returns the projection of a vector on a plane that has the specified normal v = v - (v.n/|n|^2)n
-        /// The resulting vector is also considered as the "natural" perpendicular vector of the input vector.
-        /// The normal is not necessary of unit l.
-        /// </summary>
-        /// <param name="v">The source vector to project.</param>
-        /// <param name="normal">The normal of the plane being projected on.</param>
-        /// <returns>The projected vector v = v - ((v.n)/|n|^2)n.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MVector ProjectPerpendicular(MVector v, MVector normal)
-        {
-            double l2 = normal.LengthSquared();
 
-            if (l2 == 0) { return new MVector(); }
-            else
-            {
-                double alpha = (v.x * normal.x + v.y * normal.y + v.z * normal.z) / l2;
-                return new MVector
-                    (
-                    v.x - alpha * normal.x,
-                    v.y - alpha * normal.y,
-                    v.z - alpha * normal.z
-                    );
-            }
-        }
-
-        /// <summary>
-        /// Returns the projection of a vector on the specified direction v = (v.n/|n|^2)n
-        /// The direction vector is not necessary of unit l.
-        /// </summary>
-        /// <param name="v">The source vector to project.</param>
-        /// <param name="direction">The direction of the plane being projected on.</param>
-        /// <returns>The projected vector v = (v.n/|n|^2)n.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MVector ProjectParallel(MVector v, MVector direction)
-        {
-            double l2 = direction.LengthSquared();
-
-            if (l2 == 0) { return new MVector(); }
-            else
-            {
-                double alpha = (v.x * direction.x + v.y * direction.y + v.z * direction.z) / l2;
-                return new MVector
-                    (
-                        alpha * direction.x,
-                        alpha * direction.y,
-                        alpha * direction.z
-                    );
-            }
-        }
-
-        /// <summary>
-        /// Decompose a vector into it's parallel and perpendicular contributions relative to a given direction or plane.
-        /// vpar = (v.n/|n|^2)n.
-        /// vperp = v - (v.n/|n|^2)n.
-        /// The normal is not necessary of unit l.
-        /// </summary>
-        /// <param name="v">The source vector to decompose.</param>
-        /// <param name="normal">The direction vector or the normal vector of the plane to decompose on.</param>
-        /// <param name="vpar">The parallel component.</param>
-        /// <param name="vperp">The perpendicular component.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Project(MVector v, MVector normal, out MVector vpar, out MVector vperp)
-        {
-            double l2 = normal.LengthSquared();
-
-            if (l2 == 0)
-            {
-                vpar = new MVector();
-                vperp = new MVector();
-                return false;
-            }
-            else
-            {
-                double alpha = (v.x * normal.x + v.y * normal.y + v.z * normal.z) / l2;
-                vpar = new MVector
-                    (
-                        alpha * normal.x,
-                        alpha * normal.y,
-                        alpha * normal.z
-                    );
-                vperp = new MVector
-                    (
-                        v.x - vpar.x,
-                        v.y - vpar.y,
-                        v.z - vpar.z
-                    );
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// Returns a vector rotated around a given axis.
-        /// </summary>
-        /// <param name="v">The source vector to rotate.</param>
-        /// <param name="angle">Angle of rotation (in radians).</param>
-        /// <param name="axis">Axis of rotation.</param>
-        /// <returns>The rotated vector.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MVector Rotate(MVector v, double angle, MVector axis)
-        {
-            axis.Normalize();
-
-            double c = System.Math.Cos(angle);
-            double s = System.Math.Sin(angle);
-
-            double ax = (1 - c) * v.x * axis.x;
-            double ay = (1 - c) * v.y * axis.y;
-            double az = (1 - c) * v.z * axis.z;
-
-            return new MVector(
-                v.x * c + ax * axis.x + ay * axis.x + az * axis.x + s * (axis.y * v.z - axis.z * v.y),
-                v.y * c + ax * axis.y + ay * axis.y + az * axis.y + s * (axis.z * v.x - axis.x * v.z),
-                v.z * c + ax * axis.z + ay * axis.z + az * axis.z + s * (axis.x * v.y - axis.y * v.x)
-                );
-
-            //return new Vector(
-            //    v.x * c + (1 - c) * (v.x * axis.x * axis.x + v.y * axis.x * axis.y + v.z * axis.x * axis.z) + s * (axis.y * v.z - axis.z * v.y),
-            //    v.y * c + (1 - c) * (v.x * axis.x * axis.y + v.y * axis.y * axis.y + v.z * axis.y * axis.z) + s * (axis.z * v.x - axis.x * v.z),
-            //    v.z * c + (1 - c) * (v.x * axis.x * axis.z + v.y * axis.y * axis.z + v.z * axis.z * axis.z) + s * (axis.x * v.y - axis.y * v.x)
-            //    );
-        }
-
-        /// <summary>
-        /// Returns a vector rotated around a given axis.
-        /// </summary>
-        /// <param name="v">The source vector to rotate.</param>
-        /// <param name="angle">Angle of rotation (in radians).</param>
-        /// <param name="axis">Axis of rotation.</param>
-        /// <returns>The rotated vector.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MVector Rotate(MVector v, double sin, double cos, MVector axis)
-        {
-            // warning : axis must be of unit length
-            double ax = (1 - cos) * v.x * axis.x;
-            double ay = (1 - cos) * v.y * axis.y;
-            double az = (1 - cos) * v.z * axis.z;
-
-            return new MVector(
-                v.x * cos + ax * axis.x + ay * axis.x + az * axis.x + sin * (axis.y * v.z - axis.z * v.y),
-                v.y * cos + ax * axis.y + ay * axis.y + az * axis.y + sin * (axis.z * v.x - axis.x * v.z),
-                v.z * cos + ax * axis.z + ay * axis.z + az * axis.z + sin * (axis.x * v.y - axis.y * v.x)
-                );
-
-            //return new Vector(
-            //    v.x * c + (1 - c) * (v.x * axis.x * axis.x + v.y * axis.x * axis.y + v.z * axis.x * axis.z) + s * (axis.y * v.z - axis.z * v.y),
-            //    v.y * c + (1 - c) * (v.x * axis.x * axis.y + v.y * axis.y * axis.y + v.z * axis.y * axis.z) + s * (axis.z * v.x - axis.x * v.z),
-            //    v.z * c + (1 - c) * (v.x * axis.x * axis.z + v.y * axis.y * axis.z + v.z * axis.z * axis.z) + s * (axis.x * v.y - axis.y * v.x)
-            //    );
-        }
-
-        /// <summary>
-        /// Compute the oriented angle (α ≥ 0) between two vectors in [0,π].
-        /// α is the rotation you need around v1 x v2 to align v1 with v2.
-        /// </summary>
-        /// <param name="v1">First vector for angle.</param>
-        /// <param name="v2">Second vector for angle.</param>
-        /// <returns>Returns α, the angle between v1 and v2 in [0,π].</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double OrientedAngle(MVector v1, MVector v2)
-        {
-            double dot = DotProduct(v1, v2);
-            double l = System.Math.Sqrt(v1.LengthSquared() * v2.LengthSquared());
-            double cos = dot / l;
-
-            if (cos > 1.0) // <=> cos = 1 => α = 0
-            {
-                return 0;
-            }
-            else if (cos < -1.0) // => cos = -1 <=> α = π
-            {
-                return System.Math.PI;
-            }
-            else // => α = acos(v1.v2/(|v1||v2|))
-            {
-                return System.Math.Acos(cos);
-            }
-        }
-
-        /// <summary>
-        /// Compute the oriented angle (α ≥ 0) between two vectors in [0,π].
-        /// α is the rotation you need around v1 x v2 to align v1 with v2.
-        /// </summary>
-        /// <param name="v1">First vector for angle.</param>
-        /// <param name="v2">Second vector for angle.</param>
-        /// <returns>
-        /// Returns α, the angle between v1 and v2 in [0,π] and the normalized rotation axis (v1 x v2)/(|v1||v2|).
-        /// When α = 0 or α = π, the axis could not be defined and Vector.Zero is returned.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double OrientedAngle(MVector v1, MVector v2, out MVector axis)
-        {
-            double dot = DotProduct(v1, v2);
-            double l = System.Math.Sqrt(v1.LengthSquared() * v2.LengthSquared());
-            double cos = dot / l;
-
-            if (cos >= 1.0) // <=> cos = 1 => α = 0
-            {
-                axis = MVector.Zero;
-                return 0;
-            }
-            else if (cos <= -1.0) // => cos = -1 <=> α = π
-            {
-                axis = MVector.Zero;
-                return System.Math.PI;
-            }
-            else // => α = acos(v1.v2/(|v1||v2|))
-            {
-                axis = CrossProduct(v1, v2);
-                axis.Normalize();
-                return System.Math.Acos(cos);
-            }
-        }
         #endregion
   
     }

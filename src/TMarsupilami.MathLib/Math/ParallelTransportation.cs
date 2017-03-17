@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.MathLib
 {
-    public static class ParallelTransport
+    public static class ParallelTransportation
     {
         /// COST MODEL
         /// add  : 1

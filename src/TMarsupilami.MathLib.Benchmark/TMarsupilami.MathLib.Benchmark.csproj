@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E71C6D27-3532-49D9-822A-C55BCA364B54}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TMarsupilami.MathLib.Benchmark</RootNamespace>
     <AssemblyName>TMarsupilami.MathLib.Benchmark</AssemblyName>
@@ -163,6 +163,9 @@
   <ItemGroup>
     <Compile Include="Bench_Arithmetic.cs" />
     <Compile Include="Bench_ParallelTransport.cs" />
+    <Compile Include="Bench_VectorAlloc.cs" />
+    <Compile Include="Bench_Sqrt.cs" />
+    <Compile Include="Bench_Sin.cs" />
     <Compile Include="Bench_Rotation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

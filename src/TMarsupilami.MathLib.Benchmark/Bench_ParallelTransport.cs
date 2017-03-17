@@ -50,7 +50,7 @@ namespace TMarsupilami.MathLib.Benchmark
         {
             for (int i = 0; i < N; i++)
             {
-                ParallelTransport.ZPT_Reflection(frames[i], frames[i].Origin, frames[i].ZAxis, toPoints[i], toDirs[i], ref resFrames[i]);
+                ParallelTransportation.ZPT_Reflection(frames[i], frames[i].Origin, frames[i].ZAxis, toPoints[i], toDirs[i], ref resFrames[i]);
             }
             return resFrames;
         }
@@ -60,7 +60,7 @@ namespace TMarsupilami.MathLib.Benchmark
         {
             for (int i = 0; i < N; i++)
             {
-                ParallelTransport.ZPT_Rotation(frames[i], fromDirs[i], toPoints[i], toDirs[i], ref resFrames[i]);
+                ParallelTransportation.ZPT_Rotation(frames[i], fromDirs[i], toPoints[i], toDirs[i], ref resFrames[i]);
             }
             return resFrames;
         }
@@ -70,7 +70,7 @@ namespace TMarsupilami.MathLib.Benchmark
         {
             for (int i = 0; i < N; i++)
             {
-                ParallelTransport.PT_Reflection(frames[i], frames[i].Origin, fromDir, toPoints[i], toDirs[i], ref resFrames[i]);
+                ParallelTransportation.PT_Reflection(frames[i], frames[i].Origin, fromDir, toPoints[i], toDirs[i], ref resFrames[i]);
             }
             return resFrames;
         }
@@ -80,7 +80,7 @@ namespace TMarsupilami.MathLib.Benchmark
         {
             for (int i = 0; i < N; i++)
             {
-                ParallelTransport.PT_Rotation(frames[i], fromDir, toPoints[i], toDirs[i], ref resFrames[i]);
+                ParallelTransportation.PT_Rotation(frames[i], fromDir, toPoints[i], toDirs[i], ref resFrames[i]);
             }
             return resFrames;
         }

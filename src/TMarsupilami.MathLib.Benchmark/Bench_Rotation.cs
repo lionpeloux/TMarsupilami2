@@ -46,7 +46,7 @@ namespace TMarsupilami.MathLib.Benchmark
         {
             for (int i = 0; i < N; i++)
             {
-                Rotation.ZDiffRotate_Taylor_3(resFrames[i], angles[i], ref resFrames[i]);
+                Rotation.ZDiffRotate_T3(resFrames[i], angles[i], ref resFrames[i]);
             }
             return resFrames;
         }
