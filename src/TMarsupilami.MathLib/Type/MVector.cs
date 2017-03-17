@@ -527,10 +527,34 @@ namespace TMarsupilami.MathLib
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MVector ReNormalize(MVector v)
+        public static MVector ReNormalize_R2(MVector v)
         {
-            double l2 = v.Length();
+            double l2 = v.LengthSquared();
+            double _l = Sqrt.InvSqrt_R2(l2); // fast inv sqrt for l2 in [0.9, 1.1]
+            return new MVector
+            (
+                v.x * _l,
+                v.y * _l,
+                v.z * _l
+            );
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MVector ReNormalize_R2_N1(MVector v)
+        {
+            double l2 = v.LengthSquared();
             double _l = Sqrt.InvSqrt_R2_N1(l2); // fast inv sqrt for l2 in [0.9, 1.1]
+            return new MVector
+            (
+                v.x * _l,
+                v.y * _l,
+                v.z * _l
+            );
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MVector ReNormalize_R2_N2(MVector v)
+        {
+            double l2 = v.LengthSquared();
+            double _l = Sqrt.InvSqrt_R2_N2(l2); // fast inv sqrt for l2 in [0.9, 1.1]
             return new MVector
             (
                 v.x * _l,

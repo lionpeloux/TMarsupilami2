@@ -43,7 +43,10 @@ namespace TMarsupilami.Gh.Component
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddVectorParameter("Vector(s)", "v", "The re-normalized vector(s).", GH_ParamAccess.list);
+            pManager.AddVectorParameter("Vector(s)", "v1", "The re-normalized vector(s).", GH_ParamAccess.list);
+            pManager.AddVectorParameter("Vector(s)", "v2", "The re-normalized vector(s).", GH_ParamAccess.list);
+            pManager.AddVectorParameter("Vector(s)", "v3", "The re-normalized vector(s).", GH_ParamAccess.list);
+
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -52,17 +55,26 @@ namespace TMarsupilami.Gh.Component
 
             if (!DA.GetDataList(0, vector_list)) { return; }
 
+            int n = vector_list.Count;
             var vectors = vector_list.Cast();
+            var v1 = new MVector[n];
+            var v2 = new MVector[n];
+            var v3 = new MVector[n];
 
             var watch = Stopwatch.StartNew();
             for (int i = 0; i < vectors.Count; i++)
             {
-                vectors[i] = MVector.ReNormalize(vectors[i]);
+                v1[i] = MVector.ReNormalize_R2(vectors[i]);
+                v2[i] = MVector.ReNormalize_R2_N1(vectors[i]);
+                v3[i] = MVector.ReNormalize_R2_N2(vectors[i]);
             }
             watch.Stop();
             AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
 
-            DA.SetDataList(0, vectors.Cast());
+            DA.SetDataList(0, v1.Cast());
+            DA.SetDataList(1, v2.Cast());
+            DA.SetDataList(2, v3.Cast());
+
         }
     }
 }

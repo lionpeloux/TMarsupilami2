@@ -57,7 +57,7 @@ namespace TMarsupilami.Gh.Component
             var watch = Stopwatch.StartNew();
             for (int i = 0; i < vectors.Count; i++)
             {
-                vectors[i].Normalize();
+                vectors[i] = MVector.Normalize(vectors[i]);
             }
             watch.Stop();
             AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");

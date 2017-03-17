@@ -28,7 +28,7 @@ namespace TMarsupilami.Gh
             var points_rh = new List<Point3d>(points.Count);
             for (int i = 0; i < points.Count; i++)
             {
-                points_rh[i] = points[i].Cast();
+                points_rh.Add(points[i].Cast());
             }
             return points_rh;
         }
@@ -37,7 +37,7 @@ namespace TMarsupilami.Gh
             var points = new List<MPoint>(points_rh.Count);
             for (int i = 0; i < points_rh.Count; i++)
             {
-                points[i] = points_rh[i].Cast();
+                points.Add(points_rh[i].Cast());
             }
             return points;
         }
@@ -74,7 +74,7 @@ namespace TMarsupilami.Gh
             var vectors_rh = new List<Vector3d>(vectors.Count);
             for (int i = 0; i < vectors.Count; i++)
             {
-                vectors_rh[i] = vectors[i].Cast();
+                vectors_rh.Add(vectors[i].Cast());
             }
             return vectors_rh;
         }
@@ -83,7 +83,7 @@ namespace TMarsupilami.Gh
             var vectors = new List<MVector>(vectors_rh.Count);
             for (int i = 0; i < vectors_rh.Count; i++)
             {
-                vectors[i] = vectors_rh[i].Cast();
+                vectors.Add(vectors_rh[i].Cast());
             }
             return vectors;
         }
