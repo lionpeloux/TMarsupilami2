@@ -8,12 +8,12 @@ using System.Diagnostics;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ZAnglePlane_Rotation : GH_Component
+    public class Comp_ZAnglePlane_Reflection : GH_Component
     {
 
-        public Comp_ZAnglePlane_Rotation()
-          : base("Z Angle between Planes - Rotation", "AZ",
-              "Gets the Z angle (or minimal twist angle along the ZAxis) two align two planes after parallel transport. Relies on the rotation method.",
+        public Comp_ZAnglePlane_Reflection()
+          : base("Z Angle between Planes - Reflection", "AZ",
+              "Gets the Z angle (or minimal twist angle along the ZAxis) two align two planes after parallel transport. Relies on the double reflection method.",
               "TMarsupilami", "Math")
         {
         }
@@ -22,7 +22,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.senary;
+                return GH_Exposure.quarternary;
             }
         }
         protected override System.Drawing.Bitmap Icon
@@ -34,7 +34,7 @@ namespace TMarsupilami.Gh.Component
         }
         public override Guid ComponentGuid
         {
-            get { return new Guid("{A12F00FE-DD07-44C9-B2EA-D954292DBDAE}"); }
+            get { return new Guid("{164D4A40-2BE0-4CFF-B412-F605A54AFAB5}"); }
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -75,7 +75,7 @@ namespace TMarsupilami.Gh.Component
             var watch = Stopwatch.StartNew();
             for (int i = 1; i < plane_list.Count; i++)
             {
-                angles[i - 1] = Rotation.ZAngle_Rotation(frames[i - 1], zaxis[i - 1], frames[i], zaxis[i]);
+                angles[i - 1] = Rotation.ZAngle_Reflection(frames[i - 1], zaxis[i - 1], frames[i], zaxis[i]);
             }
             watch.Stop();
             AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");

@@ -22,7 +22,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.quinary;
+                return GH_Exposure.quarternary;
             }
         }
         protected override System.Drawing.Bitmap Icon
