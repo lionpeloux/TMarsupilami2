@@ -110,12 +110,12 @@ namespace TMarsupilami.MathLib.Benchmark
         }
 
         [Benchmark]
-        public MVector[] ReNormalize()
+        public MVector[] ReNormalize_R2_N2()
         {
             for (int i = 0; i < N; i++)
             {
                 var v = vec[i];
-                resVec[i] = MVector.ReNormalize(v);
+                resVec[i] = MVector.ReNormalize_R2_N2(v);
             }
             return resVec;
         }

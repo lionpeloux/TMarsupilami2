@@ -11,6 +11,51 @@ namespace TMarsupilami.MathLib
     public static partial class Sqrt
     {
         /// <summary>
+        /// Polynomial approximation of order 1 of 1/sqrt(x).
+        /// Use it to renormalize a vector that is almost already normalized |u| in I.
+        /// Somme Newton steps can be added to increase accuracy.
+        /// </summary>
+        /// <remarks>
+        /// Use the Taylor approximaitonof order 1 around x = 1.
+        /// </remarks>
+        /// <param name="x">Input number close to 1.</param>
+        /// <returns>An approximation of 1/sqrt(x).</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double InvSqrt_T1(double x)
+        {
+            // add :  1
+            // mul :  1
+
+            double p0 = 1.0;
+            double p1 = -0.5;
+
+            double y = p0 + x * p1;
+            return y;
+        }
+
+        /// <summary>
+        /// Combined approximation of 1/sqrt(x).
+        /// Uses a polynomial approximation of order 1around 1 and 2 Newton steps.
+        /// </summary>
+        /// <param name="x">Input number close to 1.</param>
+        /// <returns>An approximation of 1/sqrt(x).</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double InvSqrt_T1_N2(double x)
+        {
+            // add :  1
+            // sub :  2
+            // mul :  7
+
+            double y;
+            double x2 = 0.5 * x;
+
+            y = InvSqrt_T1(x);          // Remez approximation
+            y = y * (1.5 - x2 * y * y); // Newton step 1
+            y = y * (1.5 - x2 * y * y); // Newton step 2
+            return y;
+        }
+
+        /// <summary>
         /// Polynomial approximation of order 2 of 1/sqrt(x) over I = [0.9 ; 1.1].
         /// Use it to renormalize a vector that is almost already normalized |u| in I.
         /// Somme Newton steps can be added to increase accuracy.

@@ -91,26 +91,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Component\Arithmetic\Comp_ReNormalizeVector.cs" />
-    <Compile Include="Component\Arithmetic\Comp_NormalizeVector.cs" />
-    <Compile Include="Component\Display\Comp_DisplayVector.cs" />
-    <Compile Include="Component\OsculatingCircle\Comp_InscribedCirclePolyline.cs" />
-    <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCirclePolyline.cs" />
-    <Compile Include="Component\OsculatingCircle\Comp_InscribedCircleEnd.cs" />
-    <Compile Include="Component\OsculatingCircle\Comp_InscribedCircleStart.cs" />
-    <Compile Include="Component\OsculatingCircle\Comp_InscribedCircleCurrent.cs" />
-    <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleEnd.cs" />
-    <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleStart.cs" />
-    <Compile Include="Component\OsculatingCircle\Comp_CircumscribedCircleCurrent.cs" />
-    <Compile Include="Component\Display\Comp_DisplayFrame.cs" />
-    <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Reflection.cs" />
-    <Compile Include="Component\Rotation\Comp_ZAnglePlane_Reflection.cs" />
-    <Compile Include="Component\Rotation\Comp_ZAnglePlane_Rotation.cs" />
-    <Compile Include="Component\Rotation\Comp_ZRotatePlane_Diff.cs" />
-    <Compile Include="Component\Rotation\Comp_ZRotatePlane.cs" />
-    <Compile Include="Component\ParallelTransport\Comp_ZParallelTransportPlane_Reflection.cs" />
-    <Compile Include="Component\ParallelTransport\Comp_ParallelTransportPlane_Rotation.cs" />
-    <Compile Include="Component\ParallelTransport\Comp_ZParallelTransportPlane_Rotation.cs" />
+    <Compile Include="Component\MathLib\Arithmetic\Comp_ReNormalizeVector.cs" />
+    <Compile Include="Component\MathLib\Arithmetic\Comp_NormalizeVector.cs" />
+    <Compile Include="Component\MathLib\Display\Comp_DisplayVector.cs" />
+    <Compile Include="Component\MathLib\OsculatingCircle\Comp_InscribedCirclePolyline.cs" />
+    <Compile Include="Component\MathLib\OsculatingCircle\Comp_CircumscribedCirclePolyline.cs" />
+    <Compile Include="Component\MathLib\OsculatingCircle\Comp_InscribedCircleEnd.cs" />
+    <Compile Include="Component\MathLib\OsculatingCircle\Comp_InscribedCircleStart.cs" />
+    <Compile Include="Component\MathLib\OsculatingCircle\Comp_InscribedCircleCurrent.cs" />
+    <Compile Include="Component\MathLib\OsculatingCircle\Comp_CircumscribedCircleEnd.cs" />
+    <Compile Include="Component\MathLib\OsculatingCircle\Comp_CircumscribedCircleStart.cs" />
+    <Compile Include="Component\MathLib\OsculatingCircle\Comp_CircumscribedCircleCurrent.cs" />
+    <Compile Include="Component\MathLib\Display\Comp_DisplayFrame.cs" />
+    <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportPlane_Reflection.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_ZAnglePlane_Reflection.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_ZAnglePlane_Rotation.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_ZRotatePlane_Diff.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_ZRotatePlane.cs" />
+    <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportPlane_Reflection.cs" />
+    <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportPlane_Rotation.cs" />
+    <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportPlane_Rotation.cs" />
+    <Compile Include="Component\_Model\Comp_SingleBeamGeometry.cs" />
     <Compile Include="Parameter\Param_MFrame.cs" />
     <Compile Include="Parameter\Param_MVector.cs" />
     <Compile Include="Parameter\Param_MPoint.cs" />
@@ -206,6 +207,7 @@
   <ItemGroup>
     <None Include="Resources\MVector.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
