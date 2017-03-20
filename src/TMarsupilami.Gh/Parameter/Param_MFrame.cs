@@ -41,6 +41,10 @@ namespace TMarsupilami.Gh.Parameter
                 return Resources.MFrame;
             }
         }
+        public override string ToString()
+        {
+            return this.m_data.ToString();
+        }
 
         public override bool Locked
         {

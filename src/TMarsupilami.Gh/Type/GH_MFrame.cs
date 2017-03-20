@@ -56,8 +56,7 @@ namespace TMarsupilami.Gh.Type
         }
         public override string ToString()
         {
-            return string.Format("O({0:0.00},{1:0.00},{2:0.00}) Z({3:0.00},{4:0.00},{5:0.00})", new object[] {
-                this.Value.Origin.X, this.Value.Origin.Y, this.Value.Origin.Z, this.Value.ZAxis.X, this.Value.ZAxis.Y, this.Value.ZAxis.Z });
+            return Value.ToString();
         }
         public override IGH_Goo Duplicate()
         {
@@ -72,27 +71,69 @@ namespace TMarsupilami.Gh.Type
         {
             if (source == null) { return false; }
 
-            if (source.GetType() == typeof(GH_Plane))
+            var type = source.GetType();
+            if (type == typeof(MFrame))
+            {
+                this.Value = (MFrame)source;
+                return true;
+            }
+            if (type == typeof(GH_Plane))
             {
                 this.Value = ((GH_Plane)source).Value.Cast();
                 return true;
             }
+
             return false;
         }
         public override bool CastTo<T>(ref T target)
         {
-            //First, see if T is similar to the Point3d primitive.
-            if (typeof(T).IsAssignableFrom(typeof(Plane)))
+            var type = typeof(T);
+
+            if (type.IsAssignableFrom(typeof(MFrame)))
             {
-                object ptr = this.Value;
+                object ptr = new MFrame(this.Value);
                 target = (T)ptr;
                 return true;
             }
 
-            //Then, see if T is similar to the GH_Point type.
-            if (typeof(T).IsAssignableFrom(typeof(GH_Plane)))
+            if (type.IsAssignableFrom(typeof(Plane)))
+            {
+                object ptr = this.Value.Cast();
+                target = (T)ptr;
+                return true;
+            }
+
+            if (type.IsAssignableFrom(typeof(GH_Plane)))
             {
                 object ptr = new GH_Plane(this.Value.Cast());
+                target = (T)ptr;
+                return true;
+            }
+
+            if (type.IsAssignableFrom(typeof(MPoint)))
+            {
+                object ptr = new MPoint(this.Value.Origin);
+                target = (T)ptr;
+                return true;
+            }
+
+            if (type.IsAssignableFrom(typeof(GH_MPoint)))
+            {
+                object ptr = new GH_MPoint(this.Value.Origin);
+                target = (T)ptr;
+                return true;
+            }
+
+            if (type.IsAssignableFrom(typeof(Point3d)))
+            {
+                object ptr = this.Value.Origin.Cast();
+                target = (T)ptr;
+                return true;
+            }
+
+            if (type.IsAssignableFrom(typeof(GH_Point)))
+            {
+                object ptr = new GH_Point(this.Value.Origin.Cast());
                 target = (T)ptr;
                 return true;
             }

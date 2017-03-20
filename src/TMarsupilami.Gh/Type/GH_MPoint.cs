@@ -70,11 +70,25 @@ namespace TMarsupilami.Gh.Type
         {
             if (source == null) { return false; }
 
-            if (source.GetType() == typeof(GH_Point))
+            var type = source.GetType();
+            if (type == typeof(GH_Point))
             {
                 this.Value = ((GH_Point)source).Value.Cast();
                 return true;
             }
+
+            if (type == typeof(GH_MFrame))
+            {            
+                this.Value = ((GH_MFrame)source).Value.Origin;
+                return true;
+            }
+
+            if (type == typeof(GH_Plane))
+            {
+                this.Value = ((GH_Plane)source).Value.Origin.Cast();
+                return true;
+            }
+
             return false;
         }
 

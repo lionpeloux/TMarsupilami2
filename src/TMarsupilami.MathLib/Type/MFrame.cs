@@ -114,6 +114,15 @@ namespace TMarsupilami.MathLib
 
         #region INSTANCE METHODS
 
+        public override string ToString()
+        {
+            return string.Format(
+                    "O({0:0.00},{1:0.00},{2:0.00}) Z({3:0.00},{4:0.00},{5:0.00})",
+                    this.Origin.X, this.Origin.Y, this.Origin.Z,
+                    this.ZAxis.X, this.ZAxis.Y, this.ZAxis.Z
+                );
+        }
+
         /// <summary>
         /// Re-normalized this frame in-place.
         /// This ensure the frame is orthonormal assuming it was almost orthonormal before the call.
