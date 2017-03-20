@@ -5,6 +5,7 @@ using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
 using System.Diagnostics;
+using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -39,30 +40,28 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddVectorParameter("Vector(s)", "v", "Vectors(s) to normalize.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "Vector(s)", "V", "Vectors(s) to normalize.", GH_ParamAccess.list);
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddVectorParameter("Vector(s)", "v", "The normalized vector(s).", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "Vector(s)", "V", "The normalized vector(s).", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var vector_list = new List<Vector3d>();
+            var vectors = new List<MVector>();
 
-            if (!DA.GetDataList(0, vector_list)) { return; }
-
-            var vectors = vector_list.Cast();
+            if (!DA.GetDataList(0, vectors)) { return; }
 
             var watch = Stopwatch.StartNew();
             for (int i = 0; i < vectors.Count; i++)
             {
-                vectors[i] = MVector.Normalize(vectors[i]);
+                vectors[i].Normalize();
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + (watch.Elapsed.TotalMilliseconds*1000) + " us");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.Elapsed.TotalMilliseconds + " ms");
 
-            DA.SetDataList(0, vectors.Cast());
+            DA.SetDataList(0, vectors);
         }
     }
 }

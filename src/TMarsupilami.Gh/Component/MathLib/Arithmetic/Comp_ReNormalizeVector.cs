@@ -5,6 +5,7 @@ using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
 using System.Diagnostics;
+using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -22,7 +23,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.quarternary;
+                return GH_Exposure.quinary;
             }
         }
         //protected override System.Drawing.Bitmap Icon
@@ -39,14 +40,13 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddVectorParameter("Vector(s)", "v", "Vectors(s) to re-normalize.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "Vector(s)", "v", "Vectors(s) to re-normalize.", GH_ParamAccess.list);
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddVectorParameter("Vector(s)", "v1", "The re-normalized vector(s).", GH_ParamAccess.list);
-            pManager.AddVectorParameter("Vector(s)", "v2", "The re-normalized vector(s).", GH_ParamAccess.list);
-            pManager.AddVectorParameter("Vector(s)", "v3", "The re-normalized vector(s).", GH_ParamAccess.list);
-
+            pManager.AddParameter(new Param_MVector(), "Vector(s)", "v1", "The re-normalized vector(s). Relies on Normalize_R2().", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "Vector(s)", "v2", "The re-normalized vector(s). Relies on Normalize_R2_N1().", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "Vector(s)", "v3", "The re-normalized vector(s). Relies on Normalize_R2_N2().", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -67,7 +67,7 @@ namespace TMarsupilami.Gh.Component
                 v1[i] = MVector.ReNormalize_R2(vectors[i]);
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time 1 = " + (watch.Elapsed.TotalMilliseconds * 1000) + " us");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time 3 = " + watch.Elapsed.TotalMilliseconds + " ms");
 
             watch = Stopwatch.StartNew();
             for (int i = 0; i < vectors.Count; i++)
@@ -75,7 +75,7 @@ namespace TMarsupilami.Gh.Component
                 v2[i] = MVector.ReNormalize_R2_N1(vectors[i]);
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time 2 = " + (watch.Elapsed.TotalMilliseconds * 1000) + " us");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time 3 = " + watch.Elapsed.TotalMilliseconds + " ms");
 
             watch = Stopwatch.StartNew();
             for (int i = 0; i < vectors.Count; i++)
@@ -83,7 +83,7 @@ namespace TMarsupilami.Gh.Component
                 v3[i] = MVector.ReNormalize_R2_N2(vectors[i]);
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time 3 = " + (watch.Elapsed.TotalMilliseconds * 1000) + " us");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time 3 = " + watch.Elapsed.TotalMilliseconds + " ms");
 
             DA.SetDataList(0, v1.Cast());
             DA.SetDataList(1, v2.Cast());

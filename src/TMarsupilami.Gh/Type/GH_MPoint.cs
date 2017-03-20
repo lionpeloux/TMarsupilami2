@@ -71,9 +71,16 @@ namespace TMarsupilami.Gh.Type
             if (source == null) { return false; }
 
             var type = source.GetType();
+
             if (type == typeof(GH_Point))
             {
                 this.Value = ((GH_Point)source).Value.Cast();
+                return true;
+            }
+
+            if (type == typeof(Point3d))
+            {
+                this.Value = ((Point3d)source).Cast();
                 return true;
             }
 
@@ -83,9 +90,21 @@ namespace TMarsupilami.Gh.Type
                 return true;
             }
 
+            if (type == typeof(MFrame))
+            {
+                this.Value = ((MFrame)source).Origin;
+                return true;
+            }
+
             if (type == typeof(GH_Plane))
             {
                 this.Value = ((GH_Plane)source).Value.Origin.Cast();
+                return true;
+            }
+
+            if (type == typeof(Plane))
+            {
+                this.Value = ((Plane)source).Origin.Cast();
                 return true;
             }
 
@@ -96,18 +115,23 @@ namespace TMarsupilami.Gh.Type
         // instance of GH_MPoint into some other type T.
         public override bool CastTo<T>(ref T target)
         {
-            //First, see if T is similar to the Point3d primitive.
             if (typeof(T).IsAssignableFrom(typeof(Point3d)))
             {
-                object ptr = this.Value;
+                object ptr = this.Value.Cast();
                 target = (T)ptr;
                 return true;
             }
 
-            //Then, see if T is similar to the GH_Point type.
             if (typeof(T).IsAssignableFrom(typeof(GH_Point)))
             {
                 object ptr = new GH_Point(this.Value.Cast());
+                target = (T)ptr;
+                return true;
+            }
+
+            if (typeof(T).IsAssignableFrom(typeof(MPoint)))
+            {
+                object ptr = new MPoint(this.Value);
                 target = (T)ptr;
                 return true;
             }

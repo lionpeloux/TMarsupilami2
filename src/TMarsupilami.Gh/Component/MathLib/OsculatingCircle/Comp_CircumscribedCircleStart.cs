@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
+using TMarsupilami.Gh.Parameter;
+using TMarsupilami.MathLib;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -37,33 +39,33 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddVectorParameter("ts", "ts", "Tangent vector at start (must be a unit vector).", GH_ParamAccess.item);
-            pManager.AddPointParameter("Ps", "Ps", "Start point.", GH_ParamAccess.item);
-            pManager.AddPointParameter("P", "P", "Second point", GH_ParamAccess.item);
+            pManager.AddParameter(new Param_MVector(), "ts", "ts", "Tangent vector at start (must be a unit vector).", GH_ParamAccess.item);
+            pManager.AddParameter(new Param_MPoint(), "Ps", "Ps", "Start point.", GH_ParamAccess.item);
+            pManager.AddParameter(new Param_MPoint(), "P", "P", "Second point", GH_ParamAccess.item);
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddNumberParameter("Curvature", "k", "Circle curvature",GH_ParamAccess.item);
-            pManager.AddVectorParameter("Curvature Binormal Vector", "kb", "Circle curvature bionormal vector.", GH_ParamAccess.item);
-            pManager.AddVectorParameter("Unit Tangent Vector at P", "t", "Circle unit tangent vector at P.", GH_ParamAccess.item);
+            pManager.AddParameter(new Param_MVector(), "Curvature Binormal Vector", "kb", "Circle curvature bionormal vector.", GH_ParamAccess.item);
+            pManager.AddParameter(new Param_MVector(), "Unit Tangent Vector at P", "t", "Circle unit tangent vector at P.", GH_ParamAccess.item);
             pManager.AddNumberParameter("fs", "fs", "Turning angle between (ts,t).", GH_ParamAccess.item);
             pManager.AddGeometryParameter("Circle", "C", "Circle passing through Ps, P and tangent to ts at Ps. Can be a line if points are aligned.", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Vector3d ts = new Vector3d();
-            Point3d ps = new Point3d();
-            Point3d p = new Point3d();
+            var ts = new MVector();
+            var ps = new MPoint();
+            var p = new MPoint();
 
             if (!DA.GetData(0, ref ts)) { return; }
             if (!DA.GetData(1, ref ps)) { return; }
             if (!DA.GetData(2, ref p)) { return; }
 
             double κ;
-            MathLib.MVector κb;
-            MathLib.MVector t;
+            MVector κb;
+            MVector t;
             double fs;
 
             if (ps == p) // ps = p
@@ -73,15 +75,15 @@ namespace TMarsupilami.Gh.Component
             }
             else
             {
-                ts.Unitize();
-                MathLib.Circle.CircumscribedCircle_Start(ts.Cast(), ps.Cast(), p.Cast(), out κ, out κb, out t, out fs);
+                ts.Normalize();
+                OsculatingCircle.CircumscribedCircle_Start(ts, ps, p, out κ, out κb, out t, out fs);
 
                 if (κ == 0) // it's a line
                 {
-                    var line = new Line(ps, t.Cast());
+                    var line = new Line(ps.Cast(), t.Cast());
                     DA.SetData(0, κ);
-                    DA.SetData(1, κb.Cast());
-                    DA.SetData(2, t.Cast());
+                    DA.SetData(1, κb);
+                    DA.SetData(2, t);
                     DA.SetData(3, fs);
                     DA.SetData(4, line);
                 }
@@ -89,13 +91,13 @@ namespace TMarsupilami.Gh.Component
                 {
                     double r = 1 / κ;
                     var b = r * κb;
-                    var n = MathLib.MVector.CrossProduct(b, t);
-                    var center = p.Cast() + r * n;
-                    var plane = new Plane(center.Cast(), t.Cast(), n.Cast());
-                    var circle = new Circle(plane, center.Cast(), r);
+                    var n = MVector.CrossProduct(b, t);
+                    var center = p + r * n;
+                    var frame = new MFrame(center, t, n);
+                    var circle = new Circle(frame.Cast(), center.Cast(), r);
                     DA.SetData(0, κ);
-                    DA.SetData(1, κb.Cast());
-                    DA.SetData(2, t.Cast());
+                    DA.SetData(1, κb);
+                    DA.SetData(2, t);
                     DA.SetData(3, fs);
                     DA.SetData(4, circle);
                 }

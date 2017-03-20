@@ -72,11 +72,20 @@ namespace TMarsupilami.Gh.Type
             if (source == null) { return false; }
 
             var type = source.GetType();
+
             if (type == typeof(MFrame))
             {
                 this.Value = (MFrame)source;
                 return true;
             }
+
+            if (type == typeof(Plane))
+            {
+                var plane = (Plane)source;
+                this.Value = new MFrame(plane.Origin.Cast(), plane.XAxis.Cast(), plane.YAxis.Cast());
+                return true;
+            }
+
             if (type == typeof(GH_Plane))
             {
                 this.Value = ((GH_Plane)source).Value.Cast();

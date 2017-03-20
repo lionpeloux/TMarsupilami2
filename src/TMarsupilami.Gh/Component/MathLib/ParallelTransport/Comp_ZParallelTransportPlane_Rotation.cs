@@ -5,6 +5,7 @@ using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
 using System.Diagnostics;
+using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -12,8 +13,8 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ZParallelTransportPlane_Rotation()
-          : base("Z Parallel Transport a Plane - Rotation", "ZPT (Rot)",
-              "Parallel transports a plane from it's origin and Z vector through a list of (P,t) tuples. Use the rotation method.",
+          : base("Z Parallel Transport a Frame - Rotation", "Z-PT (Rot)",
+              "Parallel transports a frame from it's origin and ZAxis through a list of (Point, Z-Direction) tuples. Relies on the rotation method.",
               "TMarsupilami", "Math")
         {
         }
@@ -39,46 +40,39 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Plane", "Pl", "Initial plane to parallel transport.", GH_ParamAccess.item);
-            pManager.AddPointParameter("Target Point(s)", "P", "Points to parallel transport to.", GH_ParamAccess.list);
-            pManager.AddVectorParameter("Target Direction(s)", "v", "Vectors to parallel transport to.", GH_ParamAccess.list);
-            pManager.AddBooleanParameter("Include", "inc", "If True, includes the initial plane in the output list.", GH_ParamAccess.item, false);
+            pManager.AddParameter(new Param_MFrame(), "Frame", "F", "Initial frame to parallel transport.", GH_ParamAccess.item);
+            pManager.AddParameter(new Param_MPoint(), "Target Point(s)", "P", "Point(s) to parallel transport to.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "Target Direction(s)", "V", "Vector(s) to parallel transport to.", GH_ParamAccess.list);
+            pManager.AddBooleanParameter("Include", "inc", "If True, includes the initial frame in the output list.", GH_ParamAccess.item, false);
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Planes", "Pl", "The parallel transported planes.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MFrame(), "Frames", "F", "The parallel transported frames.", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             bool isIncluded = false;
-            var plane = new Plane();
-            List<Point3d> point_list = new List<Point3d>();
-            List<Vector3d> direction_list = new List<Vector3d>();
+            var frame = new MFrame();
+            var points = new List<MPoint>();
+            var directions = new List<MVector>();
 
-            if (!DA.GetData(0, ref plane)) { return; }
-            if (!DA.GetDataList(1, point_list)) { return; }
-            if (!DA.GetDataList(2, direction_list)) { return; }
+            if (!DA.GetData(0, ref frame)) { return; }
+            if (!DA.GetDataList(1, points)) { return; }
+            if (!DA.GetDataList(2, directions)) { return; }
             if (!DA.GetData(3, ref isIncluded)) { return; }
 
-            int n = point_list.Count;
+            int n = points.Count;
 
-            if (n != direction_list.Count)
+            if (n != directions.Count)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Points and Directions list must have the same number of items.");
                 return;
             }
 
-            // Cast from GH to Marsupilami types
-            var frame = plane.Cast();
-            var points = new MPoint[n];
-            var directions = new MVector[n];
             for (int i = 0; i < n; i++)
             {
-                points[i] = point_list[i].Cast();
-                direction_list[i].Unitize(); // make sure vertors are of unit length
-                directions[i] = direction_list[i].Cast();
-                Rhino.RhinoApp.WriteLine("" + directions[i].LengthSquared());
+                directions[i].Normalize();
             }
 
             MFrame[] frames;
@@ -95,7 +89,7 @@ namespace TMarsupilami.Gh.Component
                 frames[0].ZParallelTransport_Rotation(frame.ZAxis, points[0], directions[0], ref frames[1]);
 
                 // Next frames
-                for (int i = 1; i < point_list.Count; i++)
+                for (int i = 1; i < points.Count; i++)
                 {
                     frames[i].ZParallelTransport_Rotation(directions[i - 1], points[i], directions[i], ref frames[i + 1]);
                 }
@@ -108,15 +102,15 @@ namespace TMarsupilami.Gh.Component
                 frame.ZParallelTransport_Rotation(frame.ZAxis, points[0], directions[0], ref frames[0]);
 
                 // Next frames
-                for (int i = 1; i < point_list.Count; i++)
+                for (int i = 1; i < points.Count; i++)
                 {
                     frames[i - 1].ZParallelTransport_Rotation(directions[i - 1], points[i], directions[i], ref frames[i]);
                 }
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.Elapsed.TotalMilliseconds + " ms");
 
-            DA.SetDataList(0, frames.Cast());
+            DA.SetDataList(0, frames);
         }
     }
 }

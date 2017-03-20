@@ -5,6 +5,7 @@ using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
 using System.Diagnostics;
+using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -12,8 +13,8 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ZAnglePlane_Rotation()
-          : base("Z Angle between Planes - Rotation", "AZ",
-              "Gets the Z angle (or minimal twist angle along the ZAxis) two align two planes after parallel transport. Relies on the rotation method.",
+          : base("Z Twist Angle between Planes - Rotation", "θz",
+              "Gets the Z twist angle (or minimal twist angle along the ZAxis) to align two planes after parallel transport. Relies on the rotation method.",
               "TMarsupilami", "Math")
         {
         }
@@ -29,7 +30,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return Resources.ZRotatePlane;
+                return Resources.ZAngle_Rotation;
             }
         }
         public override Guid ComponentGuid
@@ -39,46 +40,45 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Planes", "Pl", "Planes to mesure the Z angle in between.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MFrame(), "Frames", "F", "The frames to mesure the Z twist angle in between.", GH_ParamAccess.list);
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddNumberParameter("Z Angle", "Az", "The Z angle between pairs of planes.", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Z Twist Angle(s)", "θz", "The Z twist angle(s) between consecutive pair(s) of planes.", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var plane_list = new List<Plane>();
+            var frames = new List<MFrame>();
 
-            if (!DA.GetDataList(0, plane_list)) { return; }
+            if (!DA.GetDataList(0, frames)) { return; }
 
-            int n = plane_list.Count;
+            int n = frames.Count;
 
-            if (plane_list.Count < 2)
+            if (frames.Count < 2)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "The list of planes must have at least 2 items.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "The list of frames must have at least 2 items.");
                 return;
             }
 
-            // Cast from GH to Marsupilami types
-            var frames = plane_list.Cast();
 
             // Get unit ZAxis
             var zaxis = new MVector[n];
             for (int i = 0; i < frames.Count; i++)
             {
-                zaxis[i] = plane_list[i].ZAxis.Cast();
+                zaxis[i] = frames[i].ZAxis;
+                zaxis[i].Normalize();
             }
 
             var angles = new double[n - 1];
 
             var watch = Stopwatch.StartNew();
-            for (int i = 1; i < plane_list.Count; i++)
+            for (int i = 1; i < frames.Count; i++)
             {
                 angles[i - 1] = Rotation.ZAngle_Rotation(frames[i - 1], zaxis[i - 1], frames[i], zaxis[i]);
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.Elapsed.TotalMilliseconds + " ms");
 
             DA.SetDataList(0, angles);
         }

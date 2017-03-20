@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.MathLib
 {
-    public static class Circle
+    public static class OsculatingCircle
     {
         #region CIRCUMSCRIBED
 

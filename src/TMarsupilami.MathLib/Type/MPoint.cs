@@ -203,6 +203,28 @@ namespace TMarsupilami.MathLib
         {
             return new MPoint(v.X + p.X, v.Y + p.Y, v.Z + p.Z);
         }
+
+        /// <summary>
+        /// Determines whether two Point3d have equal values.
+        /// </summary>
+        /// <param name="p1">The first point.</param>
+        /// <param name="p2">The second point.</param>
+        /// <returns>true if the coordinates of the two points are exactly equal; otherwise false.</returns>
+        public static bool operator ==(MPoint p1, MPoint p2)
+        {
+            return (p1.x == p2.x && p1.y == p2.y && p1.z == p2.z);
+        }
+
+        /// <summary>
+        /// Determines whether two Point3d have different values.
+        /// </summary>
+        /// <param name="p1">The first point.</param>
+        /// <param name="p2">The second point.</param>
+        /// <returns>true if the two points differ in any coordinate; false otherwise.</returns>
+        public static bool operator !=(MPoint p1, MPoint p2)
+        {
+            return (p1.x != p2.x || p1.y != p2.y || p1.z != p2.z);
+        }
         #endregion
 
     }

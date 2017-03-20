@@ -5,6 +5,7 @@ using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
 using System.Diagnostics;
+using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -12,8 +13,8 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ParallelTransportPlane_Reflection()
-          : base("Parallel Transport a Plane - Reflection", "PT (Ref)",
-              "Parallel transports a plane through a list of (P,t) tuples. Use the double reflection method.",
+          : base("Parallel Transport a Frame - Reflection", "PT (Ref)",
+              "Parallel transports a frame through a list of (Points, Direction) tuples. Relies on the double reflection method.",
               "TMarsupilami", "Math")
         {
         }
@@ -39,30 +40,29 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Plane", "Pl", "Initial plane to parallel transport.", GH_ParamAccess.item);
-            pManager.AddPointParameter("Target Point(s)", "P", "Points to parallel transport to.", GH_ParamAccess.list);
-            pManager.AddVectorParameter("Target Direction(s)", "v", "Vectors to parallel transport to.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MFrame(), "Frame", "F", "Initial frame to parallel transport.", GH_ParamAccess.item);
+            pManager.AddParameter(new Param_MPoint(), "Target Point(s)", "P", "Point(s) to parallel transport to.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "Target Direction(s)", "V", "Vector(s) to parallel transport to.", GH_ParamAccess.list);
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Planes", "Pl", "The parallel transported planes.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MFrame(), "Frames", "F", "The parallel transported frames.", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var plane = new Plane();
-            List<Point3d> point_list = new List<Point3d>();
-            List<Vector3d> direction_list = new List<Vector3d>();
+            var frame = new MFrame();
+            var points = new List<MPoint>();
+            var directions = new List<MVector>();
 
-            if (!DA.GetData(0, ref plane)) { return; }
-            if (!DA.GetDataList(1, point_list)) { return; }
-            if (!DA.GetDataList(2, direction_list)) { return; }
+            if (!DA.GetData(0, ref frame)) { return; }
+            if (!DA.GetDataList(1, points)) { return; }
+            if (!DA.GetDataList(2, directions)) { return; }
 
+            int n = points.Count;
 
-            int n = point_list.Count;
-
-            if (n != direction_list.Count)
+            if (n != directions.Count)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Points and Directions list must have the same number of items.");
                 return;
@@ -74,15 +74,9 @@ namespace TMarsupilami.Gh.Component
                 return;
             }
 
-            // Cast from GH to Marsupilami types
-            var frame = plane.Cast();
-            var points = new MPoint[n];
-            var directions = new MVector[n];
             for (int i = 0; i < n; i++)
             {
-                points[i] = point_list[i].Cast();
-                direction_list[i].Unitize(); // make sure vectors are of unit length
-                directions[i] = direction_list[i].Cast();
+                directions[i].Normalize();
             }
 
             var frames = new MFrame[n];
@@ -93,12 +87,12 @@ namespace TMarsupilami.Gh.Component
             frames[0] = frame;
 
             // Next frames
-            for (int i = 1; i < point_list.Count; i++)
+            for (int i = 1; i < points.Count; i++)
             {
                 frames[i - 1].ParallelTransport_Reflection(frames[i - 1].Origin, directions[i - 1], points[i], directions[i], ref frames[i]);
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.Elapsed.TotalMilliseconds + " ms");
 
             DA.SetDataList(0, frames.Cast());
         }

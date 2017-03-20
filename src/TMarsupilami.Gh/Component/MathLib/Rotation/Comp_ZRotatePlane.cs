@@ -5,6 +5,7 @@ using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
 using System.Diagnostics;
+using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -12,7 +13,7 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ZRotatePlan()
-          : base("Z Rotate a Plane", "RZ",
+          : base("Z Rotate a Plane", "Rz",
               "Rotates a plane around its ZAxis.",
               "TMarsupilami", "Math")
         {
@@ -39,12 +40,12 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Plane(s)", "Pl", "Plane(s) to rotate around their ZAxis.", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Rotation Angle(s)", "θ", "Oriented angle(s) of rotation around the ZAxis.", GH_ParamAccess.list, new List<double>() { 0 });
+            pManager.AddParameter(new Param_MFrame(), "Frame(s)", "F", "The frames(s) to rotate around their ZAxis.", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Z Twist Angle(s)", "θz", "The oriented twist angle(s) of rotation around the frame(s) ZAxis.", GH_ParamAccess.list, new List<double>() { 0 });
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Planes", "Pl", "The rotated planes.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MFrame(), "Frame(s)", "F", "The rotated frame(s).", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -60,7 +61,7 @@ namespace TMarsupilami.Gh.Component
 
             if (angle_list.Count > 1 && n != angle_list.Count)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Plane(s) and Angle(s) lists must have the same number of items.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Frame(s) and Twist Angle(s) lists must have the same number of items.");
                 return;
             }
 
@@ -86,7 +87,7 @@ namespace TMarsupilami.Gh.Component
                 }
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.Elapsed.TotalMilliseconds + " ms");
 
             DA.SetDataList(0, frames.Cast());
         }

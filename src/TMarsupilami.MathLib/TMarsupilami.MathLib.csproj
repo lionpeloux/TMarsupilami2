@@ -59,7 +59,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Math\Circle.cs" />
+    <Compile Include="Math\OsculatingCircle.cs" />
     <Compile Include="Math\Projection.cs" />
     <Compile Include="Math\Sqrt.cs" />
     <Compile Include="Type\MFrame.cs" />

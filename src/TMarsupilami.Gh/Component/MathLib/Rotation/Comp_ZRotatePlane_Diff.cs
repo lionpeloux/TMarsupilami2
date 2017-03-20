@@ -5,6 +5,8 @@ using Rhino.Geometry;
 using TMarsupilami.Gh.Properties;
 using TMarsupilami.MathLib;
 using System.Diagnostics;
+using TMarsupilami.Gh.Type;
+using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -12,8 +14,8 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_ZRotatePlane_Diff()
-          : base("Z Rotate a Plane - Diff Taylor 3", "DRZ",
-              "Rotates a plane around its ZAxis. Assumes the rotation angle is closed to zero. Use a Taylor developement of order 3.",
+          : base("Z Rotate a Plane - Diff Taylor 3", "DRz",
+              "Rotates a plane around its ZAxis. Assumes the rotation twist angle is closed to zero. Use a Taylor developement of order 3.",
               "TMarsupilami", "Math")
         {
         }
@@ -39,54 +41,53 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Plane(s)", "Pl", "Plane(s) to rotate around their ZAxis.", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Rotation Angle(s)", "dθ", "Small oriented angle(s) of rotation around the ZAxis.", GH_ParamAccess.list, new List<double>() { 0 });
+            pManager.AddParameter(new Param_MFrame(), "Frame(s)", "F", "The frame(s) to rotate around their ZAxis.", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Z Twist Angle(s)", "dθz", "The small oriented twist angle(s) of rotation around the frame(s) ZAxis.", GH_ParamAccess.list, new List<double>() { 0 });
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Planes", "Pl", "The rotated planes.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MFrame(), "Frame(s)", "Pl", "The rotated frame(s).", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            var plane_list = new List<Plane>();
-            var angle_list = new List<double>();
+            var frames = new List<MFrame>();
+            var twistAngles = new List<double>();
 
-            if (!DA.GetDataList(0, plane_list)) { return; }
-            if (!DA.GetDataList(1, angle_list)) { return; }
+            if (!DA.GetDataList(0, frames)) { return; }
+            if (!DA.GetDataList(1, twistAngles)) { return; }
 
 
-            int n = plane_list.Count;
+            int n = frames.Count;
 
-            if (angle_list.Count > 1 && n != angle_list.Count)
+            if (twistAngles.Count > 1 && n != twistAngles.Count)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Plane(s) and Angle(s) lists must have the same number of items.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Frame(s) and Twist Angle(s) lists must have the same number of items.");
                 return;
             }
 
-            var frames = plane_list.Cast();
 
             var watch = Stopwatch.StartNew();
 
-            if (angle_list.Count == 1) // apply the same rotation angle to every frames
+            if (twistAngles.Count == 1) // apply the same rotation angle to every frames
             {
-                double dθ = angle_list[0];
-                for (int i = 0; i < plane_list.Count; i++)
+                double dθ = twistAngles[0];
+                for (int i = 0; i < frames.Count; i++)
                 {
                     frames[i].ZDiffRotate(dθ);
                 }
             }
             else
             {
-                for (int i = 0; i < plane_list.Count; i++)
+                for (int i = 0; i < frames.Count; i++)
                 {
-                    frames[i].ZDiffRotate(angle_list[i]);
+                    frames[i].ZDiffRotate(twistAngles[i]);
                 }
             }
             watch.Stop();
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.ElapsedMilliseconds + " ms");
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed time = " + watch.Elapsed.TotalMilliseconds + " ms");
 
-            DA.SetDataList(0, frames.Cast());
+            DA.SetDataList(0, frames);
         }
     }
 }

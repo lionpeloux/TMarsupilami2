@@ -70,7 +70,15 @@ namespace TMarsupilami.Gh.Type
         {
             if (source == null) { return false; }
 
-            if (source.GetType() == typeof(GH_Vector))
+            var type = source.GetType();
+
+            if (type == typeof(Vector3d))
+            {
+                this.Value = ((Vector3d)source).Cast();
+                return true;
+            }
+
+            if (type == typeof(GH_Vector))
             {
                 this.Value = ((GH_Vector)source).Value.Cast();
                 return true;
@@ -79,15 +87,20 @@ namespace TMarsupilami.Gh.Type
         }
         public override bool CastTo<T>(ref T target)
         {
-            //First, see if T is similar to the Point3d primitive.
-            if (typeof(T).IsAssignableFrom(typeof(Vector3d)))
+            if (typeof(T).IsAssignableFrom(typeof(MVector)))
             {
-                object ptr = this.Value;
+                object ptr = new MVector(this.Value);
                 target = (T)ptr;
                 return true;
             }
 
-            //Then, see if T is similar to the GH_Point type.
+            if (typeof(T).IsAssignableFrom(typeof(Vector3d)))
+            {
+                object ptr = this.Value.Cast();
+                target = (T)ptr;
+                return true;
+            }
+
             if (typeof(T).IsAssignableFrom(typeof(GH_Vector)))
             {
                 object ptr = new GH_Vector(this.Value.Cast());
