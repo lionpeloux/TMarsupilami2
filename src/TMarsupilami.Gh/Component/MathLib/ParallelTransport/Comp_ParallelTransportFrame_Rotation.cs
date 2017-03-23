@@ -9,10 +9,10 @@ using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ParallelTransportPlane_Rotation : GH_Component
+    public class Comp_ParallelTransportFrame_Rotation : GH_Component
     {
 
-        public Comp_ParallelTransportPlane_Rotation()
+        public Comp_ParallelTransportFrame_Rotation()
           : base("Parallel Transport a Frame - Rotation", "PT (Rot)",
               "Parallel transports a frame through a list of (Point, Direction) tuples. Relies on the rotation method.",
               "TMarsupilami", "Math")

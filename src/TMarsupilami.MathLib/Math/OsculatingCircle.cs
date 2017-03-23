@@ -452,5 +452,33 @@ namespace TMarsupilami.MathLib
 
         #endregion
 
+
+        public static void Circle3Pts(MPoint ps, MPoint p, MPoint pe,
+            ref MVector κb,
+            ref MVector e1, ref MVector e2,
+            ref double l1, ref double l2,
+            ref MVector u1, ref MVector u2,
+            ref MVector t1, ref MVector t, ref MVector t2)
+        {
+            var e = new MVector(pe - ps);
+            e1 = new MVector(p - ps);
+            e2 = new MVector(pe - p);
+
+            var l = e.Length();
+            l1 = e1.Length();
+            l2 = e2.Length();
+
+            var u = e / l;
+            u1 = e1 / l1;
+            u2 = e2 / l2;
+
+            κb = (2 / l) * MVector.CrossProduct(u1, u2);
+
+            t = l2 / l * u1 + l1 / l * u2;
+            t1 = (2 * (t * u1)) * u1 - t;
+            t2 = (2 * (t * u2)) * u2 - t;
+        }
+
+
     }
 }

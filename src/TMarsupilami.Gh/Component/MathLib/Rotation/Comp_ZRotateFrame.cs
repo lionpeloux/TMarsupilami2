@@ -9,12 +9,12 @@ using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ZRotatePlan : GH_Component
+    public class Comp_ZRotateFrame : GH_Component
     {
 
-        public Comp_ZRotatePlan()
-          : base("Z Rotate a Plane", "Rz",
-              "Rotates a plane around its ZAxis.",
+        public Comp_ZRotateFrame()
+          : base("Z Rotate a Frame", "Rz",
+              "Rotates a frame around its ZAxis.",
               "TMarsupilami", "Math")
         {
         }

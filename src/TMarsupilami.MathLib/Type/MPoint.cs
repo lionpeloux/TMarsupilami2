@@ -145,6 +145,16 @@ namespace TMarsupilami.MathLib
         #region INSTANCE METHODS
 
         /// <summary>
+        /// Computes the distance between two points.
+        /// </summary>
+        /// <param name="toPoint">The point to measure the distance.</param>
+        /// <returns>The distance between "this" point and "toPoint".</returns>
+        public double DistanceTo(MPoint toPoint)
+        {
+            return DistanceTo(this, toPoint);
+        }
+
+        /// <summary>
         /// Returns the string representation of the current point, in the form X,Y,Z.
         /// </summary>
         /// <returns>A string with the current location of the point.</returns>
@@ -156,6 +166,7 @@ namespace TMarsupilami.MathLib
         #endregion  
 
         #region STATIC OPERATORS
+
         /// <summary>
         /// Adds two points together.
         /// </summary>
@@ -225,6 +236,26 @@ namespace TMarsupilami.MathLib
         {
             return (p1.x != p2.x || p1.y != p2.y || p1.z != p2.z);
         }
+
+        #endregion
+
+        #region STATIC METHODS
+
+        /// <summary>
+        /// Computes the distance between two points.
+        /// </summary>
+        /// <param name="fromPoint">The first point.</param>
+        /// <param name="toPoint">The second point.</param>
+        /// <returns>The distance between the two points.</returns>
+        public double DistanceTo(MPoint fromPoint, MPoint toPoint)
+        {
+            double dx = fromPoint.x - toPoint.x;
+            double dy = fromPoint.y - toPoint.y;
+            double dz = fromPoint.z - toPoint.z;
+            double d = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+            return d;
+        }
+
         #endregion
 
     }

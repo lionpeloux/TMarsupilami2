@@ -10,12 +10,12 @@ using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ZRotatePlane_Diff : GH_Component
+    public class Comp_ZRotateFrame_Diff : GH_Component
     {
 
-        public Comp_ZRotatePlane_Diff()
-          : base("Z Rotate a Plane - Diff Taylor 3", "DRz",
-              "Rotates a plane around its ZAxis. Assumes the rotation twist angle is closed to zero. Use a Taylor developement of order 3.",
+        public Comp_ZRotateFrame_Diff()
+          : base("Z Rotate a Frame - Diff Taylor 3", "DRz",
+              "Rotates a frame around its ZAxis. Assumes the rotation twist angle is closed to zero. Use a Taylor developement of order 3.",
               "TMarsupilami", "Math")
         {
         }

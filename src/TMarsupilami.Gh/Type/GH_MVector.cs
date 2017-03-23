@@ -72,17 +72,18 @@ namespace TMarsupilami.Gh.Type
 
             var type = source.GetType();
 
+            if (type == typeof(MVector))
+            {
+                this.Value = (MVector)source;
+                return true;
+            }
+
             if (type == typeof(Vector3d))
             {
                 this.Value = ((Vector3d)source).Cast();
                 return true;
             }
 
-            if (type == typeof(GH_Vector))
-            {
-                this.Value = ((GH_Vector)source).Value.Cast();
-                return true;
-            }
             return false;
         }
         public override bool CastTo<T>(ref T target)

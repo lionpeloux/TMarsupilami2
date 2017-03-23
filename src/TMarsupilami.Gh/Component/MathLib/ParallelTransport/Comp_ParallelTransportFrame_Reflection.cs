@@ -9,10 +9,10 @@ using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ParallelTransportPlane_Reflection : GH_Component
+    public class Comp_ParallelTransportFrame_Reflection : GH_Component
     {
 
-        public Comp_ParallelTransportPlane_Reflection()
+        public Comp_ParallelTransportFrame_Reflection()
           : base("Parallel Transport a Frame - Reflection", "PT (Ref)",
               "Parallel transports a frame through a list of (Points, Direction) tuples. Relies on the double reflection method.",
               "TMarsupilami", "Math")

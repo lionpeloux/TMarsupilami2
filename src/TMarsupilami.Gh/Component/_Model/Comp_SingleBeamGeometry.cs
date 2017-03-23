@@ -33,7 +33,7 @@ namespace TMarsupilami.Gh.Component
         //}
         public override Guid ComponentGuid
         {
-            get { return new Guid("{8FC26282-FB27-4409-B7BC-B671EEB43A4A}"); }
+            get { return new Guid("{AB57A5F2-5338-4003-A953-9C1BDA148636}"); }
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -102,6 +102,7 @@ namespace TMarsupilami.Gh.Component
             framesPT[0] = frameStart;
             for (int i = 1; i < N + 1; i++)
             {
+                //ParallelTransportation.ZPT_Rotation(framesPT[i - 1], t[i - 1], vertices[i], t[i], ref framesPT[i]);
                 framesPT[i - 1].ZParallelTransport_Rotation(t[i - 1], vertices[i], t[i], ref framesPT[i]);
             }
 

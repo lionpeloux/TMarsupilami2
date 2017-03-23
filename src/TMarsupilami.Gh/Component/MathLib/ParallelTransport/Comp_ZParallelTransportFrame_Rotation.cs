@@ -9,10 +9,10 @@ using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ZParallelTransportPlane_Rotation : GH_Component
+    public class Comp_ZParallelTransportFrame_Rotation : GH_Component
     {
 
-        public Comp_ZParallelTransportPlane_Rotation()
+        public Comp_ZParallelTransportFrame_Rotation()
           : base("Z Parallel Transport a Frame - Rotation", "Z-PT (Rot)",
               "Parallel transports a frame from it's origin and ZAxis through a list of (Point, Z-Direction) tuples. Relies on the rotation method.",
               "TMarsupilami", "Math")

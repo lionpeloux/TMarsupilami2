@@ -51,12 +51,23 @@ namespace TMarsupilami.MathLib
         /// <summary>
         /// Constructs a new vector with the given vector.
         /// </summary>
-        /// <param name="v">The given vector.</param>
-        public MVector(MVector v)
+        /// <param name="vector">The given vector.</param>
+        public MVector(MVector vector)
         {
-            x = v.x;
-            y = v.y;
-            z = v.z;
+            x = vector.x;
+            y = vector.y;
+            z = vector.z;
+        }
+
+        /// <summary>
+        /// Constructs a new vector with a given point.
+        /// </summary>
+        /// <param name="point">The given vector.</param>
+        public MVector(MPoint point)
+        {
+            x = point.X;
+            y = point.Y;
+            z = point.Z;
         }
 
         /// <summary>
@@ -231,26 +242,28 @@ namespace TMarsupilami.MathLib
         public void Rotate(double angle, MVector axis)
         {
             axis.Normalize();
+            Rotation.Rotate(ref this, angle, axis);
+            
 
-            double c = System.Math.Cos(angle);
-            double s = System.Math.Sin(angle);
+            //double c = System.Math.Cos(angle);
+            //double s = System.Math.Sin(angle);
 
-            double ax = (1 - c) * x * axis.x;
-            double ay = (1 - c) * y * axis.y;
-            double az = (1 - c) * z * axis.z;
+            //double ax = (1 - c) * x * axis.x;
+            //double ay = (1 - c) * y * axis.y;
+            //double az = (1 - c) * z * axis.z;
 
-            double xtmp = x * c + ax * axis.x + ay * axis.x + az * axis.x + s * (axis.y * z - axis.z * y);
-            double ytmp = y * c + ax * axis.y + ay * axis.y + az * axis.y + s * (axis.z * x - axis.x * z);
-            double ztmp = z * c + ax * axis.z + ay * axis.z + az * axis.z + s * (axis.x * y - axis.y * x);
+            //double xtmp = x * c + ax * axis.x + ay * axis.x + az * axis.x + s * (axis.y * z - axis.z * y);
+            //double ytmp = y * c + ax * axis.y + ay * axis.y + az * axis.y + s * (axis.z * x - axis.x * z);
+            //double ztmp = z * c + ax * axis.z + ay * axis.z + az * axis.z + s * (axis.x * y - axis.y * x);
 
                 
-            //double xtmp = x * c + (1 - c) * (x * axis.x * axis.x + y * axis.x * axis.y + z * axis.x * axis.z) + s * (axis.y * z - axis.z * y);
-            //double ytmp = y * c + (1 - c) * (x * axis.x * axis.y + y * axis.y * axis.y + z * axis.y * axis.z) + s * (axis.z * x - axis.x * z);
-            //double ztmp = z * c + (1 - c) * (x * axis.x * axis.z + y * axis.y * axis.z + z * axis.z * axis.z) + s * (axis.x * y - axis.y * x);
+            ////double xtmp = x * c + (1 - c) * (x * axis.x * axis.x + y * axis.x * axis.y + z * axis.x * axis.z) + s * (axis.y * z - axis.z * y);
+            ////double ytmp = y * c + (1 - c) * (x * axis.x * axis.y + y * axis.y * axis.y + z * axis.y * axis.z) + s * (axis.z * x - axis.x * z);
+            ////double ztmp = z * c + (1 - c) * (x * axis.x * axis.z + y * axis.y * axis.z + z * axis.z * axis.z) + s * (axis.x * y - axis.y * x);
 
-            x = xtmp;
-            y = ytmp;
-            z = ztmp;            
+            //x = xtmp;
+            //y = ytmp;
+            //z = ztmp;            
         }
 
         /// <summary>
@@ -346,9 +359,9 @@ namespace TMarsupilami.MathLib
         /// <param name="v2">The second source vector.</param>
         /// <returns>The product vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MVector operator *(MVector v1, MVector v2)
+        public static double operator *(MVector v1, MVector v2)
         {
-            return new MVector(v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z);
+            return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
         }
 
         /// <summary>

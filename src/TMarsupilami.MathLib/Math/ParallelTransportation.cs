@@ -347,6 +347,7 @@ namespace TMarsupilami.MathLib
             framePT.Origin = toPoint;
             framePT.XAxis = d1_para;
             framePT.YAxis = d2_para;
+            framePT.ZAxis = toZUDir;
         }
 
         /// <summary>
@@ -419,6 +420,7 @@ namespace TMarsupilami.MathLib
             framePT.Origin = toPoint;
             framePT.XAxis = d1_para;
             framePT.YAxis = d2_para;
+            framePT.ZAxis = toZUDir;
         }
 
         /// <summary>
@@ -493,6 +495,8 @@ namespace TMarsupilami.MathLib
             framePT.Origin = toPoint;
             framePT.XAxis = d1_para;
             framePT.YAxis = d2_para;
+
+            framePT.ZAxis = MVector.CrossProduct(d1_para, d2_para);
         }
 
         /// <summary>
@@ -565,6 +569,8 @@ namespace TMarsupilami.MathLib
             framePT.Origin = toPoint;
             framePT.XAxis = d1_para;
             framePT.YAxis = d2_para;
+
+            framePT.ZAxis = MVector.CrossProduct(d1_para, d2_para);
         }
         
         #endregion

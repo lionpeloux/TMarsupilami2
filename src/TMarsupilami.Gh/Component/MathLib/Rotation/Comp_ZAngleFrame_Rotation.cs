@@ -9,12 +9,12 @@ using TMarsupilami.Gh.Parameter;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_ZAnglePlane_Rotation : GH_Component
+    public class Comp_ZAngleFrame_Rotation : GH_Component
     {
 
-        public Comp_ZAnglePlane_Rotation()
-          : base("Z Twist Angle between Planes - Rotation", "θz",
-              "Gets the Z twist angle (or minimal twist angle along the ZAxis) to align two planes after parallel transport. Relies on the rotation method.",
+        public Comp_ZAngleFrame_Rotation()
+          : base("Z Twist Angle between Frames - Rotation", "θz",
+              "Gets the Z twist angle (or minimal twist angle along the ZAxis) to align two frames after parallel transport. Relies on the rotation method.",
               "TMarsupilami", "Math")
         {
         }

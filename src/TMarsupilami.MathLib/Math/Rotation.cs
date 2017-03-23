@@ -13,6 +13,84 @@ namespace TMarsupilami.MathLib
         #region FRAME
 
         /// <summary>
+        /// In-place rotation of a frame around a given axis.
+        /// </summary>
+        /// <param name="vector">The source vector to rotate.</param>
+        /// <param name="angle">Angle of rotation (in radians).</param>
+        /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Rotate(ref MFrame frame, double angle, MVector axis)
+        {
+            // warning : axis must be of unit length
+
+            double cos = Math.Cos(angle);
+            double sin = Math.Sin(angle);
+            Rotate(ref frame, sin, cos, axis);
+        }
+
+        /// <summary>
+        /// In-place rotation of a frame around a given axis.
+        /// </summary>
+        /// <param name="frame">The source frame to rotate.</param>
+        /// <param name="sin">Sinus of the angle of rotation.</param>
+        /// <param name="cos">Cosinus of the angle of rotation.</param>
+        /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
+        public static void Rotate(ref MFrame frame, double sin, double cos, MVector axis)
+        {
+            // warning : axis must be of unit length
+            // assumse that ZAxis = XAxis x YAxis
+            
+            double ax = axis.X;
+            double ay = axis.Y;
+            double az = axis.Z;
+
+            double sax = sin * axis.X;
+            double say = sin * axis.Y;
+            double saz = sin * axis.Z;
+
+            double d = (1 - cos);
+            double cax = d * ax;
+            double cay = d * ay;
+            double caz = d * az;
+
+            // rotate XAxis
+
+            double vx = frame.XAxis.X;
+            double vy = frame.XAxis.Y;
+            double vz = frame.XAxis.Z;
+
+            double kx = cax * vx;
+            double ky = cay * vy;
+            double kz = caz * vz;
+
+            double vrx = vx * cos + kx * ax + ky * ax + kz * ax + say * vz - saz * vy;
+            double vry = vy * cos + kx * ay + ky * ay + kz * ay + saz * vx - sax * vz;
+            double vrz = vz * cos + kx * az + ky * az + kz * az + sax * vy - say * vx;
+
+            frame.XAxis = new MVector(vrx, vry, vrz);
+
+            // rotate YAxis
+
+            vx = frame.YAxis.X;
+            vy = frame.YAxis.Y;
+            vz = frame.YAxis.Z;
+
+            kx = cax * vx;
+            ky = cay * vy;
+            kz = caz * vz;
+
+            vrx = vx * cos + kx * ax + ky * ax + kz * ax + say * vz - saz * vy;
+            vry = vy * cos + kx * ay + ky * ay + kz * ay + saz * vx - sax * vz;
+            vrz = vz * cos + kx * az + ky * az + kz * az + sax * vy - say * vx;
+
+            frame.YAxis = new MVector(vrx, vry, vrz);
+
+            // update ZAxis with cross product
+
+            frame.ZAxis = MVector.CrossProduct(frame.XAxis, frame.YAxis);
+        }
+
+        /// <summary>
         /// Rotates a frame by an angle θ around its ZAxis (cost index = 177).
         /// </summary>
         /// <remarks>
@@ -219,31 +297,30 @@ namespace TMarsupilami.MathLib
         #region VECTOR
 
         /// <summary>
-        /// Returns a vector rotated around a given axis.
+        /// In-place rotation of a vector around a given axis.
         /// </summary>
         /// <param name="vector">The source vector to rotate.</param>
         /// <param name="angle">Angle of rotation (in radians).</param>
         /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
         /// <returns>The rotated vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MVector Rotate(MVector vector, double angle, MVector axis)
+        public static void Rotate(ref MVector vector, double angle, MVector axis)
         {
             // warning : axis must be of unit length
 
             double cos = Math.Cos(angle);
             double sin = Math.Sin(angle);
-            return Rotate(vector, sin, cos, axis);
+            Rotate(ref vector, sin, cos, axis);
         }
 
         /// <summary>
-        /// Returns a vector rotated around a given axis.
+        /// In-place rotation of a vector around a given axis.
         /// </summary>
         /// <param name="vector">The source vector to rotate.</param>
-        /// <param name="angle">Angle of rotation (in radians).</param>
+        /// <param name="sin">Sinus of the angle of rotation.</param>
+        /// <param name="cos">Cosinus of the angle of rotation.</param>
         /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
-        /// <returns>The rotated vector.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MVector Rotate(MVector vector, double sin, double cos, MVector axis)
+        public static void Rotate(ref MVector vector, double sin, double cos, MVector axis)
         {
             // warning : axis must be of unit length
 
@@ -259,11 +336,13 @@ namespace TMarsupilami.MathLib
             double ky = (1 - cos) * vy * ay;
             double kz = (1 - cos) * vz * az;
 
-            return new MVector(
-                vx * cos + kx * ax + ky * ax + kz * ax + sin * (ay * vz - az * vy),
-                vy * cos + kx * ay + ky * ay + kz * ay + sin * (az * vx - ax * vz),
-                vz * cos + kx * az + ky * az + kz * az + sin * (ax * vy - ay * vx)
-                );
+            double vrx = vx * cos + kx * ax + ky * ax + kz * ax + sin * (ay * vz - az * vy);
+            double vry = vy * cos + kx * ay + ky * ay + kz * ay + sin * (az * vx - ax * vz);
+            double vrz = vz * cos + kx * az + ky * az + kz * az + sin * (ax * vy - ay * vx);
+
+            vector.X = vrx;
+            vector.Y = vry;
+            vector.Z = vrz;
 
             //return new Vector(
             //    vx * c + (1 - c) * (vx * ax * ax + vy * ax * ay + vz * ax * az) + s * (ay * vz - az * vy),

@@ -103,14 +103,15 @@
     <Compile Include="Component\MathLib\OsculatingCircle\Comp_CircumscribedCircleStart.cs" />
     <Compile Include="Component\MathLib\OsculatingCircle\Comp_CircumscribedCircleCurrent.cs" />
     <Compile Include="Component\MathLib\Display\Comp_DisplayFrame.cs" />
-    <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportPlane_Reflection.cs" />
-    <Compile Include="Component\MathLib\Rotation\Comp_ZAnglePlane_Reflection.cs" />
-    <Compile Include="Component\MathLib\Rotation\Comp_ZAnglePlane_Rotation.cs" />
-    <Compile Include="Component\MathLib\Rotation\Comp_ZRotatePlane_Diff.cs" />
-    <Compile Include="Component\MathLib\Rotation\Comp_ZRotatePlane.cs" />
-    <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportPlane_Reflection.cs" />
-    <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportPlane_Rotation.cs" />
-    <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportPlane_Rotation.cs" />
+    <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportFrame_Reflection.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_ZAngleFrame_Reflection.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_ZAngleFrame_Rotation.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_RotateFrame.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_ZRotateFrame_Diff.cs" />
+    <Compile Include="Component\MathLib\Rotation\Comp_ZRotateFrame.cs" />
+    <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportFrame_Reflection.cs" />
+    <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportFrame_Rotation.cs" />
+    <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\_Model\Comp_SingleBeamGeometry.cs" />
     <Compile Include="Parameter\Param_MFrame.cs" />
     <Compile Include="Parameter\Param_MVector.cs" />
@@ -212,6 +213,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ZAngle_Rotation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Component\_Model\Test\" />
+    <Folder Include="Component\_Test\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
