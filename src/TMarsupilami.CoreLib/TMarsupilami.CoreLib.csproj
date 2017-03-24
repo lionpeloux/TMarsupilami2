@@ -71,9 +71,19 @@
     <Compile Include="Loads\AppliedDisplacement.cs" />
     <Compile Include="Loads\Load.cs" />
     <Compile Include="Loads\LoadCase.cs" />
-    <Compile Include="Models\Elements\Bar.cs" />
-    <Compile Include="Models\Elements\Beam.cs" />
+    <Compile Include="Models\Elements\BarElement.cs" />
+    <Compile Include="Models\Elements\BeamElement.cs" />
     <Compile Include="IDeepCloneable.cs" />
+    <Compile Include="Models\Elements\Layouts\BarLayout.cs" />
+    <Compile Include="Models\Elements\Layouts\BeamLayout.cs" />
+    <Compile Include="Models\Elements\Layouts\ILayout2D.cs" />
+    <Compile Include="Models\Elements\Layouts\ILayout1D.cs" />
+    <Compile Include="Models\Elements\Models\BeamModels\BeamModel.cs" />
+    <Compile Include="Models\Elements\Models\BeamModels\BeamModel_11.cs" />
+    <Compile Include="Models\Elements\Models\IModel2D.cs" />
+    <Compile Include="Models\Elements\Models\IModel1D.cs" />
+    <Compile Include="Models\Elements\Models\IModel.cs" />
+    <Compile Include="Models\Elements\Layouts\ILayout.cs" />
     <Compile Include="Models\Materials\Material.cs" />
     <Compile Include="Models\Materials\ConstitutiveLawGenerator.cs" />
     <Compile Include="Models\Materials\M_Generic.cs" />
@@ -82,7 +92,7 @@
     <Compile Include="Models\Model.cs" />
     <Compile Include="Models\Sections\Section.cs" />
     <Compile Include="Models\Constraints\Constraint.cs" />
-    <Compile Include="Models\Elements\Element.cs" />
+    <Compile Include="Models\Elements\Element_1D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Solvers\Solver_DR.cs" />
   </ItemGroup>
@@ -93,9 +103,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataDomain\" />
-    <Folder Include="Solvers\DR_3Dof\" />
-    <Folder Include="Solvers\DR_4Dof\" />
-    <Folder Include="Solvers\DR_6Dof\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TMarsupilami.MathLib\TMarsupilami.MathLib.csproj">
