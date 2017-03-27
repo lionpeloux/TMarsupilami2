@@ -804,8 +804,74 @@ namespace TMarsupilami.MathLib
             }
         }
 
+        /// <summary>
+        /// Basis change of a vector.
+        /// </summary>
+        /// <param name="vector">The vector expressed in the initial basis.</param>
+        /// <param name="fromBasis">Initial basis as an othonormal frame.</param>
+        /// <param name="toBasis">Target basis as an othonormal frame.</param>
+        /// <returns>The changed vector expressed in the target basis.</returns>
+        public static MVector ChangeBasis(MVector vector, MFrame fromBasis, MFrame toBasis)
+        {         
+            double dxx = fromBasis.XAxis * toBasis.XAxis;
+            double dxy = fromBasis.XAxis * toBasis.YAxis;
+            double dxz = fromBasis.XAxis * toBasis.ZAxis;
+
+            double dyx = fromBasis.YAxis * toBasis.XAxis;
+            double dyy = fromBasis.YAxis * toBasis.YAxis;
+            double dyz = fromBasis.YAxis * toBasis.ZAxis;
+
+            double dzx = fromBasis.ZAxis * toBasis.XAxis;
+            double dzy = fromBasis.ZAxis * toBasis.YAxis;
+            double dzz = fromBasis.ZAxis * toBasis.ZAxis;
+           
+            double x1 = vector.X;
+            double y1 = vector.Y;
+            double z1 = vector.Z;
+
+            double x2 = x1 * dxx + y1 * dxy + z1 * dxz;
+            double y2 = x1 * dyx + y1 * dyy + z1 * dyz;
+            double z2 = x1 * dzx + y1 * dzy + z1 * dzz;
+
+            return new MVector(x2, y2, z2);
+        }
+
+        /// <summary>
+        /// In-place basis change of a vector.
+        /// </summary>
+        /// <param name="fromVector">The vector expressed in the initial basis.</param>
+        /// <param name="fromBasis">Initial basis as an othonormal frame.</param>
+        /// <param name="toBasis">Target basis as an othonormal frame.</param>
+        /// <param name="toVector">The changed vector expressed in the target basis.</param>
+        public static void ChangeBasis(MVector fromVector, MFrame fromBasis, MFrame toBasis, ref MVector toVector)
+        {
+            double dxx = fromBasis.XAxis * toBasis.XAxis;
+            double dxy = fromBasis.XAxis * toBasis.YAxis;
+            double dxz = fromBasis.XAxis * toBasis.ZAxis;
+
+            double dyx = fromBasis.YAxis * toBasis.XAxis;
+            double dyy = fromBasis.YAxis * toBasis.YAxis;
+            double dyz = fromBasis.YAxis * toBasis.ZAxis;
+
+            double dzx = fromBasis.ZAxis * toBasis.XAxis;
+            double dzy = fromBasis.ZAxis * toBasis.YAxis;
+            double dzz = fromBasis.ZAxis * toBasis.ZAxis;
+
+            double x1 = fromVector.X;
+            double y1 = fromVector.Y;
+            double z1 = fromVector.Z;
+
+            double x2 = x1 * dxx + y1 * dxy + z1 * dxz;
+            double y2 = x1 * dyx + y1 * dyy + z1 * dyz;
+            double z2 = x1 * dzx + y1 * dzy + z1 * dzz;
+
+            toVector.X = x2;
+            toVector.Y = y2;
+            toVector.Z = z2;
+        }
+
 
         #endregion
-  
+
     }
 }

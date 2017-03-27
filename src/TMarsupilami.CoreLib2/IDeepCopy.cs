@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.CoreLib2
 {
-    public class BeamElement : IDRElement
+    public interface IDeepCopy<T>
     {
-        ILoad[] staticLoads;
-        ILoad[] dynamicLoads;
-        
+        T DeepCopy();
     }
 }

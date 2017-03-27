@@ -21,7 +21,7 @@ namespace TMarsupilami.CoreLib2
     /// <summary>
     /// Tuyauterie pour faire fonctionner un element (1D) dans un solveur de relaxation dynamique.
     /// </summary>
-    interface IDRElement
+    interface IDRElement : ISolveur
     {
         /// <summary>
         /// Indicates wheter the element should be taken into account in the secondary relaxation process over θ.
@@ -84,7 +84,9 @@ namespace TMarsupilami.CoreLib2
         //Model GetModel();
 
         void Run();         // run one iteration
-        void Run(int N);    // run N interations 
+        void Run(int N);    // run N interations
+        
+         
     }
 
 }

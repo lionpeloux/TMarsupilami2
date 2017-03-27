@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using TMarsupilami.MathLib;
 
 namespace TMarsupilami.CoreLib2
@@ -52,7 +53,7 @@ namespace TMarsupilami.CoreLib2
         private IDRConstraint[] constraints, apd;
 
         // BUILD
-        private void Dispatch(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints)
+        private void Dispatch(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints, IEnumerable<IDRConstraint> apd)
         {
             var tmp_x = new List<IDRElement>();
             var tmp_θ = new List<IDRElement>();
@@ -70,8 +71,11 @@ namespace TMarsupilami.CoreLib2
                 }
             }
 
-            elements_x = tmp_x.ToArray();
-            elements_θ = tmp_θ.ToArray();
+            this.elements_x = tmp_x.ToArray();
+            this.elements_θ = tmp_θ.ToArray();
+
+            this.constraints = constraints.ToArray();
+            this.apd = apd.ToArray();
         }
         private void SolverSetup()
         {
