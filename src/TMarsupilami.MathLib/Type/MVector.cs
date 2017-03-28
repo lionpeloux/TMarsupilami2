@@ -163,6 +163,15 @@ namespace TMarsupilami.MathLib
 
         #region INSTANCE METHODS
 
+        public bool IsNull()
+        {
+            return (x == 0) && (y == 0) && (z == 0);
+        }
+        public bool IsNull(double tolerance)
+        {
+            return (Math.Abs(x - 0) <= tolerance) && (Math.Abs(y - 0) <= tolerance) && (Math.Abs(z - 0) <= tolerance);
+        }
+
         /// <summary>
         /// Computes the length of this vector.
         /// </summary>
@@ -871,6 +880,93 @@ namespace TMarsupilami.MathLib
         }
 
 
+        /// <summary>
+        /// Set v1 to v2 (v2 = v1).
+        /// </summary>
+        /// <param name="v1">The constant vector to set to each item of v2.</param>
+        /// <param name="v2">The vectors to be modified.</param>
+        public static void Set(MVector v1, ref MVector[] v2)
+        {
+            for (int i = 0; i < v2.Length; i++)
+            {
+                v2[i] = v1;
+            }
+        }
+
+
+        /// <summary>
+        /// Add v1 to v2 (v2 = v1 + v2).
+        /// </summary>
+        /// <param name="v1">The vectors to add.</param>
+        /// <param name="v2">The vectors to add to.</param>
+        public static void Add(MVector[] v1, ref MVector[] v2)
+        {
+            int n1 = v1.Length;
+            int n2 = v2.Length;
+
+            if (n1 != n2)
+                throw new ArgumentException("MVector arrays must be of same length.");
+
+            for (int i = 0; i < v1.Length; i++)
+            {
+                v2[i] += v1[i];
+            }
+        }
+
+        /// <summary>
+        /// Add v1 to v2 (v2 = v1 + v2).
+        /// </summary>
+        /// <param name="v1">The constant vector to add to each item of v2.</param>
+        /// <param name="v2">The vectors to add to.</param>
+        public static void Add(MVector v1, ref MVector[] v2)
+        {
+            for (int i = 0; i < v2.Length; i++)
+            {
+                v2[i] += v1;
+            }
+        }
+
+
+
+        public static MVector[] Add(MVector[] v1, MVector[] v2)
+        {
+            int n1 = v1.Length;
+            int n2 = v2.Length;
+
+            if (n1 != n2)
+                throw new ArgumentException("MVector arrays must be of same length.");
+
+            var sum = new MVector[n1];
+            for (int i = 0; i < sum.Length; i++)
+            {
+                sum[i] = v1[i] + v2[i];
+            }
+            return sum;
+        }
+        public static MVector[] Substract(MVector[] v1, MVector[] v2)
+        {
+            int n1 = v1.Length;
+            int n2 = v2.Length;
+
+            if (n1 != n2)
+                throw new ArgumentException("MVector arrays must be of same length.");
+
+            var sub = new MVector[n1];
+            for (int i = 0; i < sub.Length; i++)
+            {
+                sub[i] = v1[i] - v2[i];
+            }
+            return sub;
+        }
+        public static MVector[] Multiply(double λ, MVector[] v)
+        {
+            var mul = new MVector[v.Length];
+            for (int i = 0; i < v.Length; i++)
+            {
+                mul[i] = λ * v[i];
+            }
+            return mul;
+        }
         #endregion
 
     }

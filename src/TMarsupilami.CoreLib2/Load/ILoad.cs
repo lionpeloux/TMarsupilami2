@@ -17,6 +17,7 @@ namespace TMarsupilami.CoreLib2
         Global,
     }
 
+    // force, moment, pressure, thermal, prestress, distortion, applied displacement,  ...
     public abstract class Load
     {
         /// <summary>
@@ -37,10 +38,10 @@ namespace TMarsupilami.CoreLib2
         public bool IsStatic { get; protected set; }
 
         /// <summary>
-        /// Returns true if the load is expressed in the material/local coordinate system of the element.
-        /// Returns false if the load is expressed in the global/world coordinate system.
+        /// Returns true if the load is expressed in the global/world coordinate system.
+        /// Returns false if the load is expressed in the material/local coordinate system of the element.
         /// </summary>
-        public bool IsLocal { get; protected set; }
+        public bool IsGlobal { get; protected set; }
 
         /// <summary>
         /// Returns true if the load is uniform over the element.
@@ -48,140 +49,15 @@ namespace TMarsupilami.CoreLib2
         /// </summary>
         public bool IsUniform { get; protected set; }
 
-        protected Load(int dimension, bool isStatic, bool isLocal, bool isUniform)
+        protected Load(int dimension, bool isStatic, bool isUniform, bool isGlobal)
         {
             Dimension = dimension;
             IsStatic = isStatic;
-            IsLocal = isLocal;
+            IsGlobal = isGlobal;
             IsUniform = isUniform;
         }
 
         //public abstract bool CastTo<T>(T target);
     }
 
-    public class LoadCase
-    {
-        public int Loads_0D { get; private set; }
-        public int Loads_1D { get; set; }
-        public int Loads_2D { get; set; }
-    }
-
-    // force, moment, pressure, thermal, applied displacement,  ...
-
-    public abstract class VectorLoad : Load
-    { 
-        /// <summary>
-        /// Returns true if the load is distributed.
-        /// Returns false if the load is concentrated.
-        /// </summary>
-        public bool IsDistributed { get; protected set; }
-
-        protected VectorLoad(bool isLocal, bool isUniform, bool isDistributed) 
-            : base(0, true, isLocal, isUniform)
-        {
-        }
-
-        /// <summary>
-        /// Creates a concentrated vector load to be applied at an element vertex.
-        /// </summary>
-        /// <param name="tensorValue">The vector load to be applied to the element vertex.</param>
-        /// <param name="vertexIndex">The vertex index in the element.</param>
-        /// <param name="isLocal">True if the load is given in the material/local coordinate system of the element. Default to false.</param>
-        /// <returns>A VectorLoad object.</returns>
-        public static VectorLoad CreateSingleCVL(MVector tensorValue, int vertexIndex, bool isLocal = false)
-        {
-            return new SingleConcentratedVectorLoad(tensorValue, vertexIndex, isLocal);
-        }
-
-        /// <summary>
-        /// Creates a uniform vector load to be applied at all element vertices.
-        /// </summary>
-        /// <param name="tensorValue">The uniform vector load to be applied to all the element vertices.</param>
-        /// <param name="isLocal">True if the load is given in the material/local coordinate system of the element. Default to false.</param>
-        /// <returns>A VectorLoad object.</returns>
-        public static VectorLoad CreateUniformCVL(MVector tensorValue, bool isLocal = false)
-        {
-            return new UniformConcentratedVectorLoad(tensorValue, isLocal);
-        }
-
-        /// <summary>
-        /// Creates a group of concentrated vector loads to be applied to all element vertices.
-        /// </summary>
-        /// <param name="F">The vector loads to be applied on the element vertices. Must match the internal structure of the layout of the element vertices.</param>
-        /// <param name="isLocal">True if the  vector loads are given in the material/local coordinate system of the element. Default to false.</param>
-        /// <returns>A VectorLoad object.</returns>
-        public static VectorLoad CreateMultipleCVL(MVector[] tensorValues, bool isLocal = false)
-        {
-            return new MultipleConcentratedVectorLoad(tensorValues, isLocal);
-        }
-
-
-        public abstract bool GetValueAt(int vertexIndex, out MVector value, CoordinateSystem cs = CoordinateSystem.Global);
-
-        private sealed class SingleConcentratedVectorLoad : VectorLoad
-        {
-            private int index;
-            private MVector value;
-
-            public SingleConcentratedVectorLoad(MVector tensorValue, int vertexIndex, bool isLocal)
-                : base(isLocal, false, false)
-            {
-                index = vertexIndex;
-                value = tensorValue;
-            }
-            public override bool GetValueAt(int vertexIndex, out MVector value, CoordinateSystem cs = CoordinateSystem.Global)
-            {
-                if (vertexIndex == index)
-                {
-                    value = this.value;
-                    return true;
-                }
-                else
-                {
-                    value = new MVector(0, 0, 0);
-                    return false;
-                }
-            }
-        }
-        private sealed class UniformConcentratedVectorLoad : VectorLoad
-        {
-            private MVector value;
-
-            public UniformConcentratedVectorLoad(MVector tensorValue, bool isLocal)
-                : base(isLocal, false, false)
-            {
-                value = tensorValue;
-            }
-            public override bool GetValueAt(int vertexIndex, out MVector value, CoordinateSystem cs = CoordinateSystem.Global)
-            {
-                value = this.value;
-                return true;
-            }
-        }
-        private sealed class MultipleConcentratedVectorLoad : VectorLoad
-        {
-            private MVector[] values;
-
-            public MultipleConcentratedVectorLoad(IEnumerable<MVector> tensorValues, bool isLocal)
-                : base(isLocal, false, false)
-            {
-                values = tensorValues.ToArray();
-            }
-            public override bool GetValueAt(int vertexIndex, out MVector value, CoordinateSystem cs = CoordinateSystem.Global)
-            {
-                if (vertexIndex >= 0 && vertexIndex < values.Length)
-                {
-                    value = values[vertexIndex];
-                    return true;
-                }
-                value = new MVector(0, 0, 0);
-                return false;
-            }
-        }
-    }
-
-   
-
-    
-    }
 }

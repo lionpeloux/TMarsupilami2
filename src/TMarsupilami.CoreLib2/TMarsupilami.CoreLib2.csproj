@@ -42,10 +42,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BeamElement.cs" />
+    <Compile Include="Constraint\Layout\IConstraintLayout.cs" />
     <Compile Include="IShallowCopy.cs" />
     <Compile Include="IDeepCopy.cs" />
-    <Compile Include="Layout\ILayout.cs" />
+    <Compile Include="Element\Layout\BeamLoadManager.cs" />
+    <Compile Include="Element\Layout\BeamLayout.cs" />
+    <Compile Include="Element\Layout\IElementLayout.cs" />
+    <Compile Include="Load\BeamLoad.cs" />
+    <Compile Include="Load\IDynamicLoad.cs" />
+    <Compile Include="Load\ILoadCase.cs" />
     <Compile Include="Load\ILoad.cs" />
+    <Compile Include="Element\Engine\BeamEngine.cs" />
+    <Compile Include="Model\IDRAnalysisModel.cs" />
+    <Compile Include="Solver\IDRAnalysisModel.cs" />
+    <Compile Include="Model\IModel.cs" />
+    <Compile Include="Solver\IDRElement.cs" />
+    <Compile Include="Solver\IDRConstraint.cs" />
     <Compile Include="Solver\IDRSolveur.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Solver\ISolveur.cs" />
@@ -57,7 +69,9 @@
       <Name>TMarsupilami.MathLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Constraint\Engine\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

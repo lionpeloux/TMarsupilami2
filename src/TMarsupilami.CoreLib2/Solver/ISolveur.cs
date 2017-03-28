@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.CoreLib2
 {
-    interface ISolveur
+    public interface ISolveur
     {
+        IModel GetModel();
+        void BuildAnalysis(IModel model, ILoadCase loadCase);
+
+        // le dispatcher permet d'associer à chaque element ou contrainte layout le bon 
+        void BuildAnalysis(IModel model, ILoadCase loadCase, IDispatcher dispatcher);
     }
 }
