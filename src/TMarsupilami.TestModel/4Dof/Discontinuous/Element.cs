@@ -47,25 +47,25 @@ namespace TMarsupilami.TestModel.Dof4.Discontinuous
         private double[] lm;                        // nodal lumped mass deduced from material density and section properties
 
         // REST CONFIGURATION
-        public MFrame[] _mframe_0;       // material frames in actual (deformed) configuration
-        public MPoint[] x_0;           // centerline
-        public MVector[] e_0;          // edge
-        public MVector[] t_0;          // tangent
-        public MVector[] κb_0;         // curvature binormal
+        public MFrame[] _mframe_0;      // material frames in actual (deformed) configuration
+        public MPoint[] x_0;            // centerline
+        public MVector[] e_0;           // edge
+        public MVector[] t_0;           // tangent
+        public MVector[] κb_0;          // curvature binormal
         public double[] l_0, ll_0;      // rest length of edges
         public double[] κ1_0, κ2_0;     // material curvature in rest configuration
         public double[] twist_0, τ_0;   // twist angle and rate of twist (τ) in rest configuration
 
         // DEFORMED CONFIGURATION
-        private MFrame[] _mframe;        // material frames in actual (deformed) configuration
-        public MVector[] d3_mid;       // d3 material axis evaluated at mid-edge.
-        public MPoint[] x;             // centerline : x[i]
-        public MVector[] e;            // edge : e[i] = x[i+1] - x[i]
-        public MVector[] u;            // unit edge : u[i] = e[i]/l[i]
+        private MFrame[] _mframe;       // material frames in actual (deformed) configuration
+        public MVector[] d3_mid;        // d3 material axis evaluated at mid-edge.
+        public MPoint[] x;              // centerline : x[i]
+        public MVector[] e;             // edge : e[i] = x[i+1] - x[i]
+        public MVector[] u;             // unit edge : u[i] = e[i]/l[i]
 
-        public MVector[] t;            // tangent
-        public MVector[] κb;           // curvature binormal at ghost node
-        protected MVector[] κb_mid;    // curvature binormal evaluated at mid-edge.
+        public MVector[] t;             // tangent
+        public MVector[] κb;            // curvature binormal at ghost node
+        protected MVector[] κb_mid;     // curvature binormal evaluated at mid-edge.
 
         public double[] l;              // edge length : l[i] = |e[i]|
         protected double[] ll;          // ll[i] = |e[i] + e[i+1]|
@@ -74,26 +74,26 @@ namespace TMarsupilami.TestModel.Dof4.Discontinuous
         public double[] twist, τ;       // twist angle and rate of twist : τ[i] = twist[i] / l[i]
 
         // EXTERNAL FORCES & MOMENTS
-        private MVector[] _Fext_g;     // (Fx, Fy, Fz) given in the global coordinate system (x,y,z)
-        private MVector[] _Mext_m;     // (M1, M2, Q) given in the material coordinate system(d1, d2, t)
-        public MVector[] _fext_g;      // linear external moment
-        public MVector[] _mext_m;      // linear external moment
+        private MVector[] _Fext_g;      // (Fx, Fy, Fz) given in the global coordinate system (x,y,z)
+        private MVector[] _Mext_m;      // (M1, M2, Q) given in the material coordinate system(d1, d2, t)
+        public MVector[] _fext_g;       // linear external moment
+        public MVector[] _mext_m;       // linear external moment
 
         // REACTION MOMENT AND FORCES
         // take care about signs : these are the forces and moments applied
         // by the beam to the supports. 
-        public MVector[] _Fr_g;        // (Frx, Fry, Frz) given in the global coordinate system
-        public MVector[] _Mr_m;          //   (Mr1, Mr2, Qr) given in the material coordinate system
+        public MVector[] _Fr_g;         // (Frx, Fry, Frz) given in the global coordinate system
+        public MVector[] _Mr_m;         //   (Mr1, Mr2, Qr) given in the material coordinate system
 
         // INTERNAL FORCES & MOMENTS
         private double[] _N;            // axial force : N = ES.ε
         private double[] _M1;           // bending moment around d1 material axis : M1 = EI1.(κ1-κ1_0)
         private double[] _M2;           // bending moment around d2 material axis : M2 = EI2.(κ2-κ2_0)
-        private MVector[] _M;          // total bending moment : M = M1.d1 + M2.d2
+        private MVector[] _M;           // total bending moment : M = M1.d1 + M2.d2
         private double[] _Q;            // torsional moment : Q = GJ.(τ-τ_0)
-        private MVector[] _V_M;        // shear force (bending contribution) : V_M = M'
-        private MVector[] _V_Q;        // shear force (torsion contribution) : V_Q = Qκb
-        private MVector[] _V;          // total shear force : V = V_M + V_Q
+        private MVector[] _V_M;         // shear force (bending contribution) : V_M = M'
+        private MVector[] _V_Q;         // shear force (torsion contribution) : V_Q = Qκb
+        private MVector[] _V;           // total shear force : V = V_M + V_Q
         
         // RESULTANTE FORCES (DR SPECIFIC ?? => si oui, à déplacer)
         public MVector[] Rx, Rx_int, Rx_axial, Rx_shear_M, Rx_shear_Q;

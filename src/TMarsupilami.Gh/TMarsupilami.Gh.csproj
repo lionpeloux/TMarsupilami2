@@ -113,6 +113,7 @@
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\_Model\Comp_SingleBeamGeometry.cs" />
+    <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D.cs" />
     <Compile Include="Parameter\Param_MFrame.cs" />
     <Compile Include="Parameter\Param_MVector.cs" />
     <Compile Include="Parameter\Param_MPoint.cs" />
@@ -134,6 +135,10 @@
     <Compile Include="Type\GH_MPoint.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TMarsupilami.CoreLib2\TMarsupilami.CoreLib2.csproj">
+      <Project>{3ffdb9ba-eae2-458a-975c-bd6ebe8346c9}</Project>
+      <Name>TMarsupilami.CoreLib2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TMarsupilami.MathLib\TMarsupilami.MathLib.csproj">
       <Project>{716ab6ea-8f46-443f-b6de-a0bc33022739}</Project>
       <Name>TMarsupilami.MathLib</Name>
@@ -215,7 +220,6 @@
     <None Include="Resources\ZAngle_Rotation.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Component\_Model\Test\" />
     <Folder Include="Component\_Test\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

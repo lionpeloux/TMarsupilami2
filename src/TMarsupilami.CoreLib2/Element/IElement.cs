@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.CoreLib2
 {
-    public class BeamElement : IDRElement
+    public interface IElement
     {
-        ILoad[] staticLoads;
-        ILoad[] dynamicLoads;
-        
     }
 }

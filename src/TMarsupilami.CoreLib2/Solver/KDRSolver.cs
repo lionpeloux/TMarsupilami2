@@ -53,7 +53,24 @@ namespace TMarsupilami.CoreLib2
         private IDRConstraint[] constraints, apd;
 
         // BUILD
-        private void Dispatch(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints, IEnumerable<IDRConstraint> apd)
+        public KDRSolver(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints, int maxIteration = 1000, double Ec_x_lim = 1e-12, double Ec_θ_lim = 1e-10)
+        {
+            MaxIteration = maxIteration;
+            this.Ec_x_lim = Ec_x_lim;
+            this.Ec_θ_lim = Ec_θ_lim;
+
+            CurrentIteration_x = 0;
+            CurrentIteration_θ = 0;
+            NumberOfKineticPeaks_x = 0;
+            NumberOfKineticPeaks_θ = 0;
+
+            Ec_x_history = new List<double>(5000);
+            Ec_θ_history = new List<double>(5000);
+
+            Dispatch(elements, constraints);
+            SolverSetup();
+        }
+        private void Dispatch(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints)
         {
             var tmp_x = new List<IDRElement>();
             var tmp_θ = new List<IDRElement>();
@@ -75,7 +92,6 @@ namespace TMarsupilami.CoreLib2
             this.elements_θ = tmp_θ.ToArray();
 
             this.constraints = constraints.ToArray();
-            this.apd = apd.ToArray();
         }
         private void SolverSetup()
         {
@@ -111,6 +127,8 @@ namespace TMarsupilami.CoreLib2
             // Default action on Peak
             del_x = OnKineticEnergyPeak_x;
             del_x = OnKineticEnergyPeak_θ;
+
+            Init();
         }
 
         // INIT
@@ -129,7 +147,7 @@ namespace TMarsupilami.CoreLib2
             //Rhino.RhinoApp.WriteLine("INIT_X : " + CurrentIteration_x);
 
             // apply applied displacements
-            foreach (var cst in apd) { cst.Init(); }
+            //foreach (var cst in apd) { cst.Init(); }
 
             // get boundary references (after applied displacements)
             foreach (var cst in constraints) { cst.Init(); }
@@ -155,13 +173,13 @@ namespace TMarsupilami.CoreLib2
 
                 if (Ec_x < Ec_x_lim && Ec_θ < Ec_θ_lim)
                 {
-                    this.State = SolverState.Converged;
+                    State = SolverState.Converged;
                     break;
                 }
 
                 if (CurrentIteration_x == MaxIteration)
                 {
-                    this.State = SolverState.Ended;
+                    State = SolverState.Ended;
                     break;
                 }
             }

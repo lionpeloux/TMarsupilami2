@@ -50,7 +50,7 @@ namespace TMarsupilami.CoreLib2
 
     }
 
-    public interface IBarElementLayout : IElementLayout1D
+    public interface IBarLayout : IElementLayout1D
     {
         MVector[] ActualConfiguration { get; }
         MVector[] RestConfiguration { get; }

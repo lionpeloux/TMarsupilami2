@@ -21,6 +21,7 @@ namespace TMarsupilami.CoreLib2
         /// Gets the number of element vertices.
         /// </summary>
         int Nv { get; }
+        int Ne { get; }
 
         MVector[] Rx { get; }
         double[] Rθ { get; }
@@ -57,5 +58,20 @@ namespace TMarsupilami.CoreLib2
         // LUMPED MASSES
         void Update_lm_x(ref double[] lm_x);
         void Update_lm_θ(ref double[] lm_θ);
+
+        // FOR CONSTRAINT INTERACTION
+        double[] l { get; }
+        double[] EI1 { get; }
+        double[] EI2 { get; }
+        MVector[] e { get; }
+        MFrame[] MaterialFrames { get; }
+        MVector[] Rx_int { get; }
+        double[] Rθ_int { get; }
+        MVector[] Fext_g { get; }
+        MVector[] Mext_m { get; }
+
+        MVector[] Fr_g { get; }
+        MVector[] Mr_m { get; }
+
     }
 }

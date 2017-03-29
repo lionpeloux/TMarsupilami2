@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMarsupilami.TestModel.Dof4.Discontinuous;
 using TMarsupilami.MathLib;
 using TMarsupilami.Gh.Parameter;
+using System.Diagnostics;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -44,6 +45,7 @@ namespace TMarsupilami.Gh.Component
         private List<SectionProperty> section_prop;
         private MaterialProperty material_prop;
 
+        private Stopwatch watch;
 
         // CONSTRUCTOR
         public _Comp_4DOF_DISC()
@@ -227,7 +229,8 @@ namespace TMarsupilami.Gh.Component
             }
 
 
-            DA.SetData(0, info);
+            //DA.SetData(0, info);
+            DA.SetData(0, "Elapsed = " + watch.Elapsed.TotalMilliseconds + " ms");
             DA.SetData(1, numIteration_x);
 
             // rest configuration
@@ -373,7 +376,7 @@ namespace TMarsupilami.Gh.Component
             var qext = 0 * 0.2 * 1e5;
             for (int i = 2; i < elements[0].Ne - 2; i++)
             {
-                elements[0].mext[i].Z = qext;
+               // elements[0].mext[i].Z = qext;
             }
             //elements[0].Mext[ind].Z = Q;
 
@@ -391,12 +394,12 @@ namespace TMarsupilami.Gh.Component
             //elements[0].Mext[ind] = new MVector(M1, M2, Q);
             //elements[0].Mext[ind+2] = new MVector(0, 1e-1*M2, Q);
 
-            elements[0].Mext[nend] = new MVector(M1, M2, Q);
+            //elements[0].Mext[nend] = new MVector(M1, M2, Q);
             //elements[0].Fext[elements[0].Nn - 1].Z = 0;
 
 
             //elements[0].Update_mext();
-            elements[0].Update_Fext();
+            //elements[0].Update_Fext();
 
             var constraints_list = new List<Constraint>();
 
@@ -441,7 +444,8 @@ namespace TMarsupilami.Gh.Component
             //apd[0] = AppliedDisplacement.AddAppliedDisplacement(ref elements[0], 0, new MVector(0, 0, 0), CoordinateSystem.Material);
             //apd[0] = AppliedDisplacement.AddAppliedDisplacement(ref elements[0], elements[0].Nn - 1, Math.PI / 6, MaterialAxis.t);
 
-
+            watch = new Stopwatch();
+            watch.Start();
             // INIT
             Init();
 
@@ -479,6 +483,7 @@ namespace TMarsupilami.Gh.Component
                     break;
                 }
             }
+            watch.Stop();
 
             //Enforce_x();
             //Enforce_t();

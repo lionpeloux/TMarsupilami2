@@ -46,5 +46,17 @@ namespace TMarsupilami.CoreLib2
         {
             throw new NotImplementedException();
         }
+
+        public BeamLayout(IEnumerable<MFrame> restFrames, IEnumerable<MFrame> intialFrames, bool isClosed = false)
+        {
+            ActualConfiguration = intialFrames.ToArray();
+            RestConfiguration = restFrames.ToArray();
+            IsClosed = isClosed;
+            Nv = ActualConfiguration.Length;
+            Ne = (IsClosed) ? Nv : Nv - 1;
+
+            if (ActualConfiguration.Length != RestConfiguration.Length)
+                throw new ArgumentException("restFrames and initialFrames must have the same number of frames.");
+        }
     }
 }
