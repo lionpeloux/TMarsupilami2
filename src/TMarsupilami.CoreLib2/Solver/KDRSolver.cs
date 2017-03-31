@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using TMarsupilami.Event;
 using TMarsupilami.MathLib;
 
 namespace TMarsupilami.CoreLib2
@@ -28,8 +29,10 @@ namespace TMarsupilami.CoreLib2
         public List<double> KineticEnergy_x { get { return Ec_x_history; } }
         public List<double> KineticEnergy_θ { get { return Ec_x_history; } }
 
-        private Action<KDRSolver> del_x;
-        private Action<KDRSolver> del_θ;
+        public event Action<KDRSolver> OnEnergyPeak_x;
+        public event Action<KDRSolver> OnEnergyPeak_θ;
+
+        public Cluster UpdateNodalResultants_x;
 
         // RELAX
         private int nx, nθ;
@@ -72,6 +75,7 @@ namespace TMarsupilami.CoreLib2
         }
         private void Dispatch(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints)
         {
+            UpdateNodalResultants_x = new Cluster();
             var tmp_x = new List<IDRElement>();
             var tmp_θ = new List<IDRElement>();
 
@@ -81,10 +85,15 @@ namespace TMarsupilami.CoreLib2
                 {
                     tmp_θ.Add(element);
                     tmp_x.Add(element);
+                    UpdateNodalResultants_x.Subscribe(element.UpdateResultantNodalForce);
+                    UpdateNodalResultants_x.Subscribe(element.UpdateResultantNodalMoment);
+
                 }
                 else
                 {
                     tmp_x.Add(element);
+                    UpdateNodalResultants_x.Subscribe(element.UpdateResultantNodalForce);
+                    UpdateNodalResultants_x.Subscribe(element.UpdateResultantNodalMoment);
                 }
             }
 
@@ -125,10 +134,13 @@ namespace TMarsupilami.CoreLib2
             }
 
             // Default action on Peak
-            del_x = OnKineticEnergyPeak_x;
-            del_x = OnKineticEnergyPeak_θ;
+            OnEnergyPeak_x += OnKineticEnergyPeak_x;
+            OnEnergyPeak_θ += OnKineticEnergyPeak_θ;
 
             Init();
+
+            Reset_x();
+            Reset_θ();
         }
 
         // INIT
@@ -138,9 +150,6 @@ namespace TMarsupilami.CoreLib2
             CurrentIteration_θ = 0;
             NumberOfKineticPeaks_x = 0;
             NumberOfKineticPeaks_θ = 0;
-
-            Reset_x();
-            Reset_θ();
 
             // the model is set up in it's initial configuration
             // constraints are applied and resultant forces and moments are computed
@@ -152,7 +161,7 @@ namespace TMarsupilami.CoreLib2
             // get boundary references (after applied displacements)
             foreach (var cst in constraints) { cst.Init(); }
 
-            // update config
+            //// update config
             UpdateDeformedConfig_x();
         }
 
@@ -245,11 +254,12 @@ namespace TMarsupilami.CoreLib2
         {
             //Rhino.RhinoApp.WriteLine("###### RUN X");
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
-            for (int ei = 0; ei < nx; ei++)
-            {
-                elements_x[ei].UpdateResultantNodalMoment();
-                elements_x[ei].UpdateResultantNodalForce();
-            }
+            //for (int ei = 0; ei < nx; ei++)
+            //{
+            //    elements_x[ei].UpdateResultantNodalMoment();
+            //    elements_x[ei].UpdateResultantNodalForce();
+            //}
+            UpdateNodalResultants_x.Call(); // test method Cluster
 
             // VELOCITY
             for (int ei = 0; ei < nx; ei++)
@@ -289,7 +299,6 @@ namespace TMarsupilami.CoreLib2
                     //elements[ei].GetDeformedConfig_x();
                 }
                 UpdateDeformedConfig_x();
-                del_x(this);
                 CurrentIteration_x++;
             }
             else // KINETIC PIC REACHED
@@ -299,6 +308,7 @@ namespace TMarsupilami.CoreLib2
                 Ec_x_history[Ec_x_history.Count - 1] = Ec_x;
 
                 NumberOfKineticPeaks_x++;
+                OnEnergyPeak_x(this);
 
                 // RESET
                 Reset_x();

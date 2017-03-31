@@ -68,6 +68,10 @@
     <Compile Include="Solver\KDRSolver.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TMarsupilami.Event\TMarsupilami.Event.csproj">
+      <Project>{26d44f01-92d7-4328-ac1a-c2a347dcd1f0}</Project>
+      <Name>TMarsupilami.Event</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TMarsupilami.MathLib\TMarsupilami.MathLib.csproj">
       <Project>{716ab6ea-8f46-443f-b6de-a0bc33022739}</Project>
       <Name>TMarsupilami.MathLib</Name>

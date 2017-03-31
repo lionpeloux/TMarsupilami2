@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMarsupilami.TestModel", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMarsupilami.CoreLib2", "TMarsupilami.CoreLib2\TMarsupilami.CoreLib2.csproj", "{3FFDB9BA-EAE2-458A-975C-BD6EBE8346C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMarsupilami.Event", "TMarsupilami.Event\TMarsupilami.Event.csproj", "{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{3FFDB9BA-EAE2-458A-975C-BD6EBE8346C9}.Debug64|Any CPU.Build.0 = Debug|Any CPU
 		{3FFDB9BA-EAE2-458A-975C-BD6EBE8346C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FFDB9BA-EAE2-458A-975C-BD6EBE8346C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}.Debug32|Any CPU.ActiveCfg = Debug|Any CPU
+		{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}.Debug32|Any CPU.Build.0 = Debug|Any CPU
+		{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}.Debug64|Any CPU.ActiveCfg = Debug|Any CPU
+		{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}.Debug64|Any CPU.Build.0 = Debug|Any CPU
+		{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26D44F01-92D7-4328-AC1A-C2A347DCD1F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

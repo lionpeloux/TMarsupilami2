@@ -5,6 +5,7 @@ using TMarsupilami.MathLib;
 using TMarsupilami.Gh.Parameter;
 using TMarsupilami.CoreLib2;
 using System.Diagnostics;
+using Rhino;
 
 namespace TMarsupilami.Gh.Component
 {
@@ -373,13 +374,18 @@ namespace TMarsupilami.Gh.Component
             }
 
             solver = new KDRSolver(elements, bc_list, iteration_max, Ec_x_lim, Ec_θ_lim);
+            solver.OnEnergyPeak_x += OnKineticEnergyPeak_x;
 
             watch = new Stopwatch();
             watch.Start();
             solver.Run(iteration_max);
             watch.Stop();
         }
-
+       
+        private static void OnKineticEnergyPeak_x(KDRSolver solver)
+        {
+            RhinoApp.WriteLine("EC_x[" + solver.NumberOfKineticPeaks_x + "] = " + solver.KineticEnergy_x[solver.KineticEnergy_x.Count-1]);
+        }
     }
 
 
