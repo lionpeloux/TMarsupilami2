@@ -43,6 +43,11 @@ namespace TMarsupilami.Event
             IsParallelModeEnabled = isParallelModeEnabled;
             ParallelOptions = new ParallelOptions();
         }
+        public Cluster(ParallelOptions options, bool isParallelModeEnabled = true)
+        {
+            IsParallelModeEnabled = isParallelModeEnabled;
+            ParallelOptions = options;
+        }
 
         public void Subscribe(Action handler)
         {
