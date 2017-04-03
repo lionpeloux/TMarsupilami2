@@ -113,7 +113,8 @@
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\_Model\Comp_SingleBeamGeometry.cs" />
-    <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D.cs" />
+    <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D_SKDR2.cs" />
+    <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D_SKDR1.cs" />
     <Compile Include="Parameter\Param_MFrame.cs" />
     <Compile Include="Parameter\Param_MVector.cs" />
     <Compile Include="Parameter\Param_MPoint.cs" />

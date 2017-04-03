@@ -45,9 +45,16 @@ namespace TMarsupilami.CoreLib2
         MFrame[] ActualConfiguration { get; }
         MFrame[] RestConfiguration { get; }
 
+        // Dynamic layout
+        double[] LMx { get; }
+        double[] LMθ { get; }
+        MVector[] Vx { get; }      // in global CS
+        MVector[] Vθ { get; }      // in material CS
+        MVector[] Ax { get; }      // in global CS
+        MVector[] Aθ { get; }      // in material CS
+
         // Applied loads manager
         BeamLoadManager LoadManager { get; }
-
     }
 
     public interface IBarLayout : IElementLayout1D

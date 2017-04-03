@@ -26,6 +26,13 @@ namespace TMarsupilami.CoreLib2
         MVector[] Rx { get; }
         double[] Rθ { get; }
 
+        double[] LMx { get; }
+        double[] LMθ { get; }
+        MVector[] Vx { get; }
+        MVector[] Vθ { get; }
+        MVector[] Ax { get; }
+        MVector[] Aθ { get; }
+
         // GEOMETRY
         /// <summary>
         /// Translates the actual vertices by dx (x = x + dx).

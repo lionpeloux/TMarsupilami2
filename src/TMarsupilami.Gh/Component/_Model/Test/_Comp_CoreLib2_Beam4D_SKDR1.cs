@@ -9,7 +9,7 @@ using Rhino;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class _Comp_CoreLib2_Beam4D : GH_Component
+    public class _Comp_CoreLib2_Beam4D_SKDR1 : GH_Component
     {
         private bool loop_reset = true;
         private bool loop_reset_cache = true;
@@ -31,8 +31,8 @@ namespace TMarsupilami.Gh.Component
 
 
         // CONSTRUCTOR
-        public _Comp_CoreLib2_Beam4D()
-            : base("4 DOF with Disc - simple beam", "4_DOF_DISC", "Single simple beam with various boundary conditions", "TMarsupilami", "Core2Lib")
+        public _Comp_CoreLib2_Beam4D_SKDR1()
+            : base("4_DOF_DISC_SKDR1", "4_DOF_DISC_SKDR1", "Single simple beam with various boundary conditions", "TMarsupilami", "Core2Lib")
         {
             sections_0 = new List<MFrame>();
             sections_i = new List<MFrame>();
@@ -287,7 +287,7 @@ namespace TMarsupilami.Gh.Component
             // INIT
             Rhino.RhinoApp.WriteLine("PB SETUP");
             BeamLayout layout = new BeamLayout(sections_0, sections_i, false);
-            elements = new IDRElement[1] { new Beam4D(layout, material_prop, section_prop.ToArray()) };
+            elements = new IDRElement[1] { new Beam4D_1(layout, material_prop, section_prop.ToArray()) };
 
             // EXTERNAL FORCES
             //elements[0].Fext[elements[0].Nn - 1].Z = -100000;

@@ -7,9 +7,9 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.CoreLib2
 {
-    public class Beam4D : IElement, IDRElement
+    public class Beam4D_2 : IElement, IDRElement
     {
-        BeamLayout Layout { get; set; }
+        public BeamLayout Layout { get; set; }
         BeamLoadManager LoadManager { get; set; }
 
         public bool IsTorsionCapable
@@ -32,8 +32,31 @@ namespace TMarsupilami.CoreLib2
         {
             get { return this.Rθ; }
         }
+        double[] IDRElement.LMx
+        {
+            get { return this.lm_x; }
+        }
+        double[] IDRElement.LMθ
+        {
+            get { return this.lm_θ; }
+        }
+        MVector[] IDRElement.Vx
+        {
+            get { return this.v_x; }
+        }
+        MVector[] IDRElement.Vθ
+        {
+            get { return this.v_θ; }
+        }
+        MVector[] IDRElement.Ax
+        {
+            get { return this.a_x; }
+        }
+        MVector[] IDRElement.Aθ
+        {
+            get { return this.a_θ; }
+        }
 
-        
         double[] IDRElement.l
         {
             get { return l; }
@@ -62,6 +85,7 @@ namespace TMarsupilami.CoreLib2
         {
             get { return Rθ_int; }
         }
+
         MVector[] IDRElement.Fext_g
         {
             get { return Fext_g; }
@@ -79,12 +103,11 @@ namespace TMarsupilami.CoreLib2
             get { return Mr_m; }
         }
 
-
         #region FIELDS
-        private double[] ES;      // section [m2]
-        private double[] EI1;     // area moment of inertia [m4] around first material axis (d1)
-        private double[] EI2;     // area moment of inertia [m4] around second material axis (d2)
-        private double[] GJ;      // area moment of inertia [m4] around third material axis (d3)    
+        private double[] ES;    // section [m2]
+        private double[] EI1;   // area moment of inertia [m4] around first material axis (d1)
+        private double[] EI2;   // area moment of inertia [m4] around second material axis (d2)
+        private double[] GJ;    // area moment of inertia [m4] around third material axis (d3)    
 
         private int nv;         // number of vertices
         private int ne;         // number of edges
@@ -92,6 +115,14 @@ namespace TMarsupilami.CoreLib2
         private int nv_h;       // number of handle vertices
         private int nv_g;       // number of ghost vertices
         private int ne_h;       // number of handle edges
+
+        // DYNAMIC CONFIGURATION
+        private double[] lm_x;
+        private double[] lm_θ;
+        private MVector[] v_x;
+        private MVector[] v_θ;
+        private MVector[] a_x;
+        private MVector[] a_θ;
 
         // REST CONFIGURATION      
         private double[] l_0;            // rest length of edges
@@ -111,27 +142,27 @@ namespace TMarsupilami.CoreLib2
         private MVector[] t_g;              // tangent vector at a ghost vertex
         private MVector[] t_h_l, t_h_r;     // tangent vector at left/right of a handle vertex
 
-        private double[] ε;                  // axial strain : ε = l[i]/l[i]_0 - 1
+        private double[] ε;                 // axial strain : ε = l[i]/l[i]_0 - 1
 
         private MVector[] κb;               // curvature binormal at ghost vertex
         private MVector[] κb_mid;           // curvature binormal at mid-edge
         private MVector[] κb_g;             // curvature at a ghost vertex
         private MVector[] κb_h_l, κb_h_r;   // curvature at a left/right of a handle vertex
 
-        private double[] κ1, κ2;             // material curvature : κ1 =  κb.d1 | κ2 =  κb.d1
+        private double[] κ1, κ2;            // material curvature : κ1 =  κb.d1 | κ2 =  κb.d1
         private double[] κ1_g, κ2_g;
         private double[] κ1_h_l, κ1_h_r;
         private double[] κ2_h_l, κ2_h_r;
 
-        public double[] twist, τ;       // twist angle and rate of twist : τ[i] = twist[i] / l[i]
+        public double[] twist, τ;           // twist angle and rate of twist : τ[i] = twist[i] / l[i]
 
         // INTERNAL FORCES & MOMENTS
-        private double[] N;                                // axial force : N = ES.ε
+        private double[] N;                                 // axial force : N = ES.ε
         private double[] N_l, N_r;                          // axial force at left/rigth of each node, ghost and handle
 
-        private MVector[] V_M;                             // shear force (bending contribution) : V_M = M'
-        private MVector[] V_Q;                             // shear force (torsion contribution) : V_Q = Qκb
-        private MVector[] V;                               // total shear force : V = V_M + V_Q
+        private MVector[] V_M;                              // shear force (bending contribution) : V_M = M'
+        private MVector[] V_Q;                              // shear force (torsion contribution) : V_Q = Qκb
+        private MVector[] V;                                // total shear force : V = V_M + V_Q
         private MVector[] V_M_g, V_M_h_l, V_M_h_r;          // shear (du au moment de flexion) aux ghost et à droite / gauche des handles
         private MVector[] V_Q_g, V_Q_h_l, V_Q_h_r;          // shear (du au moment de torsion) aux ghost et à droite / gauche des handles
 
@@ -158,15 +189,25 @@ namespace TMarsupilami.CoreLib2
         public double[] Rθ, Rθ_int, Rθ_Q, Rθ_M;
         #endregion
 
-        public Beam4D(BeamLayout layout, MaterialProperty materialProp, SectionProperty[] sectionProp)
+        public Beam4D_2(BeamLayout layout, MaterialProperty materialProp, SectionProperty[] sectionProp)
         {
             Layout = layout;
             nv = Layout.Nv;
             ne = Layout.Ne;
             
+            // TOPOLOGY
             ne_h = ne / 2; // Le nombre de mframe doit être impair
             nv_h = ne_h + 1;
             nv_g = nv_h - 1;
+
+            // DYNAMIC CONFIGURATION
+            lm_x = new double[Nv];
+            lm_θ = new double[Nv];
+            v_x = new MVector[Nv];
+            v_θ = new MVector[Nv];
+            a_x = new MVector[Nv];
+            a_θ = new MVector[Nv];
+
 
             // REST CONFIGURATION
             l_0 = new double[ne];
@@ -812,7 +853,7 @@ namespace TMarsupilami.CoreLib2
         }
 
         // ENERGIES
-        protected  double UpdateAxialElasticEnergy()
+        protected double UpdateAxialElasticEnergy()
         {
             double E_axial = 0;
             for (int i = 0; i < ne; i++)
@@ -822,7 +863,7 @@ namespace TMarsupilami.CoreLib2
             E_axial = E_axial / 2;
             return E_axial;
         }
-        protected  double UpdateBendingElasticEnergy()
+        protected double UpdateBendingElasticEnergy()
         {
             double E_bending = 0;
             E_bending += (EI1[0] * Math.Pow((κ1[0] - κ1_0[0]), 2) + EI2[0] * Math.Pow((κ2[0] - κ2_0[0]), 2)) * (l[0] / 4);
@@ -833,7 +874,7 @@ namespace TMarsupilami.CoreLib2
             E_bending += (EI1[ne - 1] * Math.Pow((κ1[nv - 1] - κ1_0[nv - 1]), 2) + EI2[ne - 1] * Math.Pow((κ2[nv - 1] - κ2_0[nv - 1]), 2)) * (l[ne - 1] / 4);
             return E_bending;
         }
-        protected  double UpdateTwistingElasticEnergy()
+        protected double UpdateTwistingElasticEnergy()
         {
             double E_twisting = 0;
             for (int i = 0; i < ne; i++)
@@ -1012,11 +1053,7 @@ namespace TMarsupilami.CoreLib2
             }
         }
 
-
-        // DR SPECIFIC (A DEPLACER DANS UNE INTERFACE)
-
-
-        // DR LUMPED MASS
+        // doit être customizable
         public void Update_lm_x(ref double[] lm_x)
         {
             double lm;
@@ -1030,7 +1067,6 @@ namespace TMarsupilami.CoreLib2
         }
         public void Update_lm_θ(ref double[] lm_θ)
         {
-            //Rhino.RhinoApp.WriteLine("update lm_θ");
             double lm;
             lm_θ[0] = 0.0;
             for (int i = 0; i < ne; i++)
