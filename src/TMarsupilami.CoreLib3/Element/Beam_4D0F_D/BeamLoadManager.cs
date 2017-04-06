@@ -13,8 +13,8 @@ namespace TMarsupilami.CoreLib3
         private List<BeamVectorLoad> StaticLoads { get; set; }
         private bool[] IsStaticLoadBufferActive { get; set; } // wether a buffer is filled with loads or not.
 
-        private MVector[] ptr_Fext, ptr_fext; // pointers to Fext and fext beam loads in GCS
-        private MVector[] ptr_Mext, ptr_mext; // pointers to Mext and mext beam loads in MCS
+        private MVector[] ptr_Fext_g, ptr_fext_g; // pointers to Fext and fext beam loads in GCS
+        private MVector[] ptr_Mext_m, ptr_mext_m; // pointers to Mext and mext beam loads in MCS
 
         // Fext_g : beam load buffer 0
         // fext_g : beam load buffer 1
@@ -39,10 +39,10 @@ namespace TMarsupilami.CoreLib3
                 StaticLoadBuffers[2 * i + 1] = new MVector[Beam.Nvg];
             }
 
-            ptr_Fext = beam.Fext_g;
-            ptr_Mext = beam.Mext_m;
-            ptr_fext = beam.fext_g;
-            ptr_mext = beam.mext_m;
+            ptr_Fext_g = beam.Fext_g;
+            ptr_Mext_m = beam.Mext_m;
+            ptr_fext_g = beam.fext_g;
+            ptr_mext_m = beam.mext_m;
         }
         public void Fill(IEnumerable<BeamVectorLoad> loads)
         {
@@ -62,28 +62,71 @@ namespace TMarsupilami.CoreLib3
                 }
             }
 
+            // Active les forces suiveuses
+            if (IsStaticLoadBufferActive[4])
+                Beam.Update_Loads.Subscribe(Update_ptr_Fext);
+
+            // Active les moments fixes
+            if (IsStaticLoadBufferActive[2])
+                Beam.Update_Loads.Subscribe(Update_ptr_Mext);
+
             Update();
         }
         public void Update()
         {
             // IN GLOBAL CS
-            for (int i = 0; i < ptr_Fext.Length; i++)
+            for (int i = 0; i < ptr_Fext_g.Length; i++)
             {
-                ptr_Fext[i] = StaticLoadBuffers[0][i];
+                ptr_Fext_g[i] = StaticLoadBuffers[0][i];
             }
-            for (int i = 0; i < ptr_fext.Length; i++)
+            for (int i = 0; i < ptr_fext_g.Length; i++)
             {
-                ptr_fext[i] = StaticLoadBuffers[1][i];
+                ptr_fext_g[i] = StaticLoadBuffers[1][i];
             }
 
             //// IN MATERIAL CS
-            for (int i = 0; i < ptr_Mext.Length; i++)
+            for (int i = 0; i < ptr_Mext_m.Length; i++)
             {
-                ptr_Mext[i] = StaticLoadBuffers[6][i];
+                ptr_Mext_m[i] = StaticLoadBuffers[6][i];
             }
-            for (int i = 0; i < ptr_mext.Length; i++)
+            for (int i = 0; i < ptr_mext_m.Length; i++)
             {
-                ptr_mext[i] = StaticLoadBuffers[7][i];
+                ptr_mext_m[i] = StaticLoadBuffers[7][i];
+            }
+        }
+
+        // dans l'hypothèse ou Fext_m est actif, il faut faire un update des efforts du repère materiel vers le repère global
+        public void Update_ptr_Fext()
+        {
+            for (int i = 0; i < ptr_Fext_g.Length; i++)
+            {
+                int index = 2 * i;
+
+                // convert Fext_m to Global CS
+                var Fext_m = StaticLoadBuffers[4][i];
+                var Fext_m_to_g = Fext_m.X * Beam.ActualConfiguration[index].XAxis
+                                    + Fext_m.Y * Beam.ActualConfiguration[index].YAxis
+                                    + Fext_m.Z * Beam.ActualConfiguration[index].ZAxis;
+
+                ptr_Fext_g[i] = StaticLoadBuffers[0][i] + Fext_m_to_g;
+            }
+        }
+
+        // dans l'hypothèse ou Mext_g est actif, il faut faire un update des efforts du repère global vers le repère materiel
+        public void Update_ptr_Mext()
+        {
+            for (int i = 0; i < ptr_Mext_m.Length; i++)
+            {
+                int index = 2 * i;
+
+                // convert Fext_m to Global CS
+                var Mext_g = StaticLoadBuffers[3][i];
+                var Mext_g_to_m = new MVector(  Mext_g * Beam.ActualConfiguration[index].XAxis,
+                                                Mext_g * Beam.ActualConfiguration[index].YAxis,
+                                                Mext_g * Beam.ActualConfiguration[index].ZAxis
+                                             );
+
+                ptr_Mext_m[i] = StaticLoadBuffers[4][i] + Mext_g_to_m;
             }
         }
 

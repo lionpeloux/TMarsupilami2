@@ -358,45 +358,59 @@ namespace TMarsupilami.Gh.Component
                     break;
             }
 
+            var loads = new List<BeamVectorLoad>();
+
             switch (bc_end)
             {
+                
+
                 case (int)BoundaryConditionType.Free:
-                    var Fext = 1 * new MVector(0, 0, -1e6);
+                    var Fext = 1 * new MVector(0, 0, -1e5);
                     var Mext = new MVector(1e5, 1e5, 0);
 
-                    var loads = new List<BeamVectorLoad>();
-
-                    //loads.Add(BeamVectorLoad.Create_Fext(1*Fext, Boundary.End, beam, true));
+                    // force verticale
+                    //loads.Add(BeamVectorLoad.Create_Fext(Fext, Boundary.End, beam, true));
+                    
+                    // force suiveuse
+                    //loads.Add(BeamVectorLoad.Create_Fext(new MVector(-1e5, 0, 0), beam.Nvh / 2, beam, false));
+                    
                     //loads.Add(BeamVectorLoad.Create_fext(Fext, Boundary.End, beam, true));
                     //loads.Add(BeamVectorLoad.Create_Mext(Mext, Boundary.End, beam, true));
                     //loads.Add(BeamVectorLoad.Create_mext(-Mext, Boundary.End, beam, true));
 
                     //loads.Add(BeamVectorLoad.Create_Fext(Fext, Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_fext(-Fext, Boundary.End, beam, false));
-                    //loads.Add(BeamVectorLoad.Create_Mext(Mext, Boundary.End, beam, false));
+                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0,-1e6,0), Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_mext(0*new MVector(0,0,1e5), Boundary.End, beam, false));
 
-                    beam.Load(loads);
+
                     //elements[0].Mext[elements[0].Nn - 1] = new MVector(M1, M2,Q);
                     //elements[0].Fext[elements[0].Nn - 1] = new MVector(0, 0, 0*1e4);
                     break;
                 case (int)BoundaryConditionType.Clamped:
                     bc_list.Add(BoundaryCondition.AddClampedBoundaryCondition(elements[0], Boundary.End));
+                    //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0,0,1e6), beam.Nvh/2, beam, false));
+                    //loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 1e6, 0), beam.Nvh / 2, beam, true));
                     break;
                 default:
                     bc_list.Add(BoundaryCondition.AddPinnedBoundaryCondition(elements[0], Boundary.End));
                     break;
             }
 
+            beam.Load(loads);
+
             //solver = new KDRSolver2(elements, bc_list, iteration_max, Ec_x_lim, Ec_θ_lim);
             solver = new KDRSolver(elements, bc_list,  iteration_max, Ec_x_lim, Ec_θ_lim);
             solver.OnEnergyPeak_x += OnKineticEnergyPeak_x;
             solver.OnConvergence += OnConvergence;
+            solver.OnNotConvergence += OnNotConvergence;
 
             watch = new Stopwatch();
             watch.Start();
             solver.Run(iteration_max);
             watch.Stop();
+
+
         }
        
         private static void OnKineticEnergyPeak_x(KDRSolver solver)
@@ -408,6 +422,12 @@ namespace TMarsupilami.Gh.Component
         {
             Rhino.RhinoApp.WriteLine("Ec_x[CVG = " + solver.CurrentIteration_x + "] = " + string.Format("{0:E8}", solver.Ec_x));
             Rhino.RhinoApp.WriteLine("Ec_θ[CVG = " + solver.CurrentIteration_θ + "] = " + string.Format("{0:E8}", solver.Ec_θ));
+        }
+
+        private static void OnNotConvergence(KDRSolver solver)
+        {
+            Rhino.RhinoApp.WriteLine("Ec_x[ENDED = " + solver.CurrentIteration_x + "] = " + string.Format("{0:E8}", solver.Ec_x));
+            Rhino.RhinoApp.WriteLine("Ec_θ[ENDED = " + solver.CurrentIteration_θ + "] = " + string.Format("{0:E8}", solver.Ec_θ));
         }
 
     }

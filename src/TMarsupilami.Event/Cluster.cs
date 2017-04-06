@@ -42,10 +42,10 @@ namespace TMarsupilami.Event
         {
             IsParallelModeEnabled = isParallelModeEnabled;
             ParallelOptions = new ParallelOptions();
+            invocationList = new Delegate[0];
         }
-        public Cluster(ParallelOptions options, bool isParallelModeEnabled = true)
+        public Cluster(ParallelOptions options, bool isParallelModeEnabled = true):this(isParallelModeEnabled)
         {
-            IsParallelModeEnabled = isParallelModeEnabled;
             ParallelOptions = options;
         }
 

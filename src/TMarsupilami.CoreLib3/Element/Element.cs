@@ -174,6 +174,11 @@ namespace TMarsupilami.CoreLib3
                 return Nvg - 1;
         }
 
+        public int HandleToGlobalVertexIndex(int handleVertexIndex)
+        {
+            return 2 * handleVertexIndex;
+        }
+
         public bool IsEdgeIndexValid(int edgeIndex, bool throwError = false)
         {
             if (edgeIndex < 0 || edgeIndex >= Nvg)

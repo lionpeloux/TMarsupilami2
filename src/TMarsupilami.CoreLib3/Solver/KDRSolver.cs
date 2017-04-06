@@ -37,6 +37,8 @@ namespace TMarsupilami.CoreLib3
         public event Action<KDRSolver> OnEnergyPeak_x;
         public event Action<KDRSolver> OnEnergyPeak_θ;
         public event Action<KDRSolver> OnConvergence;
+        public event Action<KDRSolver> OnNotConvergence;
+
 
         // INIT
         private Cluster Init_all;
@@ -305,6 +307,7 @@ namespace TMarsupilami.CoreLib3
                 if (CurrentIteration_x == MaxIteration)
                 {
                     State = SolverState.Ended;
+                    OnNotConvergence(this);
                     break;
                 }
             }

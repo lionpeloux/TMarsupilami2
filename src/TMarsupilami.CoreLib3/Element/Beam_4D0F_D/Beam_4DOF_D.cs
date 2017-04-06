@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMarsupilami.Event;
 using TMarsupilami.MathLib;
 
 namespace TMarsupilami.CoreLib3
@@ -90,6 +91,9 @@ namespace TMarsupilami.CoreLib3
         public Beam_4DOF_D(IEnumerable<MFrame> restFrames, IEnumerable<MFrame> actualFrames, IEnumerable<Section> sections, IEnumerable<Material> materials, bool isClosed = false)
             :base(isClosed)
         {
+
+            Update_Loads = new Cluster();
+
             // DEEP COPY of FRAMES
             mframes_0 = restFrames.ToArray();
             mframes_i = actualFrames.ToArray();
@@ -356,6 +360,8 @@ namespace TMarsupilami.CoreLib3
             {
                 mframes[i].ZRotate(dθ[i]);
             }
+
+            Update_Loads.Call();
         }
 
         // GEOMETRY
