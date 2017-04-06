@@ -59,6 +59,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="IDeepCopy.cs" />
+    <Compile Include="IShallowCopy.cs" />
     <Compile Include="Math\OsculatingCircle.cs" />
     <Compile Include="Math\Projection.cs" />
     <Compile Include="Math\Sqrt.cs" />

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.MathLib
 {
-    public struct MPoint
+    public struct MPoint : IDeepCopy<MPoint>
     {
         #region FIELDS
 
@@ -143,6 +143,11 @@ namespace TMarsupilami.MathLib
         #endregion
 
         #region INSTANCE METHODS
+
+        public MPoint DeepCopy()
+        {
+            return new MPoint(this);
+        }
 
         /// <summary>
         /// Computes the distance between two points.

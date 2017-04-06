@@ -15,7 +15,7 @@ namespace TMarsupilami.MathLib
     /// The ZAxis is never stored in the datastructure to ensure lowmemory usage. 
     /// It is lazyly "on demand" evaluated when accessing the ZAxis property.
     /// </summary>
-    public struct MFrame //: IEquatable<Frame>
+    public struct MFrame : IDeepCopy<MFrame>
     {
         #region FIELDS
         
@@ -120,6 +120,10 @@ namespace TMarsupilami.MathLib
 
         #region INSTANCE METHODS
 
+        public MFrame DeepCopy()
+        {
+            return new MFrame(this);
+        }
         public override string ToString()
         {
             return string.Format(
@@ -214,6 +218,7 @@ namespace TMarsupilami.MathLib
         {
             ParallelTransportation.PT_Reflection(this, fromPoint, fromUDir, toPoint, toUDir, ref this);
         }
+
         #endregion
 
         #region STATIC PROPERTIES

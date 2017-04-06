@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.MathLib
 {
-    public struct MVector : IEquatable<MVector>
+    public struct MVector : IDeepCopy<MVector>, IEquatable<MVector>
     {
         #region FIELDS
         
@@ -162,6 +162,11 @@ namespace TMarsupilami.MathLib
         #endregion
 
         #region INSTANCE METHODS
+
+        public MVector DeepCopy()
+        {
+            return new MVector(this);
+        }
 
         public bool IsNull()
         {
