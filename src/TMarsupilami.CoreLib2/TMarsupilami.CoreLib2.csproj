@@ -41,26 +41,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Beam4D_2.cs" />
-    <Compile Include="Beam4D_1.cs" />
+    <Compile Include="Element\Beam\Beam4D_2.cs" />
+    <Compile Include="Element\Beam\Beam4D_1.cs" />
     <Compile Include="Constraint\BoundaryCondition.cs" />
-    <Compile Include="Constraint\Layout\IConstraintLayout.cs" />
     <Compile Include="Element\IElement.cs" />
     <Compile Include="IShallowCopy.cs" />
     <Compile Include="IDeepCopy.cs" />
-    <Compile Include="Element\Layout\BeamLoadManager.cs" />
-    <Compile Include="Element\Layout\BeamLayout.cs" />
-    <Compile Include="Element\Layout\IElementLayout.cs" />
+    <Compile Include="Element\Beam\BeamLoadManager.cs" />
+    <Compile Include="Element\Beam\BeamLayout.cs" />
+    <Compile Include="Element\IElementLayout.cs" />
+    <Compile Include="Load\AppliedDisplacement.cs" />
     <Compile Include="Load\BeamLoad.cs" />
     <Compile Include="Load\IDynamicLoad.cs" />
-    <Compile Include="Load\ILoadCase.cs" />
-    <Compile Include="Load\ILoad.cs" />
-    <Compile Include="Model\IAnalysisModel.cs" />
+    <Compile Include="Load\Load.cs" />
     <Compile Include="Property\MaterialProperty.cs" />
     <Compile Include="Property\Property.cs" />
     <Compile Include="Property\SectionProperty.cs" />
     <Compile Include="Solver\IDRAnalysisModel.cs" />
-    <Compile Include="Model\IModel.cs" />
+    <Compile Include="Model\Model.cs" />
     <Compile Include="Solver\IDRElement.cs" />
     <Compile Include="Solver\IDRConstraint.cs" />
     <Compile Include="Solver\IDRSolveur.cs" />
@@ -79,7 +77,10 @@
       <Name>TMarsupilami.MathLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Element\Bar\" />
+    <Folder Include="NewFolder1\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

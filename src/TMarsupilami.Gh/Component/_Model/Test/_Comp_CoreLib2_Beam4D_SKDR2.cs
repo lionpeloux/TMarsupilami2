@@ -21,21 +21,22 @@ namespace TMarsupilami.Gh.Component
         private int index;
 
         private List<double> b1, b2;
-        private List<MFrame> sections_0, sections_i;
+        private List<MFrame> frames_0, frames_i;
         private int bc_start, bc_end;
-        private List<SectionProperty> section_prop;
-        private MaterialProperty material_prop;
+        private List<SectionProperty> sections;
+        private List<MaterialProperty> materials;
         private IDRElement[] elements;
         private KDRSolver2 solver;
-        private Stopwatch watch; 
+        private Stopwatch watch;
+        private Model model;
 
 
         // CONSTRUCTOR
         public _Comp_CoreLib2_Beam4D_SKDR2()
             : base("4_DOF_DISC_SKDR2", "4_DOF_DISC_SKDR2", "Single simple beam with various boundary conditions", "TMarsupilami", "Core2Lib")
         {
-            sections_0 = new List<MFrame>();
-            sections_i = new List<MFrame>();
+            frames_0 = new List<MFrame>();
+            frames_i = new List<MFrame>();
             N = 1;
         }
         public override Guid ComponentGuid
@@ -157,14 +158,14 @@ namespace TMarsupilami.Gh.Component
         {
             Rhino.RhinoApp.WriteLine("SOLVE INSTANCE");
             Rhino.RhinoApp.WriteLine("BRANCH : 1beam_simple");
-            sections_0.Clear();
-            sections_i.Clear();
+            frames_0.Clear();
+            frames_i.Clear();
 
             b1 = new List<double>();
             b2 = new List<double>();
 
-            if (!DA.GetDataList(0, sections_0)) { return; }
-            if (!DA.GetDataList(1, sections_i)) { return; }
+            if (!DA.GetDataList(0, frames_0)) { return; }
+            if (!DA.GetDataList(1, frames_i)) { return; }
 
             if (!DA.GetDataList(2, b1)) { return; }
             if (!DA.GetDataList(3, b2)) { return; }
@@ -182,8 +183,8 @@ namespace TMarsupilami.Gh.Component
             {
                 loop_reset_cache = loop_reset;
 
-                int n = sections_i.Count;
-                section_prop = new List<SectionProperty>();
+                int n = frames_i.Count;
+                sections = new List<SectionProperty>();
 
                 // n-1 section definitions
                 if (n == 1)
@@ -191,18 +192,18 @@ namespace TMarsupilami.Gh.Component
                     var sprop = SectionProperty.RectangularSection(b1[0], b2[0]);
                     for (int i = 0; i < n - 1; i++)
                     {
-                        section_prop.Add(sprop);
+                        sections.Add(sprop);
                     }
                 }
                 else
                 {
                     for (int i = 0; i < n - 1; i++)
                     {
-                        section_prop.Add(SectionProperty.RectangularSection(b1[i], b2[i]));
+                        sections.Add(SectionProperty.RectangularSection(b1[i], b2[i]));
                     }
                 }
 
-                material_prop = new MaterialProperty(StandardMaterials.GFRP);
+                materials = new List<MaterialProperty>() { new MaterialProperty(StandardMaterials.GFRP) };
                 DR_Relax(iteration_max);
             }
 
@@ -219,7 +220,7 @@ namespace TMarsupilami.Gh.Component
             //DA.SetDataList(7, elements[0].τ_0);
 
             // actual configuration
-            DA.SetDataList(8, elements[0].MaterialFrames);
+            DA.SetDataList(8, solver.elements_x[0].MaterialFrames);
             //DA.SetDataList(9, elements[0].e);
             //DA.SetDataList(10, elements[0].t);
             //DA.SetDataList(11, elements[0].t_g);
@@ -286,8 +287,11 @@ namespace TMarsupilami.Gh.Component
 
             // INIT
             Rhino.RhinoApp.WriteLine("PB SETUP");
-            BeamLayout layout = new BeamLayout(sections_0, sections_i, false);
-            elements = new IDRElement[1] { new Beam4D_2(layout, material_prop, section_prop.ToArray()) };
+            BeamLayout layout = new BeamLayout(1, frames_0, frames_i, sections, materials, false);
+            elements = new IDRElement[1] { new Beam4D_2(layout) };
+
+            model = new Model();
+            int beamId = model.AddBeamLayout(frames_0, frames_i, sections, materials, false);
 
             // EXTERNAL FORCES
             //elements[0].Fext[elements[0].Nn - 1].Z = -100000;
@@ -343,19 +347,22 @@ namespace TMarsupilami.Gh.Component
             //elements[0].Update_Fext();
 
             var bc_list = new List<IDRConstraint>();
-
+            var bc_ids = new List<int>();
             switch (bc_start)
             {
                 case (int)BoundaryConditionType.Free:
                     elements[0].Mext_m[0] = new MVector(M1, M2, 0);
                     elements[0].Fext_g[0] = new MVector(0, 0, 0 * 1e6);
-
                     break;
+
                 case (int)BoundaryConditionType.Clamped:
                     bc_list.Add(BoundaryCondition.AddClampedBoundaryCondition(elements[0], Boundary.Start));
+                    bc_ids.Add(model.AddBoundaryConstraint(beamId, 0, BoundaryConditionType.Clamped));
                     break;
+
                 default:
                     bc_list.Add(BoundaryCondition.AddPinnedBoundaryCondition(elements[0], Boundary.Start));
+                    bc_ids.Add(model.AddBoundaryConstraint(beamId, 0, BoundaryConditionType.Pinned));
                     break;
             }
 
@@ -367,13 +374,16 @@ namespace TMarsupilami.Gh.Component
                     break;
                 case (int)BoundaryConditionType.Clamped:
                     bc_list.Add(BoundaryCondition.AddClampedBoundaryCondition(elements[0], Boundary.End));
+                    bc_ids.Add(model.AddBoundaryConstraint(beamId, elements[0].Nv - 1, BoundaryConditionType.Clamped));
                     break;
                 default:
                     bc_list.Add(BoundaryCondition.AddPinnedBoundaryCondition(elements[0], Boundary.End));
+                    bc_ids.Add(model.AddBoundaryConstraint(beamId, elements[0].Nv-1, BoundaryConditionType.Pinned));
                     break;
             }
 
-            solver = new KDRSolver2(elements, bc_list, iteration_max, Ec_x_lim, Ec_θ_lim);
+            //solver = new KDRSolver2(elements, bc_list, iteration_max, Ec_x_lim, Ec_θ_lim);
+            solver = new KDRSolver2(model, iteration_max, Ec_x_lim, Ec_θ_lim);
             solver.OnEnergyPeak_x += OnKineticEnergyPeak_x;
             solver.OnConvergence += OnConvergence;
 

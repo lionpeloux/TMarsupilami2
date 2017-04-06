@@ -4,42 +4,60 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.CoreLib2
 {
-    public enum BoundaryConditionType
-    {
-        Free,       // fully free end (x,y,z) & (xx,yy,zz) + eventual end moments
-        Pinned,     // fixed (x,y,z) & (xx,yy,zz) + eventual end moments
-        Clamped,    // fully fixed (x,y,z) & (xx,yy,zz)
-        Elastic,    // end force and moment relative to a fixed position 
-    }
-    public enum Boundary
-    {
-        Start,
-        End,
-    }
     
-    public abstract class BoundaryCondition : IJoint, IDRConstraint
+    
+    public abstract class BoundaryCondition : IDRConstraint
     {
         #region PROPERTIES
+        public ConstraintLayoutType Type { get { return ConstraintLayoutType.BoundaryCondition; } }
+        public BoundaryConditionType SubType { get; protected set; }
         public MVector F { get; protected set; }
         public MVector M { get; protected set; }
         public IDRElement Element { get; protected set; }
-        public BoundaryConditionType Type { get; protected set; }
         public Boundary Boundary { get; protected set; }
         public int VertexIndex { get; protected set; }
 
         #endregion
 
         #region CONSTRUCTORS
-        protected BoundaryCondition(IDRElement element, BoundaryConditionType type, Boundary boundary) : base()
+        protected BoundaryCondition(IDRElement element, BoundaryConditionType subType, Boundary boundary) : base()
         {
             Element = element;
-            Type = type;
+            SubType = subType;
             Boundary = boundary;
             if (Boundary == Boundary.Start) { VertexIndex = 0; }
             else { VertexIndex = element.Nv - 1; }
         }
         #endregion
 
+        public static BoundaryCondition CreateBoundaryCondition(BoundaryConditionLayout layout, IDRElement element)
+        {
+            if (layout.Rx == 0 && layout.Rθ == 1) // PINNED
+            {
+                if (layout.ElementVertexIndex == 0)
+                {
+                    return new Pinned(element, Boundary.Start);
+                }
+                else
+                {
+                    return new Pinned(element, Boundary.End);
+                }
+            }
+
+            if (layout.Rx == 0 && layout.Rθ == 0) // CLAMPED
+            {
+                if (layout.ElementVertexIndex == 0)
+                {
+                    return new Clamped(element, Boundary.Start);
+                }
+                else
+                {
+                    return new Clamped(element, Boundary.End);
+                }
+            }
+
+            throw new Exception("Undefined Boundary Condition");
+        }
         public static BoundaryCondition AddPinnedBoundaryCondition(IDRElement element, Boundary boundary)
         {
             return new Pinned(element, boundary);

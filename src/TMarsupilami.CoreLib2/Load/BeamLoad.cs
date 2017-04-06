@@ -6,18 +6,7 @@ using System.Threading.Tasks;
 using TMarsupilami.MathLib;
 
 namespace TMarsupilami.CoreLib2
-{
-    public enum LoadType:int
-    {
-        AppliedDisplacement,
-        Force,
-        Moment,
-        Pressure,
-        Distorsion,
-        Prestress,
-        Thermal
-    }
-   
+{ 
     public enum VectorLoadType:int
     {
         Force,

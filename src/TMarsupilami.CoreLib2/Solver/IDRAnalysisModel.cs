@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TMarsupilami.CoreLib2.Model
+namespace TMarsupilami.CoreLib2
 {
-    interface IAnalysisModel
+    interface IDRAnalysisModel
     {
     }
 }

@@ -189,7 +189,7 @@ namespace TMarsupilami.CoreLib2
         public double[] Rθ, Rθ_int, Rθ_Q, Rθ_M;
         #endregion
 
-        public Beam4D_2(BeamLayout layout, MaterialProperty materialProp, SectionProperty[] sectionProp)
+        public Beam4D_2(BeamLayout layout)
         {
             Layout = layout;
             nv = Layout.Nv;
@@ -311,10 +311,13 @@ namespace TMarsupilami.CoreLib2
 
             for (int i = 0; i < ne; i++)
             {
-                ES[i] = materialProp.E * sectionProp[i].S;
-                EI1[i] = materialProp.E * sectionProp[i].I1;
-                EI2[i] = materialProp.E * sectionProp[i].I2;
-                GJ[i] = materialProp.G * sectionProp[i].J;
+                var section = Layout.Sections[i];
+                var material = Layout.Materials[0];
+
+                ES[i] = material.E * section.S;
+                EI1[i] = material.E * section.I1;
+                EI2[i] = material.E * section.I2;
+                GJ[i] = material.G * section.J;
             }
 
             // REST CONFIGURATION

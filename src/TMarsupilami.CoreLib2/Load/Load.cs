@@ -17,6 +17,17 @@ namespace TMarsupilami.CoreLib2
         Global,
     }
 
+    public enum LoadType : int
+    {
+        AppliedDisplacement,
+        Force,
+        Moment,
+        Pressure,
+        Distorsion,
+        Prestress,
+        Thermal
+    }
+
     // force, moment, pressure, thermal, prestress, distortion, applied displacement,  ...
     public abstract class Load
     {
@@ -56,8 +67,10 @@ namespace TMarsupilami.CoreLib2
             IsGlobal = isGlobal;
             IsUniform = isUniform;
         }
-
-        //public abstract bool CastTo<T>(T target);
     }
 
+    public class LoadCase
+    {
+        private Dictionary<int, Load> loadsByElementId;
+    }
 }

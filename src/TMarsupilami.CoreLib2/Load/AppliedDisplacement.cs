@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace TMarsupilami.CoreLib2
 {
-    public interface IAnalysisModel
+    class AppliedDisplacement
     {
-        IModel GetModel();
     }
 }

@@ -9,6 +9,18 @@ namespace TMarsupilami.CoreLib2
 {
     public interface IElementLayout
     {
+        int Id { get; set; }
+
+        /// <summary>
+        /// Gets the spatial dimension of the elemennt.
+        /// </summary>
+        /// <remarks>
+        ///     - 0 if the load is punctual
+        ///     - 1 if the load is distributed over a 1D element (curve)
+        ///     - 2 if the load is distributed over a 2D element (surface)
+        ///     - 3 if the load is distribuded over a 3D element (volume)
+        /// </remarks>
+        int Dimension { get; }
     }
 
     public interface IElementLayout1D : IElementLayout

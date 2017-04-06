@@ -24,13 +24,15 @@ namespace TMarsupilami.CoreLib2
         public int NumberOfKineticPeaks_x { get; protected set; }
         public int NumberOfKineticPeaks_θ { get; protected set; }
 
+        // EVENTS
         public event Action<KDRSolver2> OnEnergyPeak_x;
         public event Action<KDRSolver2> OnEnergyPeak_θ;
         public event Action<KDRSolver2> OnConvergence;
 
-        private Cluster Initialize;
-        
-        // 3 and 4 DOF elements : X
+        // INIT
+        private Cluster Init_all;
+
+        // 3 & 4 DOF ELEMENTS : X
         private Cluster Update_x_CenterlineProperties;
         private Cluster Update_x_CurvatureBinormal;
         private Cluster Update_x_MaterialFrame;
@@ -43,7 +45,7 @@ namespace TMarsupilami.CoreLib2
         private Cluster Update_x_ResultantNodalMoment;
         private Cluster Update_x_ResultantNodalForce;
 
-        // 4 DOF : θ
+        // 4 DOF ELEMENTS : θ
         private Cluster Update_θ_CenterlineProperties;
         private Cluster Update_θ_CurvatureBinormal;
         private Cluster Update_θ_MaterialFrame;
@@ -55,6 +57,16 @@ namespace TMarsupilami.CoreLib2
         private Cluster Update_θ_InternalNodalForce;
         private Cluster Update_θ_ResultantNodalMoment;
         private Cluster Update_θ_ResultantNodalForce;
+
+        // CONSTRAINTS : X
+        private Cluster Enforce_x_Fr;
+        private Cluster Enforce_x_Mr;
+        private Cluster Enforce_x_Qr;
+
+        // CONSTRAINTS : θ
+        private Cluster Enforce_θ_Fr;
+        private Cluster Enforce_θ_Mr;
+        private Cluster Enforce_θ_Qr;
 
         // RELAX
         private int nx, nθ;
@@ -74,8 +86,8 @@ namespace TMarsupilami.CoreLib2
         private MVector[][] v_x, v_θ;
         private MVector[][] a_x, a_θ;
 
-        private IDRElement[] elements_x, elements_θ;
-        private IDRConstraint[] constraints, apd;
+        public IDRElement[] elements_x, elements_θ;
+        private IDRConstraint[] constraints_x;
 
         // BUILD
         public KDRSolver2(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints, int maxIteration = 1000, double Ec_x_lim = 1e-12, double Ec_θ_lim = 1e-10)
@@ -89,19 +101,10 @@ namespace TMarsupilami.CoreLib2
             NumberOfKineticPeaks_x = 0;
             NumberOfKineticPeaks_θ = 0;
 
-            Build(elements, constraints);
-            SolverSetup();
-        }
-        private void Build(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints)
-        {
-            var tmp_x = new List<IDRElement>();
-            var tmp_θ = new List<IDRElement>();
-
             ParallelOptions = new ParallelOptions();
             IsParallelModeEnabled = false;
 
-            Initialize = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            
+            Init_all = new Cluster(ParallelOptions, IsParallelModeEnabled);
 
             Update_x_CenterlineProperties = new Cluster(ParallelOptions, IsParallelModeEnabled);
             Update_x_CurvatureBinormal = new Cluster(ParallelOptions, IsParallelModeEnabled);
@@ -127,13 +130,83 @@ namespace TMarsupilami.CoreLib2
             Update_θ_ResultantNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
             Update_θ_ResultantNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
 
-            //
-            foreach (var cst in constraints) { Initialize.Subscribe(cst.Init); }
+            // CONSTRAINTS : X
+            Enforce_x_Fr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Enforce_x_Mr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Enforce_x_Qr = new Cluster(ParallelOptions, IsParallelModeEnabled);
 
+            // CONSTRAINTS : θ
+            Enforce_θ_Fr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Enforce_θ_Mr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Enforce_θ_Qr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+
+            Build(elements, constraints);
+            SolverSetup();
+        }
+        public KDRSolver2(Model model, int maxIteration = 1000, double Ec_x_lim = 1e-12, double Ec_θ_lim = 1e-10)
+        {
+            MaxIteration = maxIteration;
+            this.Ec_x_lim = Ec_x_lim;
+            this.Ec_θ_lim = Ec_θ_lim;
+
+            CurrentIteration_x = 0;
+            CurrentIteration_θ = 0;
+            NumberOfKineticPeaks_x = 0;
+            NumberOfKineticPeaks_θ = 0;
+
+            ParallelOptions = new ParallelOptions();
+            IsParallelModeEnabled = false;
+
+            Init_all = new Cluster(ParallelOptions, IsParallelModeEnabled);
+
+            Update_x_CenterlineProperties = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_CurvatureBinormal = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_MaterialFrame = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_TwistingMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_BendingMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_AxialForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_ShearForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_InternalNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_InternalNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_ResultantNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_x_ResultantNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
+
+            Update_θ_CenterlineProperties = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_CurvatureBinormal = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_MaterialFrame = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_TwistingMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_BendingMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_AxialForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_ShearForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_InternalNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_InternalNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_ResultantNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Update_θ_ResultantNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
+
+            // CONSTRAINTS : X
+            Enforce_x_Fr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Enforce_x_Mr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Enforce_x_Qr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+
+            // CONSTRAINTS : θ
+            Enforce_θ_Fr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Enforce_θ_Mr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            Enforce_θ_Qr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+
+            Build(model);
+            SolverSetup();
+        }
+
+
+        private void Build(IEnumerable<IDRElement> elements, IEnumerable<IDRConstraint> constraints)
+        {
+            // ELEMENTS
+            var elements_x = new List<IDRElement>();
+            var elements_θ = new List<IDRElement>();
 
             foreach (var element in elements)
             {
-                tmp_x.Add(element);
+                elements_x.Add(element);
 
                 Update_x_CenterlineProperties.Subscribe(element.UpdateCenterlineProperties);
                 Update_x_CurvatureBinormal.Subscribe(element.UpdateCurvatureBinormal);
@@ -152,7 +225,7 @@ namespace TMarsupilami.CoreLib2
 
                 if (element.IsTorsionCapable)
                 {
-                    tmp_θ.Add(element);
+                    elements_θ.Add(element);
 
                     Update_θ_CenterlineProperties.Subscribe(element.UpdateCenterlineProperties);
                     Update_θ_CurvatureBinormal.Subscribe(element.UpdateCurvatureBinormal);
@@ -171,11 +244,89 @@ namespace TMarsupilami.CoreLib2
                 }
             }
 
-            this.elements_x = tmp_x.ToArray();
-            this.elements_θ = tmp_θ.ToArray();
+            this.elements_x = elements_x.ToArray();
+            this.elements_θ = elements_θ.ToArray();
 
-            this.constraints = constraints.ToArray();
+            // CONSTRAINTS
+            var constraints_x = new List<IDRConstraint>();
+
+            // INIT
+            foreach (var cst in constraints)
+            {
+                constraints_x.Add(cst);
+                Init_all.Subscribe(cst.Init);
+            }
+
+            this.constraints_x = constraints_x.ToArray();
         }
+        private void Build(Model model)
+        {
+            // ELEMENTS
+            var elements_x = new List<IDRElement>();
+            var elements_θ = new List<IDRElement>();
+
+            foreach (var layout in model.elements)
+            {
+                var beamLayout = layout as BeamLayout;
+                var beamElement = new Beam4D_2(beamLayout);
+          
+                elements_x.Add(beamElement);
+
+                Update_x_CenterlineProperties.Subscribe(beamElement.UpdateCenterlineProperties);
+                Update_x_CurvatureBinormal.Subscribe(beamElement.UpdateCurvatureBinormal);
+                Update_x_MaterialFrame.Subscribe(beamElement.UpdateMaterialFrame);
+
+                Update_x_TwistingMoment.Subscribe(beamElement.UpdateTwistingMoment);
+                Update_x_BendingMoment.Subscribe(beamElement.UpdateBendingMoment);
+                Update_x_AxialForce.Subscribe(beamElement.UpdateAxialForce);
+                Update_x_ShearForce.Subscribe(beamElement.UpdateShearForce);
+
+                Update_x_InternalNodalMoment.Subscribe(beamElement.UpdateInternalNodalMoment);
+                Update_x_InternalNodalForce.Subscribe(beamElement.UpdateInternalNodalForce);
+
+                Update_x_ResultantNodalMoment.Subscribe(beamElement.UpdateResultantNodalMoment);
+                Update_x_ResultantNodalForce.Subscribe(beamElement.UpdateResultantNodalForce);
+
+                if (beamElement.IsTorsionCapable)
+                {
+                    elements_θ.Add(beamElement);
+
+                    Update_θ_CenterlineProperties.Subscribe(beamElement.UpdateCenterlineProperties);
+                    Update_θ_CurvatureBinormal.Subscribe(beamElement.UpdateCurvatureBinormal);
+                    Update_θ_MaterialFrame.Subscribe(beamElement.UpdateMaterialFrame);
+
+                    Update_θ_TwistingMoment.Subscribe(beamElement.UpdateTwistingMoment);
+                    Update_θ_BendingMoment.Subscribe(beamElement.UpdateBendingMoment);
+                    Update_θ_AxialForce.Subscribe(beamElement.UpdateAxialForce);
+                    Update_θ_ShearForce.Subscribe(beamElement.UpdateShearForce);
+
+                    Update_θ_InternalNodalMoment.Subscribe(beamElement.UpdateInternalNodalMoment);
+                    Update_θ_InternalNodalForce.Subscribe(beamElement.UpdateInternalNodalForce);
+
+                    Update_θ_ResultantNodalMoment.Subscribe(beamElement.UpdateResultantNodalMoment);
+                    Update_θ_ResultantNodalForce.Subscribe(beamElement.UpdateResultantNodalForce);
+                }
+            }
+
+            this.elements_x = elements_x.ToArray();
+            this.elements_θ = elements_θ.ToArray();
+
+            // CONSTRAINTS
+            var constraints_x = new List<IDRConstraint>();
+
+            foreach (var layout in model.constraints)
+            {
+                var bcLayout = layout as BoundaryConditionLayout;
+                var bcConstraint = BoundaryCondition.CreateBoundaryCondition(bcLayout, elements_θ[0]);
+
+                constraints_x.Add(bcConstraint);
+                Init_all.Subscribe(bcConstraint.Init);
+
+            }
+
+            this.constraints_x = constraints_x.ToArray();
+        }
+
         private void SolverSetup()
         {
             nx = elements_x.Length;
@@ -233,17 +384,11 @@ namespace TMarsupilami.CoreLib2
             NumberOfKineticPeaks_x = 0;
             NumberOfKineticPeaks_θ = 0;
 
-            // the model is set up in it's initial configuration
-            // constraints are applied and resultant forces and moments are computed
-            //Rhino.RhinoApp.WriteLine("INIT_X : " + CurrentIteration_x);
-
             // apply applied displacements
-            //foreach (var cst in apd) { cst.Init(); }
-
             // get boundary references (after applied displacements)
-            Initialize.Call();
+            Init_all.Call();
 
-            //// update config
+            // update config
             UpdateDeformedConfig_x();
         }
 
@@ -354,7 +499,6 @@ namespace TMarsupilami.CoreLib2
                 Reset_x();
             }
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Move_x(double dt)
         {
             for (int ei = 0; ei < nx; ei++)
@@ -367,7 +511,6 @@ namespace TMarsupilami.CoreLib2
             }
             UpdateDeformedConfig_x();
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ComputeEc_x()
         {
             Ec_x = 0.0;
@@ -484,8 +627,6 @@ namespace TMarsupilami.CoreLib2
                 Reset_θ();
             }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Move_θ(double dt)
         {
             for (int ei = 0; ei < nθ; ei++)
@@ -498,7 +639,6 @@ namespace TMarsupilami.CoreLib2
             }
             UpdateDeformedConfig_θ();         
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ComputeEc_θ()
         {
             Ec_θ = 0.0;
@@ -538,7 +678,7 @@ namespace TMarsupilami.CoreLib2
             Update_x_CenterlineProperties.Call();
 
             // enforce tangent constraints (t, κb)
-            foreach (var cst in constraints) { cst.Enforce_Mr(); }
+            foreach (var cst in constraints_x) { cst.Enforce_Mr(); }
 
             // update curvature binormal (κb)
             Update_x_CurvatureBinormal.Call();
@@ -559,8 +699,8 @@ namespace TMarsupilami.CoreLib2
             Update_x_InternalNodalForce.Call();
 
             // enforce nodal force and moment contraints
-            foreach (var cst in constraints) { cst.Enforce_Qr(); }
-            foreach (var cst in constraints) { cst.Enforce_Fr(); }
+            foreach (var cst in constraints_x) { cst.Enforce_Qr(); }
+            foreach (var cst in constraints_x) { cst.Enforce_Fr(); }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateDeformedConfig_θ()
@@ -577,8 +717,8 @@ namespace TMarsupilami.CoreLib2
             Update_θ_InternalNodalForce.Call();
 
             // enforce nodal force and moment contraints
-            foreach (var cst in constraints) { cst.Enforce_Qr(); }
-            foreach (var cst in constraints) { cst.Enforce_Fr(); }
+            foreach (var cst in constraints_x) { cst.Enforce_Qr(); }
+            foreach (var cst in constraints_x) { cst.Enforce_Fr(); }
         }
 
         private static void OnKineticEnergyPeak_x(KDRSolver2 solver)
