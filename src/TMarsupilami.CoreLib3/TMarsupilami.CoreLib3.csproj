@@ -45,6 +45,7 @@
     <Compile Include="Element\Beam_4D0F_D\BeamLoadManager.cs" />
     <Compile Include="Element\Beam_4D0F_D\Beam_4DOF_D.cs" />
     <Compile Include="Element\Element.cs" />
+    <Compile Include="Force.cs" />
     <Compile Include="Solver\KDRSolver.cs" />
     <Compile Include="Load\AppliedDisplacement.cs" />
     <Compile Include="Load\BeamLoad.cs" />

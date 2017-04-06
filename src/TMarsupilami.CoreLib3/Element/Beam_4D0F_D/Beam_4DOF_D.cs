@@ -275,6 +275,10 @@ namespace TMarsupilami.CoreLib3
             UpdateCenterlineProperties();
         }
 
+        public override string ToString()
+        {
+            return "Beam_4DOF_D";
+        }
 
         public void SetRestConfig(MFrame[] restFrames)
         {

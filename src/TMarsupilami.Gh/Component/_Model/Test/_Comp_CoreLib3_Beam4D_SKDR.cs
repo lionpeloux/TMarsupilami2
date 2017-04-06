@@ -70,85 +70,7 @@ namespace TMarsupilami.Gh.Component
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            // tracking
-            pManager.Register_StringParam("Info", "info", "");
-            pManager.Register_IntegerParam("Index", "index", "");
-
-            // rest config
-            pManager.Register_DoubleParam("Length", "l_0", "Length of edge ei.");
-            pManager.RegisterParam(new Param_MVector(), "Curvature Binormal", "kb_0", "Curvature binormal vector");
-            pManager.Register_DoubleParam("Curvature 1", "k1_0", "Curvature around d1 material vector.");
-            pManager.Register_DoubleParam("Curvature 2", "k2_0", "Curvature around d2 material vector.");
-            pManager.Register_DoubleParam("Twist Angle", "twist_0", "Twist angle between to consecutive sections.");
-            pManager.Register_DoubleParam("Rate of twist", "tau_0", "Rate of twist between to consecutive sections.");
-
-            // deformed config
-            pManager.AddParameter(new Param_MFrame(), "sections", "sections", "Actual configuration.", GH_ParamAccess.item);
-            pManager.RegisterParam(new Param_MVector(), "e", "e", "Centerline edges.");
-            pManager.RegisterParam(new Param_MVector(), "", "t", "");
-            pManager.RegisterParam(new Param_MVector(), "", "t_g", "");
-            pManager.RegisterParam(new Param_MVector(), "", "t_h_l", "");
-            pManager.RegisterParam(new Param_MVector(), "", "t_h_r", "");
-
-            pManager.Register_DoubleParam("", "l", "");
-            pManager.Register_DoubleParam("", "ε", "");
-
-            pManager.RegisterParam(new Param_MVector(), "", "kb_g", "");
-            pManager.RegisterParam(new Param_MVector(), "", "kb_h_l", "");
-            pManager.RegisterParam(new Param_MVector(), "", "kb_h_r", "");
-
-            pManager.Register_DoubleParam("", "twist", "");
-            pManager.Register_DoubleParam("", "τ", "");
-
-            // external forces and moments
-            pManager.RegisterParam(new Param_MVector(), "", "Fext", "");
-            pManager.RegisterParam(new Param_MVector(), "", "Mext", "");
-            pManager.RegisterParam(new Param_MVector(), "", "fext", "");
-            pManager.RegisterParam(new Param_MVector(), "", "mext", "");
-
-            pManager.RegisterParam(new Param_MVector(), "", "Fr", "");
-            pManager.RegisterParam(new Param_MVector(), "", "Mr", "");
-
-            // internal config
-            pManager.RegisterParam(new Param_MVector(), "", "M_g", "");
-            pManager.RegisterParam(new Param_MVector(), "", "M_h_l", "");
-            pManager.RegisterParam(new Param_MVector(), "", "M_h_r", "");
-
-            pManager.Register_DoubleParam("", "Q", "");
-            pManager.Register_DoubleParam("", "Q_l", "");
-            pManager.Register_DoubleParam("", "Q_r", "");
-
-            pManager.RegisterParam(new Param_MVector(), "", "V_M_g", "");
-            pManager.RegisterParam(new Param_MVector(), "", "V_M_h_l", "");
-            pManager.RegisterParam(new Param_MVector(), "", "V_M_h_r", "");
-
-            pManager.Register_DoubleParam("", "N", "");
-            pManager.Register_DoubleParam("", "N_l", "");
-            pManager.Register_DoubleParam("", "N_r", "");
-
-            //// resultante
-            pManager.RegisterParam(new Param_MVector(), "Rx_axial", "", ""); //16
-            pManager.RegisterParam(new Param_MVector(), "Rx_shear_M", "", "");
-            pManager.RegisterParam(new Param_MVector(), "Rx_shear_Q", "", "");
-            pManager.Register_DoubleParam("Rθ_M", "", "");
-            pManager.Register_DoubleParam("Rθ_Q", "", "");
-
-
-            pManager.Register_DoubleParam("Ec_x", "Ec_x", "");
-            pManager.Register_DoubleParam("Ec_θ", "Ec_θ", "");
-            //pManager.Register_CurveParam("section_base", "section_base", "");
-
-            pManager.Register_DoubleParam("lm_x", "lm_x", "");
-            pManager.Register_DoubleParam("lm_θ", "lm_θ", "");
-
-            pManager.RegisterParam(new Param_MVector(), "v_x", "v_x", "");
-            pManager.Register_DoubleParam("v_θ", "v_θ", "");
-
-            //pManager.RegisterParam(new Param_MVector(), "R_x", "R_x", "");
-            //pManager.Register_DoubleParam("R_θ", "R_θ", "");
-
-
-
+            pManager.RegisterParam(new Param_MBeam(), "Beams", "B", "Beam elements.");
         }
 
         // SOLVER
@@ -205,77 +127,10 @@ namespace TMarsupilami.Gh.Component
                 DR_Relax(iteration_max);
             }
 
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed = " + watch.Elapsed.TotalMilliseconds + " ms");
+            this.Message = "Elapsed = " + watch.Elapsed.TotalMilliseconds + " ms";
 
-            DA.SetData(0, "Elapsed = " + watch.Elapsed.TotalMilliseconds + " ms");
-            DA.SetData(1, solver.CurrentIteration_x);
-
-            // rest configuration
-            //DA.SetDataList(2, elements[0].l_0);
-            //DA.SetDataList(3, elements[0].κb_0);
-            //DA.SetDataList(4, elements[0].κ1_0);
-            //DA.SetDataList(5, elements[0].κ2_0);
-            //DA.SetDataList(6, elements[0].twist_0);
-            //DA.SetDataList(7, elements[0].τ_0);
-
-            // actual configuration
-            DA.SetDataList(8, solver.elements_x[0].ActualConfiguration);
-            //DA.SetDataList(9, elements[0].e);
-            //DA.SetDataList(10, elements[0].t);
-            //DA.SetDataList(11, elements[0].t_g);
-            //DA.SetDataList(12, elements[0].t_h_l);
-            //DA.SetDataList(13, elements[0].t_h_r);
-
-            //DA.SetDataList(14, elements[0].l);
-            //DA.SetDataList(15, elements[0].ε);
-
-            //DA.SetDataList(16, elements[0].κb_g);
-            //DA.SetDataList(17, elements[0].κb_h_l);
-            //DA.SetDataList(18, elements[0].κb_h_r);
-            //DA.SetDataList(19, elements[0].twist);
-            //DA.SetDataList(20, elements[0].τ);
-
-            //DA.SetDataList(21, elements[0].GetFext(CoordinateSystem.Global));
-            //DA.SetDataList(22, elements[0].GetMext(CoordinateSystem.Global));
-            //DA.SetDataList(23, elements[0].Getfext(CoordinateSystem.Global));
-            //DA.SetDataList(24, elements[0].Getmext(CoordinateSystem.Global));
-
-            // réactions
-            //DA.SetDataList(25, elements[0].GetFr(CoordinateSystem.Global));
-            //DA.SetDataList(26, elements[0].GetMr(CoordinateSystem.Global));
-
-            //DA.SetDataList(27, elements[0].M_g);
-            //DA.SetDataList(28, elements[0].M_h_l);
-            //DA.SetDataList(29, elements[0].M_h_r);
-
-            //DA.SetDataList(30, elements[0].Q);
-            //DA.SetDataList(31, elements[0].Q_l);
-            //DA.SetDataList(32, elements[0].Q_r);
-
-            //elements[0].GetShearForceAtNodes();
-            //DA.SetDataList(33, elements[0].V_M_g);
-            //DA.SetDataList(34, elements[0].V_M_h_l);
-            //DA.SetDataList(35, elements[0].V_M_h_r);
-
-            //DA.SetDataList(36, elements[0].N);
-            //DA.SetDataList(37, elements[0].N_l);
-            //DA.SetDataList(38, elements[0].N_r);
-
-            //DA.SetDataList(39, elements[0].Rx_axial);
-            //DA.SetDataList(40, elements[0].Rx_shear_M);
-            //DA.SetDataList(41, elements[0].Rx_shear_Q);
-            //DA.SetDataList(42, elements[0].Rθ_M);
-            //DA.SetDataList(43, elements[0].Rθ_Q);
-
-            //// dynamic relaxation
-            //DA.SetDataList(44, Ec_x_history);
-            //DA.SetDataList(45, Ec_θ_history);
-            //DA.SetDataList(46, lm_x[0]);
-            //DA.SetDataList(47, lm_θ[0]);
-            //DA.SetDataList(48, v_x[0]);
-            //DA.SetDataList(49, v_θ[0]);
-
-
-            index++;
+            DA.SetDataList(0, solver.elements_x);
         }
 
         private void DR_Relax(int iteration_max)
@@ -288,13 +143,6 @@ namespace TMarsupilami.Gh.Component
             Beam_4DOF_D beam = new Beam_4DOF_D(frames_0, frames_i, sections, materials);
             elements = new Beam[1] { beam };
 
-            // EXTERNAL FORCES
-            //elements[0].Fext[elements[0].Nn - 1].Z = -100000;
-
-            // MOMENTS (uncomment pour tester le moment d'extrémité)
-            //elements[0].Mext[elements[0].Nn - 1] =  10e6;
-            //elements[0].Update_mext();
-
             double M1 = 1 * 50 * 1e4;
             double M2 = 1 * 20 * -1e4;
             double Q = 0 * 1e6;
@@ -303,43 +151,7 @@ namespace TMarsupilami.Gh.Component
 
             int nmid = elements[0].Nv / 2;
             int nend = elements[0].Nv - 1;
-            //elements[0].Fext[ind] = 1e-2 * -1e6 * MVector.ZAxis;
-            //elements[0].mext[ind-1] = new MVector(0, 1e-1*-M2, Q);
-
-            // Example saut de courbure
-            //var m = new MVector(0, 20e-1 * -M2, 0 * Q);
-            //elements[0].mext[ind-1] = m;
-            //elements[0].mext[ind] = m;
-            //elements[0].mext[ind+1] = m;
-
-            // Example avec Moment de Torsion
-            var qext = 0 * 0.2 * 1e5;
-            for (int i = 2; i < elements[0].Ne - 2; i++)
-            {
-                //elements[0].mext_g[i].Z = qext;
-            }
-            //elements[0].Mext[ind].Z = Q;
-
-            // example shear linéique
-            //elements[0].Fext[0].Z = 0 * Fz;
-
-            //var f1ext = -1 * 1e3;
-            //for (int i = 2; i < elements[0].Ne-2; i++)
-            //{
-            //    elements[0].fext[i].X = f1ext;
-            //}
-            //elements[0].Fext[ind].Z = 1*Fz;
-
-            //elements[0].Fext[ind].X = 0*Fn;
-            //elements[0].Mext[ind] = new MVector(M1, M2, Q);
-            //elements[0].Mext[ind+2] = new MVector(0, 1e-1*M2, Q);
-
-            //elements[0].Mext[nend] = new MVector(M1, M2, Q);
-            //elements[0].Fext[elements[0].Nn - 1].Z = 0;
-
-
-            //elements[0].Update_mext();
-            //elements[0].Update_Fext();
+ 
 
             var bc_list = new List<BoundaryCondition>();
             switch (bc_start)
@@ -372,7 +184,7 @@ namespace TMarsupilami.Gh.Component
                     //loads.Add(BeamVectorLoad.Create_Fext(Fext, Boundary.End, beam, true));
                     
                     // force suiveuse
-                    //loads.Add(BeamVectorLoad.Create_Fext(new MVector(-1e5, 0, 0), beam.Nvh / 2, beam, false));
+                    loads.Add(BeamVectorLoad.Create_Fext(new MVector(-1e4, 0, 0), Boundary.End, beam, false));
                     
                     //loads.Add(BeamVectorLoad.Create_fext(Fext, Boundary.End, beam, true));
                     //loads.Add(BeamVectorLoad.Create_Mext(Mext, Boundary.End, beam, true));
@@ -380,7 +192,7 @@ namespace TMarsupilami.Gh.Component
 
                     //loads.Add(BeamVectorLoad.Create_Fext(Fext, Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_fext(-Fext, Boundary.End, beam, false));
-                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0,-1e6,0), Boundary.End, beam, false));
+                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0,0,1e5), Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_mext(0*new MVector(0,0,1e5), Boundary.End, beam, false));
 
 
