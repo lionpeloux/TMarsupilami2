@@ -95,6 +95,7 @@
     <Compile Include="Component\CoreLib\Comp_DisplayForce.cs" />
     <Compile Include="Component\MathLib\Arithmetic\Comp_ReNormalizeVector.cs" />
     <Compile Include="Component\MathLib\Arithmetic\Comp_NormalizeVector.cs" />
+    <Compile Include="Component\MathLib\Centerline\Comp_InterpolateFrames.cs" />
     <Compile Include="Component\MathLib\Centerline\Comp_CenterlineProperties.cs" />
     <Compile Include="Component\MathLib\Display\Comp_DisplayVector.cs" />
     <Compile Include="Component\MathLib\OsculatingCircle\Comp_InscribedCirclePolyline.cs" />

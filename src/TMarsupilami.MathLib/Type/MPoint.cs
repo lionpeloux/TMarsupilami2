@@ -172,6 +172,18 @@ namespace TMarsupilami.MathLib
 
         #region STATIC OPERATORS
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MPoint operator *(double λ, MPoint p)
+        {
+            return new MPoint(λ * p.X, λ * p.Y, λ * p.Z);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MPoint operator *(MPoint p, double λ)
+        {
+            return new MPoint(λ * p.X, λ * p.Y, λ * p.Z);
+        }
+
         /// <summary>
         /// Adds two points together.
         /// </summary>
@@ -206,6 +218,18 @@ namespace TMarsupilami.MathLib
         public static MPoint operator +(MPoint p, MVector v)
         {
             return new MPoint(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
+        }
+
+        /// <summary>
+        /// Substract a vector to a point.
+        /// </summary>
+        /// <param name="p">The source point.</param>
+        /// <param name="v">The translation vector.</param>
+        /// <returns>The translated point.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MPoint operator -(MPoint p, MVector v)
+        {
+            return new MPoint(p.X - v.X, p.Y - v.Y, p.Z - v.Z);
         }
 
         /// <summary>
