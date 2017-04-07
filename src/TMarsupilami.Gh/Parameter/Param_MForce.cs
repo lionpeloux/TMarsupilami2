@@ -14,7 +14,7 @@ using TMarsupilami.Gh.Properties;
 
 namespace TMarsupilami.Gh.Parameter
 {
-    public class Param_MForce : GH_Param<GH_MForce>, IGH_PreviewObject
+    public class Param_MForce : GH_Param<GH_MForce>
     {
 
         // Fields
@@ -64,66 +64,5 @@ namespace TMarsupilami.Gh.Parameter
         {
             base.ClearData();
         }
-
-        // IGH_PreviewObject
-        public bool Hidden
-        {
-            get
-            {
-                return this.m_hidden;
-            }
-            set
-            {
-                this.m_hidden = value;
-            }
-        }
-        public bool IsPreviewCapable
-        {
-            get
-            {
-                return true;
-            }
-        }
-        public BoundingBox ClippingBox
-        {
-            get
-            {
-                return this.Preview_ComputeClippingBox();
-            }
-        }
-        public void DrawViewportMeshes(IGH_PreviewArgs args)
-        {
-        }
-        public void DrawViewportWires(IGH_PreviewArgs args)
-        {
-            // specific preview of the data relative to the parameter component
-
-            Color color;
-            if (Attributes.GetTopLevel.Selected)
-            {
-                color = Color.Yellow;
-            }
-            else
-            {
-                color = Color.Red;
-            }
-
-            int dataCount = base.m_data.DataCount;
-            if (dataCount != 0)
-            {
-                for (int b = 0; b < m_data.Branches.Count; b++)
-                {
-                    var branch = m_data.Branches[b];
-                    for (int i = 0; i < branch.Count; i++)
-                    {
-                        var force = branch[i];
-                        if (force != null)
-                        {
-                            force.DrawForce(args.Display, CentralSettings.PreviewPlaneRadius, color);
-                        }
-                    }
-                }
-            }
-        }   
     }
 }

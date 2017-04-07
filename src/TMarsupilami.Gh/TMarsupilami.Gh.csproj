@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component\CoreLib\Comp_DisplayBeam.cs" />
+    <Compile Include="Component\CoreLib\Comp_DisplayForce.cs" />
     <Compile Include="Component\MathLib\Arithmetic\Comp_ReNormalizeVector.cs" />
     <Compile Include="Component\MathLib\Arithmetic\Comp_NormalizeVector.cs" />
     <Compile Include="Component\MathLib\Display\Comp_DisplayVector.cs" />

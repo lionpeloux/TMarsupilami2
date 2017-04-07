@@ -76,42 +76,42 @@ namespace TMarsupilami.Gh.Type
         {
             if (typeof(T).IsAssignableFrom(typeof(MVector)))
             {
-                object ptr = this.Value.F;
+                object ptr = this.Value.ValueInGCS;
                 target = (T)ptr;
                 return true;
             }
 
             if (typeof(T).IsAssignableFrom(typeof(GH_MVector)))
             {
-                object ptr = new GH_MVector(this.Value.F);
+                object ptr = new GH_MVector(this.Value.ValueInGCS);
                 target = (T)ptr;
                 return true;
             }
 
             if (typeof(T).IsAssignableFrom(typeof(Vector3d)))
             {
-                object ptr = this.Value.F.Cast();
+                object ptr = this.Value.ValueInGCS.Cast();
                 target = (T)ptr;
                 return true;
             }
 
             if (typeof(T).IsAssignableFrom(typeof(GH_Vector)))
             {
-                object ptr = new GH_Vector(this.Value.F.Cast());
+                object ptr = new GH_Vector(this.Value.ValueInGCS.Cast());
                 target = (T)ptr;
                 return true;
             }
 
             if (typeof(T).IsAssignableFrom(typeof(double)))
             {
-                object ptr = this.Value.F.Length();
+                object ptr = this.Value.ValueInGCS.Length();
                 target = (T)ptr;
                 return true;
             }
 
             if (typeof(T).IsAssignableFrom(typeof(GH_Number)))
             {
-                object ptr = new GH_Number(this.Value.F.Length());
+                object ptr = new GH_Number(this.Value.ValueInGCS.Length());
                 target = (T)ptr;
                 return true;
             }
@@ -134,12 +134,14 @@ namespace TMarsupilami.Gh.Type
         }
 
         // PREVIEW
-        public void DrawForce(DisplayPipeline display, double scale, Color color)
+        public void DrawForce(MVector vector, DisplayPipeline display, Color color, double scale = 1, double arrowSize = 0.15, int lineWidth = 1)
         {
             var origin = Value.LocalFrame.Origin.Cast();
-            var force = Value.ToGlobalCS().Cast();
-            var line = new Line(origin, force, scale * force.Length);
-            display.DrawArrow(line, color);
+            var force = Value.ValueInGCS.Cast();
+            double l = force.Length;
+            var line = new Line(origin, force, scale * l);
+            double h = l * arrowSize; // arrow head size
+            display.DrawLineArrow(line, color, lineWidth, h);
         }
         #endregion
 
