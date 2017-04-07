@@ -249,6 +249,10 @@ namespace TMarsupilami.MathLib
 
         #endregion
 
+        public static double DistanceTo(MFrame f1, MFrame f2)
+        {
+            return MPoint.DistanceTo(f1.Origin, f2.Origin);
+        }
 
     }
 }

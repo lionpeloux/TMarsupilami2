@@ -64,6 +64,7 @@
     <Compile Include="IShallowCopy.cs" />
     <Compile Include="Math\OsculatingCircle.cs" />
     <Compile Include="Math\Projection.cs" />
+    <Compile Include="Math\Centerline.cs" />
     <Compile Include="Math\Sqrt.cs" />
     <Compile Include="Type\MFrame.cs" />
     <Compile Include="Type\MPoint.cs" />

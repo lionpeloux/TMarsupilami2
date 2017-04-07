@@ -252,7 +252,7 @@ namespace TMarsupilami.MathLib
         /// <param name="fromPoint">The first point.</param>
         /// <param name="toPoint">The second point.</param>
         /// <returns>The distance between the two points.</returns>
-        public double DistanceTo(MPoint fromPoint, MPoint toPoint)
+        public static double DistanceTo(MPoint fromPoint, MPoint toPoint)
         {
             double dx = fromPoint.x - toPoint.x;
             double dy = fromPoint.y - toPoint.y;

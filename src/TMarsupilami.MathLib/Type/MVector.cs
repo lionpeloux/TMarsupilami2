@@ -71,6 +71,18 @@ namespace TMarsupilami.MathLib
         }
 
         /// <summary>
+        /// Constructs a new vector with two given point.
+        /// </summary>
+        /// <param name="fromPoint">The start point.</param>
+        /// <param name="toPoint">The end point.</param>
+        public MVector(MPoint fromPoint, MPoint toPoint)
+        {
+            x = toPoint.X - fromPoint.X;
+            y = toPoint.Y - fromPoint.Y;
+            z = toPoint.Z - fromPoint.Z;
+        }
+
+        /// <summary>
         /// Constructs a vector with the given array.
         /// </summary>
         /// <param name="xyz">An array with the [x,y,z] components.</param>

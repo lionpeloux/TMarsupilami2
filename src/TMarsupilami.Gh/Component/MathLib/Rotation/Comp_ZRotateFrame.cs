@@ -83,7 +83,9 @@ namespace TMarsupilami.Gh.Component
             {
                 for (int i = 0; i < plane_list.Count; i++)
                 {
-                    frames[i].ZRotate(angle_list[i]);
+                    var frame = new MFrame();
+                    frames[i].ZRotate(angle_list[i], ref frame);
+                    frames[i] = frame;
                 }
             }
             watch.Stop();

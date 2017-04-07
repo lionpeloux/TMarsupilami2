@@ -71,7 +71,7 @@ namespace TMarsupilami.Gh.Component
             isGlobal = true;
             scale = 1;
 
-            if (!DA.GetDataList(0, ghForces)){ isNull &= false; return; }
+            if (DA.GetDataList(0, ghForces)){ isNull = false; }
 
             // OPTIONAL WITH DEFAULT
             DA.GetData(1, ref isProjected);
@@ -81,13 +81,11 @@ namespace TMarsupilami.Gh.Component
 
         public override void DrawViewportWires(IGH_PreviewArgs args)
         {
-            Rhino.RhinoApp.Write("smdlsdl");
-            if (!isNull && !Locked)
+            if (!isNull)
             {
                 Color color = Attributes.GetTopLevel.Selected ? args.WireColour_Selected : Color.Cyan;
-                double scale = 1.0;
                 double arrowSize = 0.15;
-                int lineWidth = 1;
+                int lineWidth = 2;
 
                 foreach (var ghForce in ghForces)
                 {
