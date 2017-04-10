@@ -64,11 +64,17 @@ namespace TMarsupilami.CoreLib3
 
             // Active les forces suiveuses
             if (IsStaticLoadBufferActive[4])
-                Beam.Update_Loads.Subscribe(Update_ptr_Fext);
+            {
+                //Beam.Update_Loads.Subscribe(Update_ptr_Fext);
+                Beam.FramesRotated += Update_ptr_Fext;
+            }
 
             // Active les moments fixes
             if (IsStaticLoadBufferActive[2])
-                Beam.Update_Loads.Subscribe(Update_ptr_Mext);
+            {
+                //Beam.Update_Loads.Subscribe(Update_ptr_Mext);
+                Beam.FramesRotated += Update_ptr_Mext;
+            }
 
             Update();
         }
@@ -96,7 +102,7 @@ namespace TMarsupilami.CoreLib3
         }
 
         // dans l'hypothèse ou Fext_m est actif, il faut faire un update des efforts du repère materiel vers le repère global
-        public void Update_ptr_Fext()
+        public void Update_ptr_Fext(double[] dθ)
         {
             for (int i = 0; i < ptr_Fext_g.Length; i++)
             {
@@ -113,7 +119,7 @@ namespace TMarsupilami.CoreLib3
         }
 
         // dans l'hypothèse ou Mext_g est actif, il faut faire un update des efforts du repère global vers le repère materiel
-        public void Update_ptr_Mext()
+        public void Update_ptr_Mext(double[] dθ)
         {
             for (int i = 0; i < ptr_Mext_m.Length; i++)
             {

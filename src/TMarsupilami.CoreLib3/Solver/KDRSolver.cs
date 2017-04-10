@@ -45,6 +45,16 @@ namespace TMarsupilami.CoreLib3
 
         // 3 & 4 DOF ELEMENTS : X
         private Cluster Update_x_CenterlineProperties;
+        public event Action CenterlinePropertiesChanging
+        {
+            add { Update_x_CenterlineProperties.Subscribe(value); }
+            remove { Update_x_CenterlineProperties.UnSubscribe(value); }
+        }
+        protected void OnCenterlinePropertiesChanging(bool isParallel = false)
+        {
+            Update_x_CenterlineProperties.Call();
+        }
+
         private Cluster Update_x_CurvatureBinormal;
         private Cluster Update_x_MaterialFrame;
         private Cluster Update_x_TwistingMoment;
@@ -166,7 +176,9 @@ namespace TMarsupilami.CoreLib3
 
                 elements_x.Add(beam);
 
-                Update_x_CenterlineProperties.Subscribe(beam.UpdateCenterlineProperties);
+                CenterlinePropertiesChanging += beam.UpdateCenterlineProperties;
+                //Update_x_CenterlineProperties.Subscribe(beam.UpdateCenterlineProperties);
+
                 Update_x_CurvatureBinormal.Subscribe(beam.UpdateCurvatureBinormal);
                 Update_x_MaterialFrame.Subscribe(beam.UpdateMaterialFrame);
 
@@ -566,7 +578,8 @@ namespace TMarsupilami.CoreLib3
         private void UpdateDeformedConfig_x()
         {
             // update centerline properties (e,l,ll,t)
-            Update_x_CenterlineProperties.Call();
+            OnCenterlinePropertiesChanging();
+            //Update_x_CenterlineProperties.Call();
 
             // enforce tangent constraints (t, κb)
             foreach (var cst in constraints_x) { cst.Enforce_Mr(); }
@@ -593,6 +606,7 @@ namespace TMarsupilami.CoreLib3
             foreach (var cst in constraints_x) { cst.Enforce_Qr(); }
             foreach (var cst in constraints_x) { cst.Enforce_Fr(); }
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateDeformedConfig_θ()
         {

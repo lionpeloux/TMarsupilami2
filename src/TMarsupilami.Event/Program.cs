@@ -27,7 +27,7 @@ namespace TMarsupilami.Event
             var handlers = new EventHandler<object, EventArgs>[n];
             var sleepTimes = new int[n];
             var rdm = new Random();
-
+            
             for (int i = 0; i < handlers.Length; i++)
             {
                 // assign to local variables to ensure proper closure
@@ -155,10 +155,6 @@ namespace TMarsupilami.Event
         }
 
     }
-
-  
-
-    
 
 }
 

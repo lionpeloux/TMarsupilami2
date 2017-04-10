@@ -86,6 +86,39 @@ namespace TMarsupilami.CoreLib3
     {
         public Cluster Update_Loads; // trigger loading update
 
+        // EVENT : TopologyChanged
+        public event Action<int[]> TopologyChanged;
+        protected virtual void OnTopologyChanged(int[] indexMap)
+        {
+            Action<int[]> handler = TopologyChanged;
+            if (handler != null)
+            {
+                handler(indexMap);
+            }
+        }
+
+        // EVENT : FramesTranslated
+        public event Action<MVector[]> FramesTranslated;
+        protected virtual void OnFramesTranslated(MVector[] dx)
+        {
+            Action<MVector[]> handler = FramesTranslated;
+            if (handler != null)
+            {
+                handler(dx);
+            }
+        }
+
+        // EVENT : FramesRotated
+        public event Action<double[]> FramesRotated;
+        protected virtual void OnFramesRotated(double[] dθ)
+        {
+            Action<double[]> handler = FramesRotated;
+            if (handler != null)
+            {
+                handler(dθ);
+            }
+        }
+
         #region PRIVATE FIELDS
 
         // TOPOLOGY
@@ -269,4 +302,5 @@ namespace TMarsupilami.CoreLib3
         public abstract void Update_lm_θ(ref double[] lm_θ);
         #endregion
     }
+
 }

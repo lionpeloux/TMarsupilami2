@@ -58,7 +58,6 @@ namespace TMarsupilami.Event
             ParallelOptions = options;
         }
 
-
         public void Subscribe(EventHandler<TSender, TEventArgs> handler)
         {
             this.handler += handler;

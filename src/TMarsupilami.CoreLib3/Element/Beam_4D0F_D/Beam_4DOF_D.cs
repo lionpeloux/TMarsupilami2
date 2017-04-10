@@ -356,6 +356,7 @@ namespace TMarsupilami.CoreLib3
             {
                 x[i] = mframes[i].Origin + dx[i];
             }
+            OnFramesTranslated(dx);
         }
         public override void Move(double[] dθ)
         {
@@ -366,6 +367,7 @@ namespace TMarsupilami.CoreLib3
             }
 
             Update_Loads.Call();
+            OnFramesRotated(dθ);
         }
 
         // GEOMETRY
