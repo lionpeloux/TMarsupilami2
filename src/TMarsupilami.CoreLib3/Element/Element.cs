@@ -117,6 +117,50 @@ namespace TMarsupilami.CoreLib3
             }
         }
 
+        // EVENT : TangentVectorEnforcing
+        public event Action<MVector[]> TangentVectorEnforcing;
+        protected virtual void OnTangentVectorEnforcing(MVector[] t)
+        {
+            Action<MVector[]> handler = TangentVectorEnforcing;
+            if (handler != null)
+            {
+                handler(t);
+            }
+        }
+
+        // EVENT : ReactionBendingMomentUpdating
+        public event Action<MVector[], double[], double[], double[], double[]> ReactionBendingMomentUpdating;
+        protected virtual void OnReactionBendingMomentUpdating(MVector[] Mr, double[] M1_h_l, double[] M2_h_l, double[] M1_h_r, double[] M2_h_r)
+        {
+            Action<MVector[], double[], double[], double[], double[]> handler = ReactionBendingMomentUpdating;
+            if (handler != null)
+            {
+                handler(Mr, M1_h_l, M2_h_l, M1_h_r, M2_h_r);
+            }
+        }
+
+        // EVENT : ReactionTwistingMomentUpdating
+        public event Action<MVector[], double[]> ReactionTwistingMomentUpdating;
+        protected virtual void OnReactionTwistingMomentUpdating(MVector[] Mr, double[] Rθ)
+        {
+            Action<MVector[], double[]> handler = ReactionTwistingMomentUpdating;
+            if (handler != null)
+            {
+                handler(Mr, Rθ);
+            }
+        }
+
+        // EVENT : ReactionForceEnforcing
+        public event Action<MVector[], MVector[]> ReactionForceUpdating;
+        protected virtual void OnReactionForceUpdating(MVector[] Fr, MVector[] Rx)
+        {
+            Action<MVector[], MVector[]> handler = ReactionForceUpdating;
+            if (handler != null)
+            {
+                handler(Fr, Rx);
+            }
+        }
+
         #region PRIVATE FIELDS
 
         // TOPOLOGY

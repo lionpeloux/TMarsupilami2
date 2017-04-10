@@ -328,8 +328,8 @@ namespace TMarsupilami.CoreLib3
             }
             for (int i = 0; i < ne; i++)
             {
-                twist_0[i] = -Rotation.ZAngle_Rotation(frames_0[i], frames_0[i].ZAxis, frames_0[i + 1], frames_0[i + 1].ZAxis);
-                τ_0[i] = twist_0[i] / l_0[i];
+                var twist = -Rotation.ZAngle_Rotation(frames_0[i], frames_0[i].ZAxis, frames_0[i + 1], frames_0[i + 1].ZAxis);
+                τ_0[i] = twist / l_0[i];
             }
         }
         public void SetInitialConfig(MFrame[] initialFrames)
@@ -550,7 +550,7 @@ namespace TMarsupilami.CoreLib3
                 τ[i] = twist[i] / l[i];
 
                 // introduire un twist lié à un qext ?
-                Q[i] = GJ[i] * (twist[i] - twist_0[i]) / l[i];
+                Q[i] = GJ[i] * (τ[i] - τ_0[i]);
             }
 
             MVector M_mid;

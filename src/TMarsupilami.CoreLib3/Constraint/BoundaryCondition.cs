@@ -181,5 +181,192 @@ namespace TMarsupilami.CoreLib3
         }
     }
 
-    
+    public abstract class BC
+    {
+        #region PROPERTIES
+        public BoundaryConditionType Type { get; protected set; }
+        public MVector F { get; protected set; }
+        public MVector M { get; protected set; }
+        public Beam Beam { get; protected set; }
+        public Boundary Boundary { get; protected set; }
+        public int VertexIndex { get; protected set; }
+
+        #endregion
+
+        #region CONSTRUCTORS
+        protected BC(Beam beam, BoundaryConditionType type, Boundary boundary) : base()
+        {
+            Beam = beam;
+            Type = type;
+            Boundary = boundary;
+            VertexIndex = beam.BoundaryToVertexIndex(Boundary);
+        }
+        #endregion
+
+        public static BC AddPinnedBoundaryCondition(Beam beam, Boundary boundary)
+        {
+            return new Pinned(beam, boundary);
+        }
+        public static BC AddClampedBoundaryCondition(Beam beam, Boundary boundary)
+        {
+            return new Clamped(beam, boundary);
+        }
+
+        public virtual void Init() { }
+        public virtual void Enforce_t(MVector[] t) { }
+        public virtual void Enforce_Mr(MVector[] Mr, double[] M1_h_l, double[] M2_h_l, double[] M1_h_r, double[] M2_h_r) { }
+        public virtual void Enforce_Qr(MVector[] Mr, double[] Rθ) { }
+        public virtual void Enforce_Fr(MVector[] Fr, MVector[] Rx) { }
+
+        // internal class
+        private class Pinned : BC
+        {
+            public Pinned(Beam beam, Boundary boundary)
+                : base(beam, BoundaryConditionType.Pinned, boundary)
+            {
+                beam.ReactionForceUpdating += Enforce_Fr;
+            }
+
+            public override string ToString()
+            {
+                return "[BOUNDARY CONDITION] : pinned";
+            }
+
+            public override void Enforce_Fr(MVector[] Fr, MVector[] Rx)
+            {
+                if (Boundary == Boundary.Start)
+                {
+                    this.F = Rx[0];  // force appliquée par la poutre sur le support
+                    Fr[0] = - this.F; // force appliquée par le support sur la poutre
+                }
+                else
+                {
+                    this.F = Rx[Beam.Nv - 1];  // force appliquée par la poutre sur le support
+                    Fr[Beam.Nvh - 1] = -this.F; // force appliquée par le support sur la poutre
+                }
+
+            }
+        }
+        private class Clamped : BC
+        {
+            private MFrame clamped_frame;    // clamped configuration storage
+
+            public Clamped(Beam beam, Boundary boundary)
+                : base(beam, BoundaryConditionType.Clamped, boundary)
+            {
+                Init();
+                beam.TangentVectorEnforcing += Enforce_t;
+                beam.ReactionForceUpdating += Enforce_Fr;
+                beam.ReactionBendingMomentUpdating += Enforce_Mr;
+                beam.ReactionTwistingMomentUpdating += Enforce_Qr;
+            }
+
+            public override string ToString()
+            {
+                return "[BOUNDARY CONDITION] : clamped";
+            }
+
+            public override void Init()
+            {
+                if (Boundary == Boundary.Start)
+                {
+                    clamped_frame = Beam.ActualConfiguration[0];
+                }
+                else
+                {
+                    clamped_frame = Beam.ActualConfiguration[Beam.Nv - 1];
+                }
+            }
+            public override void Enforce_t(MVector[] t)
+            {
+                if (Boundary == Boundary.Start)
+                {
+                    t[0] = clamped_frame.ZAxis;
+                }
+                else if (Boundary == Boundary.End)
+                {
+                    t[Beam.Nvh - 1] = clamped_frame.ZAxis;
+                }
+                else
+                {
+                }
+            }
+            public override void Enforce_Mr(MVector[] Mr, double[] M1_h_l, double[] M2_h_l, double[] M1_h_r, double[] M2_h_r)
+            {
+                //beam.t[VertexIndex] = clamped_frame.ZAxis;
+                MVector κb;
+                double κ1, κ2;
+                double M1, M2;
+
+
+                if (Boundary == Boundary.Start)
+                {
+                    // beam curvature regarding clamped bondary condition
+                    //κb = 2 / (Beam.l[0] * Beam.l[0]) * MVector.CrossProduct(clamped_frame.ZAxis, Beam.e[0]);
+
+                    //// bending moment due to the clamped boundary
+                    //κ1 = κb * Beam.ActualConfiguration[0].XAxis;
+                    //κ2 = κb * Beam.ActualConfiguration[0].YAxis;
+                    //M1 = κ1 * Beam.EI1[0];
+                    //M2 = κ2 * Beam.EI2[0];
+
+                    //Beam.Mr_m[0].X = M1;
+                    //Beam.Mr_m[0].Y = M2;
+
+                    //Mr[0].X = - (M1_h_r[0] + Mext[0];
+                    //Mr[0].Y = M2_h_r[0];
+                }
+                else if (Boundary == Boundary.End)
+                {
+                    // beam curvature regarding clamped bondary condition
+                    //κb = 2 / (Beam.l[Beam.Ne - 1] * Beam.l[Beam.Ne - 1]) * MVector.CrossProduct(Beam.e[Beam.Ne - 1], clamped_frame.ZAxis);
+
+                    //// bending moment due to the clamped boundary
+                    //κ1 = κb * Beam.ActualConfiguration[Beam.Nv - 1].XAxis;
+                    //κ2 = κb * Beam.ActualConfiguration[Beam.Nv - 1].YAxis;
+                    //M1 = κ1 * Beam.EI1[Beam.Ne - 1];
+                    //M2 = κ2 * Beam.EI2[Beam.Ne - 1];
+
+                    //Beam.Mr_m[Beam.Nvh - 1].X = -M1;
+                    //Beam.Mr_m[Beam.Nvh - 1].Y = -M2;
+
+                    //Mr[Beam.Nvh - 1].X = -M1_h_l[Beam.Nvh-1];
+                    //Mr[Beam.Nvh - 1].Y = -M2_h_l[Beam.Nvh-1];
+                }
+                else
+                {
+                    // a écrire
+                }
+            }
+            public override void Enforce_Qr(MVector[] Mr, double[] Rθ)
+            {
+                double Qr;
+
+                if (Boundary == Boundary.Start)
+                {
+                    Qr = Rθ[0];  // force appliquée par la poutre sur le support
+                    Mr[0].Z = -Qr; // force appliquée par le support sur la poutre
+                }
+                else
+                {
+                    Qr = Rθ[Beam.Nv - 1];  // force appliquée par la poutre sur le support
+                    Mr[Beam.Nvh - 1].Z = -Qr; // force appliquée par le support sur la poutre
+                }
+            }
+            public override void Enforce_Fr(MVector[] Fr, MVector[] Rx)
+            {
+                if (Boundary == Boundary.Start)
+                {
+                    this.F = Rx[0];  // force appliquée par la poutre sur le support
+                    Fr[0] = -this.F; // force appliquée par le support sur la poutre
+                }
+                else
+                {
+                    this.F = Rx[Beam.Nv - 1];  // force appliquée par la poutre sur le support
+                    Fr[Beam.Nvh - 1] = -this.F; // force appliquée par le support sur la poutre
+                }
+
+            }
+        }
+    }
 }
