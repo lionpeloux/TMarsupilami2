@@ -285,7 +285,7 @@ namespace TMarsupilami.CoreLib3
                 }
                 else if (Boundary == Boundary.End)
                 {
-                    t[Beam.Nvh - 1] = clamped_frame.ZAxis;
+                    t[Beam.Nv - 1] = clamped_frame.ZAxis;
                 }
                 else
                 {

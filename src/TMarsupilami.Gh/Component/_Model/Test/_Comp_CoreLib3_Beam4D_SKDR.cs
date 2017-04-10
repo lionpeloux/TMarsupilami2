@@ -167,7 +167,8 @@ namespace TMarsupilami.Gh.Component
                     break;
 
                 default:
-                    bc_list.Add(BoundaryCondition.AddPinnedBoundaryCondition(elements[0], Boundary.Start));
+                    //bc_list.Add(BoundaryCondition.AddPinnedBoundaryCondition(elements[0], Boundary.Start));
+                    BC.AddPinnedBoundaryCondition(elements[0], Boundary.Start);
                     break;
             }
 
@@ -193,7 +194,7 @@ namespace TMarsupilami.Gh.Component
 
                     //loads.Add(BeamVectorLoad.Create_Fext(Fext, Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_fext(-Fext, Boundary.End, beam, false));
-                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 0, 1e5), Boundary.End, beam, false));
+                    //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 0, 1e5), Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_mext(0*new MVector(0,0,1e5), Boundary.End, beam, false));
 
 
@@ -201,7 +202,8 @@ namespace TMarsupilami.Gh.Component
                     //elements[0].Fext[elements[0].Nn - 1] = new MVector(0, 0, 0*1e4);
                     break;
                 case (int)BoundaryConditionType.Clamped:
-                    bc_list.Add(BoundaryCondition.AddClampedBoundaryCondition(elements[0], Boundary.End));
+                    //bc_list.Add(BoundaryCondition.AddClampedBoundaryCondition(elements[0], Boundary.End));
+                    BC.AddClampedBoundaryCondition(elements[0], Boundary.End);
                     //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0,0,1e6), beam.Nvh/2, beam, false));
                     //loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 1e6, 0), beam.Nvh / 2, beam, true));
                     break;

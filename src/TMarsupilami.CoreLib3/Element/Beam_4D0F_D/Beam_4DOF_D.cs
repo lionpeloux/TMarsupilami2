@@ -84,7 +84,8 @@ namespace TMarsupilami.CoreLib3
         // RESULTANTE FORCES (DR SPECIFIC ?? => si oui, à déplacer)
         private MVector[] Rint_x_axial, Rint_x_shear_M, Rint_x_shear_Q;
         private double[] Rint_θ_torsion_Q, Rint_θ_torsion_M;
-        
+        private MVector[] Rint_θ_bending;
+
         #endregion
 
         // pour l'instant, on passe l'ensemble des frames et des sections
@@ -242,6 +243,7 @@ namespace TMarsupilami.CoreLib3
             Rint_θ = new MVector[nv];
             Rint_θ_torsion_Q = new double[nv];
             Rint_θ_torsion_M = new double[nv];
+            Rint_θ_bending = new MVector[nv];
 
             ES = new double[ne];
             EI1 = new double[ne];
@@ -589,6 +591,14 @@ namespace TMarsupilami.CoreLib3
         /// </summary>
         public override void UpdateInternalNodalMoment()
         {
+            // BENDING MOMENT
+            Rint_θ_bending[0] = M_h_r[0];
+            for (int i = 1; i < nv_h-1; i++)
+            {
+                Rint_θ_bending[2 * i] = M_h_r[i] - M_h_l[i];
+            }
+            Rint_θ_bending[nv - 1] = -M_h_l[nv_h - 1];
+
             // TWISTING MOMENT | torsion contribution (Q)
             Rint_θ_torsion_Q[0] = Q[0];
             Rint_θ_torsion_Q[1] = -Q[0];
@@ -646,9 +656,11 @@ namespace TMarsupilami.CoreLib3
             dRθ = 0.5 * (κM + m3) * l[ne - 1];
             Rint_θ_torsion_M[nv - 1] = dRθ;
 
-            // RESULTING TWISTING MOMENT
+            // RESULTING MOMENT
             for (int i = 0; i < nv; i++)
             {
+                Rint_θ[i].X = Rint_θ_bending[i].X;
+                Rint_θ[i].Y = Rint_θ_bending[i].Y;
                 Rint_θ[i].Z = Rint_θ_torsion_Q[i] + Rint_θ_torsion_M[i];
             }
         }
