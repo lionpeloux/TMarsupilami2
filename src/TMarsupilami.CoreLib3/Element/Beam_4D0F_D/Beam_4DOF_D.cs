@@ -83,7 +83,7 @@ namespace TMarsupilami.CoreLib3
 
         // RESULTANTE FORCES (DR SPECIFIC ?? => si oui, à déplacer)
         private MVector[] Rint_x_axial, Rint_x_shear_M, Rint_x_shear_Q;
-        private double[] Rint_θ_Q, Rint_θ_M;
+        private double[] Rint_θ_torsion_Q, Rint_θ_torsion_M;
         
         #endregion
 
@@ -238,10 +238,10 @@ namespace TMarsupilami.CoreLib3
             Rint_x_axial = new MVector[nv];
             Rint_x_shear_M = new MVector[nv];
             Rint_x_shear_Q = new MVector[nv];
-            R_θ = new double[nv];
-            Rint_θ = new double[nv];
-            Rint_θ_Q = new double[nv];
-            Rint_θ_M = new double[nv];
+            R_θ = new MVector[nv];
+            Rint_θ = new MVector[nv];
+            Rint_θ_torsion_Q = new double[nv];
+            Rint_θ_torsion_M = new double[nv];
 
             ES = new double[ne];
             EI1 = new double[ne];
@@ -543,13 +543,8 @@ namespace TMarsupilami.CoreLib3
         {
             for (int i = 0; i < Ne; i++)
             {
-                //twist[i] = MaterialFrame[i].GetTwistAngle(MaterialFrame[i + 1]);
-                //twist[i] = (MaterialFrame[i].Cast()).GetTwistAngle(MaterialFrame[i + 1].Cast());
                 twist[i] = -Rotation.ZAngle_Rotation(mframes[i], mframes[i].ZAxis, mframes[i + 1], mframes[i + 1].ZAxis);
-
                 τ[i] = twist[i] / l[i];
-
-                // introduire un twist lié à un qext ?
                 Q[i] = GJ[i] * (τ[i] - τ_0[i]);
             }
 
@@ -592,15 +587,15 @@ namespace TMarsupilami.CoreLib3
         public override void UpdateInternalNodalMoment()
         {
             // TWISTING MOMENT | torsion contribution (Q)
-            Rint_θ_Q[0] = Q[0];
-            Rint_θ_Q[1] = -Q[0];
+            Rint_θ_torsion_Q[0] = Q[0];
+            Rint_θ_torsion_Q[1] = -Q[0];
             for (int i = 1; i < ne - 1; i++)
             {
-                Rint_θ_Q[i] += Q[i];
-                Rint_θ_Q[i + 1] = -Q[i];
+                Rint_θ_torsion_Q[i] += Q[i];
+                Rint_θ_torsion_Q[i + 1] = -Q[i];
             }
-            Rint_θ_Q[nv - 2] += Q[ne - 1];
-            Rint_θ_Q[nv - 1] = -Q[ne - 1];
+            Rint_θ_torsion_Q[nv - 2] += Q[ne - 1];
+            Rint_θ_torsion_Q[nv - 1] = -Q[ne - 1];
 
             // TWISTING MOMENT | bending contribution (M)
             double m3, κM, dRθ;
@@ -609,13 +604,13 @@ namespace TMarsupilami.CoreLib3
             m3 = mext_m[0].Z;
             κM = MVector.CrossProduct(κb_h_r[0], M_h_r[0]) * mframes[0].ZAxis;
             dRθ = 0.5 * (κM + m3) * l[0];
-            Rint_θ_M[0] = dRθ;
+            Rint_θ_torsion_M[0] = dRθ;
 
             // i = 1
             m3 = mext_m[0].Z;
             κM = MVector.CrossProduct(κb_mid[0], 0.5 * (M_h_r[0] + M_g[0])) * d3_mid[0];
             dRθ = 0.5 * (κM + m3) * l[0];
-            Rint_θ_M[1] = dRθ;
+            Rint_θ_torsion_M[1] = dRθ;
 
             for (int i = 0; i < ne_h - 1; i++)
             {
@@ -624,75 +619,56 @@ namespace TMarsupilami.CoreLib3
                 κM = MVector.CrossProduct(κb_mid[2 * i + 1], 0.5 * (M_g[i] + M_h_l[i + 1])) * d3_mid[2 * i + 1];
                 dRθ = 0.5 * (κM + m3) * l[2 * i + 1];
 
-                Rint_θ_M[2 * i + 1] += dRθ;
-                Rint_θ_M[2 * i + 2] = dRθ;
+                Rint_θ_torsion_M[2 * i + 1] += dRθ;
+                Rint_θ_torsion_M[2 * i + 2] = dRθ;
 
                 // 2i + 2
                 m3 = mext_m[i + 1].Z;
                 κM = MVector.CrossProduct(κb_mid[2 * i + 2], 0.5 * (M_h_r[i + 1] + M_g[i + 1])) * d3_mid[2 * i + 2];
                 dRθ = 0.5 * (κM + m3) * l[2 * i + 2];
 
-                Rint_θ_M[2 * i + 2] += dRθ;
-                Rint_θ_M[2 * i + 3] = dRθ;
+                Rint_θ_torsion_M[2 * i + 2] += dRθ;
+                Rint_θ_torsion_M[2 * i + 3] = dRθ;
             }
 
             // i = nv-2
             m3 = mext_m[nv_g - 1].Z;
             κM = MVector.CrossProduct(κb_mid[ne - 1], 0.5 * (M_g[nv_g - 1] + M_h_l[nv_h - 1])) * d3_mid[ne - 1];
             dRθ = 0.5 * (κM + m3) * l[ne - 1];
-            Rint_θ_M[nv - 2] += dRθ;
+            Rint_θ_torsion_M[nv - 2] += dRθ;
 
             // i = nv-1
             m3 = mext_m[nv_g - 1].Z;
             κM = MVector.CrossProduct(κb_h_l[nv_h - 1], M_h_l[nv_h - 1]) * mframes[nv - 1].ZAxis;
             dRθ = 0.5 * (κM + m3) * l[ne - 1];
-            Rint_θ_M[nv - 1] = dRθ;
+            Rint_θ_torsion_M[nv - 1] = dRθ;
 
             // RESULTING TWISTING MOMENT
             for (int i = 0; i < nv; i++)
             {
-                Rint_θ[i] = Rint_θ_Q[i] + Rint_θ_M[i];
+                Rint_θ[i].Z = Rint_θ_torsion_Q[i] + Rint_θ_torsion_M[i];
             }
         }
 
         public override void UpdateResultantNodalMoment()
         {
-            // RESULTING TWISTING MOMENT
-            //for (int i = 0; i < nv; i++)
-            //{
-            //    double Qext = Mext_m[i].Z;
-            //    double Qr = Mr_m[i].Z;
-            //    R_θ[i] = -Qr + Qext + Rint_θ[i];
-            //}
-
-            int index;
-            double Qext, Qr;
-
-            // HANDLES
-
-            Qext = Mext_m[0].Z + 0.0 * mext_m[0].Z * l[0];
-            Qr = Mr_m[0].Z;
-            R_θ[0] = -Qr + Qext + Rint_θ[0];
-
-            for (int i = 1; i < nv_h-1; i++)
+            // ADD APPLIED LOADS TO INTERNAL RESULTANT
+            R_θ[0] = Rint_θ[0] + Mext_m[0] + (0.5 * l[0]) * mext_m[0];
+            for (int i = 1; i < nv_h - 1; i++)
             {
-                index = 2 * i;
-                Qext = Mext_m[i].Z + 0.0 * (mext_m[i - 1].Z * l[index - 1] + mext_m[i].Z * l[index]);
-                Qr = Mr_m[i].Z;
-                R_θ[index] = -Qr + Qext + Rint_θ[index];
+                R_θ[2 * i] = Rint_θ[2 * i] + Mext_m[i] + 0.5 * (mext_m[i - 1] * l[2 * i - 1] + mext_m[i] * l[2 * i]);
             }
-
-            Qext = Mext_m[nv_h - 1].Z + 0.0 * mext_m[nv_g - 1].Z * l[2 * nv_g - 1];
-            Qr = Mr_m[nv_h - 1].Z;
-            R_θ[nv - 1] = -Qr + Qext + Rint_θ[nv - 1];
-
-            // GHOSTS (no Qr and Qext)
+            R_θ[nv - 1] = Rint_θ[nv - 1] + Mext_m[nv_h - 1] + (0.5 * l[2 * nv_g - 1]) * mext_m[nv_g - 1];
 
             for (int i = 0; i < nv_g; i++)
             {
-                index = 2 * i + 1;
-                Qext = 0.0 * mext_m[i].Z * (l[index - 1] + l[index]);
-                R_θ[index] = Qext + Rint_θ[index];
+                R_θ[2 * i + 1] = Rint_θ[2 * i + 1] + (0.5 * (l[2 * i] + l[2 * i + 1])) * mext_m[i];
+            }
+
+            // ADD REACTION MOMENTS TO INTERNAL RESULTANT
+            for (int i = 0; i < nv_h; i++)
+            {
+                R_θ[2 * i].Z += -Mr_m[i].Z;
             }
         }
 
@@ -836,54 +812,25 @@ namespace TMarsupilami.CoreLib3
         public override void UpdateResultantNodalForce()
         {
             // RESULTANT FORCE
-            // ici, prendre en compte l'effort tranchant linéique extérieur
-            // celui si créé un déséquilibre qui engendre un moment supplémentaire.
-            //for (int i = 0; i < nv; i++)
-            //{
-            //    R_x[i] = -Fr_g[i] + Fext_g[i] + Rint_x[i];
-            //}
 
-            int index;
-            MVector Fext, Fr;
-
-            //for (int i = 0; i < nv_h; i++)
-            //{
-            //    index = 2 * i;
-            //    R_x[index] = -Fr_g[index] + Fext_g[i] + Rint_x[index];
-            //}
-
-
-
-            // HANDLES
-            Fext = Fext_g[0] + 0.0 * fext_g[0] * l[0];
-            Fr = Fr_g[0];
-            R_x[0] = -Fr + Fext + Rint_x[0];
-
+            // ADD APPLIED LOADS TO INTERNAL RESULTANT
+            R_x[0] = Rint_x[0] + Fext_g[0] + (0.5 * l[0]) * fext_g[0];
             for (int i = 1; i < nv_h - 1; i++)
             {
-                index = 2 * i;
-                Fext = Fext_g[i] + 0.0 * (fext_g[i - 1] * l[index - 1] + fext_g[i] * l[index]);
-                Fr = Fr_g[i];
-                R_x[index] = -Fr + Fext + Rint_x[index];
+                R_x[2 * i] = Rint_x[2 * i] + Fext_g[i] + 0.5 * (fext_g[i - 1] * l[2 * i - 1] + fext_g[i] * l[2 * i]);
             }
-
-            Fext = Fext_g[nv_h - 1] + 0.0 * fext_g[nv_g - 1] * l[2 * nv_g - 1];
-            Fr = Fr_g[nv_h - 1];
-            R_x[nv - 1] = -Fr + Fext + Rint_x[nv - 1];
-
-            // GHOSTS
-
-            //for (int i = 0; i < nv_g; i++)
-            //{
-            //    index = 2 * i + 1;
-            //    R_x[index] = -Fr_g[index] + Rint_x[index];
-            //}
-
+            R_x[nv - 1] = Rint_x[nv - 1] + Fext_g[nv_h - 1] + (0.5 * l[2 * nv_g - 1]) * fext_g[nv_g - 1];
             for (int i = 0; i < nv_g; i++)
             {
-                index = 2 * i + 1;
-                Fext = 0.5 * fext_g[i] * (l[index - 1] + l[index]);
-                R_x[index] = Fext + Rint_x[index];
+                R_x[2 * i + 1] = Rint_x[2 * i + 1] + (0.5 * (l[2 * i] + l[2 * i + 1])) * fext_g[i];
+            }
+
+            OnReactionForceUpdating(Fr_g, R_x);
+
+            // ADD REACTION FORCES TO INTERNAL RESULTANT
+            for (int i = 0; i < nv_h; i++)
+            {
+                R_x[2 * i] += -Fr_g[i];
             }
         }
 

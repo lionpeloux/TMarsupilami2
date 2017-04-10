@@ -153,12 +153,12 @@ namespace TMarsupilami.CoreLib3
 
                 if (Boundary == Boundary.Start)
                 {
-                    Qr = Beam.Rθ_int[0];
+                    Qr = Beam.Rθ_int[0].Z;
                     Beam.Mr_m[0].Z = Qr;
                 }
                 else
                 {
-                    Qr = Beam.Rθ_int[Beam.Nv - 1];
+                    Qr = Beam.Rθ_int[Beam.Nv - 1].Z;
                     Beam.Mr_m[Beam.Nvh - 1].Z = Qr;
                 }              
             }
@@ -215,7 +215,7 @@ namespace TMarsupilami.CoreLib3
         public virtual void Init() { }
         public virtual void Enforce_t(MVector[] t) { }
         public virtual void Enforce_Mr(MVector[] Mr, double[] M1_h_l, double[] M2_h_l, double[] M1_h_r, double[] M2_h_r) { }
-        public virtual void Enforce_Qr(MVector[] Mr, double[] Rθ) { }
+        public virtual void Enforce_Qr(MVector[] Mr, MVector[] Rθ) { }
         public virtual void Enforce_Fr(MVector[] Fr, MVector[] Rx) { }
 
         // internal class
@@ -237,12 +237,12 @@ namespace TMarsupilami.CoreLib3
                 if (Boundary == Boundary.Start)
                 {
                     this.F = Rx[0];  // force appliquée par la poutre sur le support
-                    Fr[0] = - this.F; // force appliquée par le support sur la poutre
+                    Fr[0] = this.F;
                 }
                 else
                 {
                     this.F = Rx[Beam.Nv - 1];  // force appliquée par la poutre sur le support
-                    Fr[Beam.Nvh - 1] = -this.F; // force appliquée par le support sur la poutre
+                    Fr[Beam.Nvh - 1] = this.F;
                 }
 
             }
@@ -338,18 +338,18 @@ namespace TMarsupilami.CoreLib3
                     // a écrire
                 }
             }
-            public override void Enforce_Qr(MVector[] Mr, double[] Rθ)
+            public override void Enforce_Qr(MVector[] Mr, MVector[] Rθ)
             {
                 double Qr;
 
                 if (Boundary == Boundary.Start)
                 {
-                    Qr = Rθ[0];  // force appliquée par la poutre sur le support
+                    Qr = Rθ[0].Z;  // force appliquée par la poutre sur le support
                     Mr[0].Z = -Qr; // force appliquée par le support sur la poutre
                 }
                 else
                 {
-                    Qr = Rθ[Beam.Nv - 1];  // force appliquée par la poutre sur le support
+                    Qr = Rθ[Beam.Nv - 1].Z;  // force appliquée par la poutre sur le support
                     Mr[Beam.Nvh - 1].Z = -Qr; // force appliquée par le support sur la poutre
                 }
             }
