@@ -69,7 +69,7 @@ namespace TMarsupilami.Gh.Component
 
             Point3d[] points;
 
-            Centerline.GetCurvature(frames, x, e, u, l, t, κb, τ, isClosed);
+            Centerline.GetCurvature(frames, x, e, u, l, t, κb, isClosed);
             Centerline.ZAlignFrames(frames, t);
             Centerline.GetTwist(frames, l, τ, isClosed);
 

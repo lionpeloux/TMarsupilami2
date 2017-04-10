@@ -42,18 +42,18 @@ namespace TMarsupilami.MathLib
         /// <param name="κb">The centerline curvature binormal vector.</param>
         /// <param name="τ">The centerline rate of twist.</param>
         /// <param name="isClosed">True is the centerline is closed. False otherwise.</param>
-        public static void GetCurvature(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ, bool isClosed)
+        public static void GetCurvature(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, bool isClosed)
         {
             if (isClosed)
             {
-                GetCurvature_Closed(frames, x, e, u, l, t, κb, τ);
+                GetCurvature_Closed(frames, x, e, u, l, t, κb);
             }
             else
             {
-                GetCurvature_Open(frames, x, e, u, l, t, κb, τ);
+                GetCurvature_Open(frames, x, e, u, l, t, κb);
             }
         }
-        private static void GetCurvature_Open(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ)
+        private static void GetCurvature_Open(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb)
         {
             int nv = frames.Length;
             int ne = nv - 1; // open centerline
@@ -87,7 +87,7 @@ namespace TMarsupilami.MathLib
             t[nv - 1] = frames[nv - 1].ZAxis;
             κb[nv - 1] = (2 / l[ne - 1]) * MVector.CrossProduct(u[ne - 1], t[nv - 1]);
         }
-        private static void GetCurvature_Closed(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ)
+        private static void GetCurvature_Closed(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb)
         {
             int nv = frames.Length;
             int ne = nv; // closed centerline
@@ -130,40 +130,46 @@ namespace TMarsupilami.MathLib
         }
 
 
-        private static void GetCurvature2_Open(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ)
+        private static void GetCurvature(
+            MPoint[] x, 
+            MVector[] e, double[] l, MVector[] u, 
+            MVector[] t_h_r, MVector[] t_g, MVector[] t_h_l, 
+            MVector[] κb_g)
         {
-            int nv = frames.Length;
-            int ne = nv - 1; // open centerline
+            int nv_g = e.Length / 2; // must have an even number of edges (either open or closed centerline).
 
-            // i = 0
-            x[0] = frames[0].Origin;
-            e[0] = new MVector(frames[0].Origin, frames[1].Origin);
-            l[0] = e[0].Length();
-            u[0] = (1 / l[0]) * e[0];
-            t[0] = frames[0].ZAxis;
-            κb[0] = (-2 / l[0]) * MVector.CrossProduct(u[0], t[0]);
+            int index;
 
-            // i = 1, ..., nv-2
-            for (int i = 1; i < nv - 1; i++)
+            // i = 0, ..., nv_g-1
+            for (int i = 0; i < nv_g; i++)
             {
-                x[i] = frames[i].Origin;
-                e[i] = new MVector(frames[i].Origin, frames[i + 1].Origin);
-                l[i] = e[i].Length();
-                u[i] = (1 / l[i]) * e[i];
+                // 2i
+                index = 2 * i;
+                e[index] = new MVector(x[index], x[index + 1]);
+                var l1 = e[index].Length();
+                l[index] = l1;
+                var u1 = (1 / l[index]) * e[index];
+                u[index] = u1;
 
-                double _ll = 1 / MPoint.DistanceTo(frames[i - 1].Origin, frames[i + 1].Origin);
-                t[i] = _ll * (l[i] * u[i - 1] + l[i - 1] * u[i]);
-                κb[i] = (2 * _ll) * MVector.CrossProduct(u[i - 1], u[i]);
+                // 2i+1
+                index += 1;
+                e[index] = new MVector(x[index], x[index + 1]);
+                var l2 = e[index].Length();
+                l[index] = l2;
+                var u2 = (1 / l[index]) * e[index];
+                u[index] = u2;
+
+                // i
+                double _ll = 1 / new MVector(x[index - 1], x[index + 1]).Length();
+                κb_g[i] = (2 * _ll) * MVector.CrossProduct(u1, u2);
+
+                var t = (l2 * _ll) * u1 + (l1 * _ll) * u2;
+                t_h_r[i] = (2 * (t * u1)) * u1 - t;
+                t_g[i] = t;
+                t_h_l[i] = (2 * (t * u2)) * u2 - t;
             }
-
-            // i = nv-1
-            x[nv - 1] = frames[nv - 1].Origin;
-            e[ne - 1] = new MVector(frames[nv - 2].Origin, frames[nv - 1].Origin);
-            l[ne - 1] = e[ne - 1].Length();
-            u[ne - 1] = (1 / l[ne - 1]) * e[ne - 1];
-            t[nv - 1] = frames[nv - 1].ZAxis;
-            κb[nv - 1] = (2 / l[ne - 1]) * MVector.CrossProduct(u[ne - 1], t[nv - 1]);
         }
+
 
 
         // Get Twist
@@ -257,6 +263,31 @@ namespace TMarsupilami.MathLib
 
             return f;
         }
+        public static MPoint Interpolate(MPoint p1, MPoint p2, MVector κb1, MVector κb2)
+        {
+            MPoint x;
+            MPoint p = new MPoint();
+
+            var κb = 0.5 * (κb1 + κb2);
+            var κ = κb.Length();
+            var e = new MVector(p1, p2);
+            var l = e.Length();
+            var u = (1 / l) * e;
+
+            if (κ == 0)
+            {
+                x = 0.5 * (p1 + p2);
+            }
+            else
+            {
+                var r = 1 / κ;
+                var h = r - Math.Sqrt(r * r - l * l / 4);
+                var n = -r * MVector.CrossProduct(u, κb);
+
+                x = p1 + 0.5 * e - h * n;
+            }
+            return p;
+        }
 
         /// <summary>
         /// Applies the <see cref="Interpolate">Interpolate</see> process over a whole centerline given by its frames.
@@ -295,7 +326,7 @@ namespace TMarsupilami.MathLib
                 var l_tmp = new double[ne];
                 var τ_tmp = new double[ne];
 
-                Centerline.GetCurvature_Open(framesInterp, x_tmp, e_tmp, u_tmp, l_tmp, t_tmp, κb_tmp, τ_tmp);
+                Centerline.GetCurvature_Open(framesInterp, x_tmp, e_tmp, u_tmp, l_tmp, t_tmp, κb_tmp);
                 Centerline.ZAlignFrames(framesInterp, t_tmp);
                 Centerline.GetTwist_Open(framesInterp, l_tmp, τ_tmp);
 
@@ -339,7 +370,7 @@ namespace TMarsupilami.MathLib
                 var l_tmp = new double[ne];
                 var τ_tmp = new double[ne];
 
-                Centerline.GetCurvature_Closed(framesInterp, x_tmp, e_tmp, u_tmp, l_tmp, t_tmp, κb_tmp, τ_tmp);
+                Centerline.GetCurvature_Closed(framesInterp, x_tmp, e_tmp, u_tmp, l_tmp, t_tmp, κb_tmp);
                 Centerline.ZAlignFrames(framesInterp, t_tmp);
                 Centerline.GetTwist_Closed(framesInterp, l_tmp, τ_tmp);
 
@@ -366,5 +397,150 @@ namespace TMarsupilami.MathLib
             
             return framesInterp;
         }
+        
+        public static MVector[] RefineVertexBasedQuantity(MVector[] vertexBasedQuantity, bool isClosed, int recursionCount = 1)
+        {
+            var tmp = RefineVertexBasedQuantity(vertexBasedQuantity, isClosed);
+
+            for (int i = 1; i < recursionCount; i++)
+            {
+                tmp = RefineVertexBasedQuantity(tmp, isClosed);
+            }
+
+            return tmp;
+        }
+        private static MVector[] RefineVertexBasedQuantity(MVector[] vertexBasedQuantity, bool isClosed)
+        {
+            if (!isClosed)
+            {
+                int nv = vertexBasedQuantity.Length;
+                int ne = nv - 1; // open centerline
+
+                var refinedArray = new MVector[nv + ne];
+
+                refinedArray[0] = vertexBasedQuantity[0];
+
+                for (int i = 0; i < ne; i++)
+                {
+                    refinedArray[2 * i + 1] = 0.5 * (vertexBasedQuantity[i] + vertexBasedQuantity[i + 1]);
+                    refinedArray[2 * i + 2] = vertexBasedQuantity[i + 1];
+                }
+                return refinedArray;
+
+            }
+            else
+            {
+                int nv = vertexBasedQuantity.Length;
+                int ne = nv; // closed centerline
+
+                MVector[] refinedArray = new MVector[nv + ne];
+
+                refinedArray[0] = vertexBasedQuantity[0];
+
+                for (int i = 0; i < ne-1; i++)
+                {
+                    refinedArray[2 * i + 1] = 0.5 * (vertexBasedQuantity[i] + vertexBasedQuantity[i + 1]);
+                    refinedArray[2 * i + 2] = vertexBasedQuantity[i + 1];
+                }
+                refinedArray[nv + ne - 1] = 0.5 * (vertexBasedQuantity[nv - 1] + vertexBasedQuantity[0]);
+
+                return refinedArray;
+            }  
+        }
+
+        public static double[] RefineVertexBasedQuantity(double[] vertexBasedQuantity, bool isClosed, int recursionCount = 1)
+        {
+            var tmp = RefineVertexBasedQuantity(vertexBasedQuantity, isClosed);
+
+            for (int i = 1; i < recursionCount; i++)
+            {
+                tmp = RefineVertexBasedQuantity(tmp, isClosed);
+            }
+
+            return tmp;
+        }
+        private static double[] RefineVertexBasedQuantity(double[] vertexBasedQuantity, bool isClosed)
+        {
+            if (!isClosed)
+            {
+                int nv = vertexBasedQuantity.Length;
+                int ne = nv - 1; // open centerline
+
+                var refinedArray = new double[nv + ne];
+
+                refinedArray[0] = vertexBasedQuantity[0];
+
+                for (int i = 0; i < ne; i++)
+                {
+                    refinedArray[2 * i + 1] = 0.5 * (vertexBasedQuantity[i] + vertexBasedQuantity[i + 1]);
+                    refinedArray[2 * i + 2] = vertexBasedQuantity[i + 1];
+                }
+                return refinedArray;
+
+            }
+            else
+            {
+                int nv = vertexBasedQuantity.Length;
+                int ne = nv; // closed centerline
+
+                var refinedArray = new double[nv + ne];
+
+                refinedArray[0] = vertexBasedQuantity[0];
+
+                for (int i = 0; i < ne - 1; i++)
+                {
+                    refinedArray[2 * i + 1] = 0.5 * (vertexBasedQuantity[i] + vertexBasedQuantity[i + 1]);
+                    refinedArray[2 * i + 2] = vertexBasedQuantity[i + 1];
+                }
+                refinedArray[nv + ne - 1] = 0.5 * (vertexBasedQuantity[nv - 1] + vertexBasedQuantity[0]);
+
+                return refinedArray;
+            }
+        }
+
+        public static MVector[] RefineEdgeBasedQuantity(MVector[] edgeBasedQuantity, bool isClosed, int recursionCount = 1)
+        {
+            var tmp = RefineEdgeBasedQuantity(edgeBasedQuantity, isClosed);
+            for (int i = 1; i < recursionCount; i++)
+            {
+                tmp = RefineVertexBasedQuantity(tmp, isClosed);
+            }
+            return tmp;
+        }
+        private static MVector[] RefineEdgeBasedQuantity(MVector[] edgeBasedQuantity, bool isClosed)
+        {
+            int ne = edgeBasedQuantity.Length;
+            var refinedArray = new MVector[ne + ne];
+            refinedArray[0] = edgeBasedQuantity[0];
+            for (int i = 0; i < ne; i++)
+            {
+                refinedArray[2 * i] = edgeBasedQuantity[i];
+                refinedArray[2 * i + 1] = edgeBasedQuantity[i];
+            }
+            return refinedArray;     
+        }
+
+        public static double[] RefineEdgeBasedQuantity(double[] edgeBasedQuantity, bool isClosed, int recursionCount = 1)
+        {
+            var tmp = RefineEdgeBasedQuantity(edgeBasedQuantity, isClosed);
+            for (int i = 1; i < recursionCount; i++)
+            {
+                tmp = RefineVertexBasedQuantity(tmp, isClosed);
+            }
+            return tmp;
+        }
+        private static double[] RefineEdgeBasedQuantity(double[] edgeBasedQuantity, bool isClosed)
+        {
+            int ne = edgeBasedQuantity.Length;
+            var refinedArray = new double[ne + ne];
+            refinedArray[0] = edgeBasedQuantity[0];
+            for (int i = 0; i < ne; i++)
+            {
+                refinedArray[2 * i] = edgeBasedQuantity[i];
+                refinedArray[2 * i + 1] = edgeBasedQuantity[i];
+            }
+            return refinedArray;
+        }
+
     }
 }

@@ -75,7 +75,7 @@ namespace TMarsupilami.Gh.Component
 
             MFrame[] framesInterp;
 
-            Centerline.GetCurvature(frames, x, e, u, l, t, κb, τ, isClosed);
+            Centerline.GetCurvature(frames, x, e, u, l, t, κb, isClosed);
             Centerline.ZAlignFrames(frames, t);
             Centerline.GetTwist(frames, l, τ, isClosed);
             framesInterp = Centerline.Refine(frames, κb, τ, isClosed, recursionCount);
