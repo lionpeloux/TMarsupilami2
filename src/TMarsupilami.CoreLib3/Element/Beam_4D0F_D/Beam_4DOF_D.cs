@@ -392,6 +392,7 @@ namespace TMarsupilami.CoreLib3
                 t[2 * i].Normalize();
             }
             t[nv - 1] = e[ne - 1] / l[ne - 1];
+            OnTangentVectorEnforcing(t);
         }
         public override void UpdateCurvatureBinormal()
         {
@@ -405,26 +406,26 @@ namespace TMarsupilami.CoreLib3
             // i = 0
             // κb[0] = 2 / (l[0] * l[0]) * MVector.CrossProduct(t[0], e[0]);
             // κb is given by applied external moment
-            κb_h_r[0] = (-(Mext_m[0].X - Mr_m[0].X) / EI1[0]) * mframes[0].XAxis + (-(Mext_m[0].Y - Mr_m[0].Y) / EI2[0]) * mframes[0].YAxis;
-            κ = κb_h_r[0].Length();
+            //κb_h_r[0] = (-(Mext_m[0].X - Mr_m[0].X) / EI1[0]) * mframes[0].XAxis + (-(Mext_m[0].Y - Mr_m[0].Y) / EI2[0]) * mframes[0].YAxis;
+            //κ = κb_h_r[0].Length();
 
-            if (κ > 0)
-            {
-                α = -Math.Asin(κ * l[0] / 2);
-                Rotation.Rotate(ref t[0], α, κb_h_r[0] / κ);
-            }
+            //if (κ > 0)
+            //{
+            //    α = -Math.Asin(κ * l[0] / 2);
+            //    Rotation.Rotate(ref t[0], α, κb_h_r[0] / κ);
+            //}
 
             // i = nv-1
             //κb[nv - 1] = 2 / (l[ne - 1] * l[ne - 1]) * MVector.CrossProduct(e[ne - 1], t[nv - 1]);
             // κb is given by applied external moment
-            κb_h_l[nv_h - 1] = ((Mext_m[nv_h - 1].X - Mr_m[nv_h - 1].X) / EI1[ne - 1]) * mframes[nv - 1].XAxis + ((Mext_m[nv_h - 1].Y - Mr_m[nv_h - 1].Y) / EI2[ne - 1]) * mframes[nv - 1].YAxis;
-            κ = κb_h_l[nv_h - 1].Length();
+            //κb_h_l[nv_h - 1] = ((Mext_m[nv_h - 1].X - Mr_m[nv_h - 1].X) / EI1[ne - 1]) * mframes[nv - 1].XAxis + ((Mext_m[nv_h - 1].Y - Mr_m[nv_h - 1].Y) / EI2[ne - 1]) * mframes[nv - 1].YAxis;
+            //κ = κb_h_l[nv_h - 1].Length();
 
-            if (κ > 0)
-            {
-                α = Math.Asin(κ * l[ne - 1] / 2);
-                Rotation.Rotate(ref t[nv - 1], α, κb_h_l[nv_h - 1] / κ);
-            }
+            //if (κ > 0)
+            //{
+            //    α = Math.Asin(κ * l[ne - 1] / 2);
+            //    Rotation.Rotate(ref t[nv - 1], α, κb_h_l[nv_h - 1] / κ);
+            //}
         }
         public override void UpdateMaterialFrame()
         {
@@ -464,6 +465,7 @@ namespace TMarsupilami.CoreLib3
             d1 = mframes[0].XAxis;
             d2 = mframes[0].YAxis;
 
+            κb_h_r[0] = 2 / (l[0] * l[0]) * MVector.CrossProduct(t[0], e[0]);
             κ1_h_r[0] = κb_h_r[0] * d1;
             κ2_h_r[0] = κb_h_r[0] * d2;
 
@@ -518,6 +520,7 @@ namespace TMarsupilami.CoreLib3
             d1 = mframes[nv - 1].XAxis;
             d2 = mframes[nv - 1].YAxis;
 
+            κb_h_l[n] = 2 / (l[ne - 2] * l[ne - 1]) * MVector.CrossProduct(e[ne - 1], t[nv - 1]);
             κ1_h_l[n] = κb_h_l[n] * d1;
             κ2_h_l[n] = κb_h_l[n] * d2;
 
