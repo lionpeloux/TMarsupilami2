@@ -102,7 +102,7 @@ namespace TMarsupilami.CoreLib3
 
         // ALIAS
         private MVector[][] R_x;
-        private double[][] R_θ;
+        private MVector[][] R_θ;
         private double[][] lm_x, lm_θ;
         private MVector[][] v_x, v_θ;
         private MVector[][] a_x, a_θ;
@@ -252,7 +252,7 @@ namespace TMarsupilami.CoreLib3
             }
 
             lm_θ = new double[nθ][];        
-            R_θ = new double[nθ][];           
+            R_θ = new MVector[nθ][];           
             v_θ = new MVector[nθ][];
             a_θ = new MVector[nθ][];
             dθ = new double[nθ][];
@@ -472,7 +472,7 @@ namespace TMarsupilami.CoreLib3
             {
                 for (int nj = 0; nj < elements_θ[ei].Nv; nj++)
                 {
-                    var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj];
+                    var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj].Z;
                     a_θ[ei][nj].Z = a;
                     v_θ[ei][nj].Z = (0.5 * dt) * a;
                     //v_θ[ei][nj].Z = 0.5 * (dt / lm_θ[ei][nj]) * R_θ[ei][nj];
@@ -499,7 +499,7 @@ namespace TMarsupilami.CoreLib3
             {
                 for (int nj = 0; nj < elements_θ[ei].Nv; nj++)
                 {
-                    var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj];
+                    var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj].Z;
                     a_θ[ei][nj].Z = a;
                     v_θ[ei][nj].Z += dt * a;
                     //v_θ[ei][nj].Z += (dt / lm_θ[ei][nj]) * R_θ[ei][nj];
@@ -565,7 +565,7 @@ namespace TMarsupilami.CoreLib3
             {
                 for (int nj = 0; nj < elements_θ[ei].Nv; nj++)
                 {
-                    v_θ[ei][nj].Z -= (dt / lm_θ[ei][nj]) * R_θ[ei][nj];
+                    v_θ[ei][nj].Z -= (dt / lm_θ[ei][nj]) * R_θ[ei][nj].Z;
                 }
             }
 

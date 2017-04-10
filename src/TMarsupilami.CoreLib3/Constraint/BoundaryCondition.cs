@@ -345,12 +345,12 @@ namespace TMarsupilami.CoreLib3
                 if (Boundary == Boundary.Start)
                 {
                     Qr = Rθ[0].Z;  // force appliquée par la poutre sur le support
-                    Mr[0].Z = -Qr; // force appliquée par le support sur la poutre
+                    Mr[0].Z = Qr; 
                 }
                 else
                 {
                     Qr = Rθ[Beam.Nv - 1].Z;  // force appliquée par la poutre sur le support
-                    Mr[Beam.Nvh - 1].Z = -Qr; // force appliquée par le support sur la poutre
+                    Mr[Beam.Nvh - 1].Z = Qr; 
                 }
             }
             public override void Enforce_Fr(MVector[] Fr, MVector[] Rx)
@@ -358,14 +358,13 @@ namespace TMarsupilami.CoreLib3
                 if (Boundary == Boundary.Start)
                 {
                     this.F = Rx[0];  // force appliquée par la poutre sur le support
-                    Fr[0] = -this.F; // force appliquée par le support sur la poutre
+                    Fr[0] = this.F;
                 }
                 else
                 {
                     this.F = Rx[Beam.Nv - 1];  // force appliquée par la poutre sur le support
-                    Fr[Beam.Nvh - 1] = -this.F; // force appliquée par le support sur la poutre
+                    Fr[Beam.Nvh - 1] = this.F;
                 }
-
             }
         }
     }

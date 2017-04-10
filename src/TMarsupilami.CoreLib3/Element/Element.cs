@@ -140,10 +140,10 @@ namespace TMarsupilami.CoreLib3
         }
 
         // EVENT : ReactionTwistingMomentUpdating
-        public event Action<MVector[], double[]> ReactionTwistingMomentUpdating;
-        protected virtual void OnReactionTwistingMomentUpdating(MVector[] Mr, double[] Rθ)
+        public event Action<MVector[], MVector[]> ReactionTwistingMomentUpdating;
+        protected virtual void OnReactionTwistingMomentUpdating(MVector[] Mr, MVector[] Rθ)
         {
-            Action<MVector[], double[]> handler = ReactionTwistingMomentUpdating;
+            Action<MVector[], MVector[]> handler = ReactionTwistingMomentUpdating;
             if (handler != null)
             {
                 handler(Mr, Rθ);
@@ -203,7 +203,7 @@ namespace TMarsupilami.CoreLib3
 
         // NODAL RESULTANT
         protected MVector[] R_x, Rint_x;
-        protected double[] R_θ, Rint_θ;
+        protected MVector[] R_θ, Rint_θ;
 
         // EXTERNAL FORCES & MOMENTS
         public MVector[] Fext_g;
@@ -299,9 +299,9 @@ namespace TMarsupilami.CoreLib3
         internal MVector[] Aθ { get { return a_θ; } }
 
         internal MVector[] Rx_int { get { return this.Rint_x; } }
-        internal double[] Rθ_int { get { return this.Rint_θ; } }
+        internal MVector[] Rθ_int { get { return this.Rint_θ; } }
         internal MVector[] Rx { get { return this.R_x; } }
-        internal double[] Rθ { get { return this.R_θ; } }
+        internal MVector[] Rθ { get { return this.R_θ; } }
 
 
         #endregion
