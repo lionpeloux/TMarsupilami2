@@ -214,8 +214,7 @@ namespace TMarsupilami.CoreLib3
 
         public virtual void Init() { }
         public virtual void Enforce_t(MVector[] t) { }
-        public virtual void Enforce_Mr(MVector[] Mr, double[] M1_h_l, double[] M2_h_l, double[] M1_h_r, double[] M2_h_r) { }
-        public virtual void Enforce_Qr(MVector[] Mr, MVector[] Rθ) { }
+        public virtual void Enforce_Mr(MVector[] Mr, MVector[] Rθ) { }
         public virtual void Enforce_Fr(MVector[] Fr, MVector[] Rx) { }
 
         // internal class
@@ -257,8 +256,7 @@ namespace TMarsupilami.CoreLib3
                 Init();
                 beam.TangentVectorEnforcing += Enforce_t;
                 beam.ReactionForceUpdating += Enforce_Fr;
-                beam.ReactionBendingMomentUpdating += Enforce_Mr;
-                beam.ReactionTwistingMomentUpdating += Enforce_Qr;
+                beam.ReactionMomentUpdating += Enforce_Mr;
             }
 
             public override string ToString()
@@ -291,66 +289,17 @@ namespace TMarsupilami.CoreLib3
                 {
                 }
             }
-            public override void Enforce_Mr(MVector[] Mr, double[] M1_h_l, double[] M2_h_l, double[] M1_h_r, double[] M2_h_r)
+            public override void Enforce_Mr(MVector[] Mr, MVector[] Rθ)
             {
-                //beam.t[VertexIndex] = clamped_frame.ZAxis;
-                MVector κb;
-                double κ1, κ2;
-                double M1, M2;
-
-
                 if (Boundary == Boundary.Start)
                 {
-                    // beam curvature regarding clamped bondary condition
-                    //κb = 2 / (Beam.l[0] * Beam.l[0]) * MVector.CrossProduct(clamped_frame.ZAxis, Beam.e[0]);
-
-                    //// bending moment due to the clamped boundary
-                    //κ1 = κb * Beam.ActualConfiguration[0].XAxis;
-                    //κ2 = κb * Beam.ActualConfiguration[0].YAxis;
-                    //M1 = κ1 * Beam.EI1[0];
-                    //M2 = κ2 * Beam.EI2[0];
-
-                    //Beam.Mr_m[0].X = M1;
-                    //Beam.Mr_m[0].Y = M2;
-
-                    //Mr[0].X = - (M1_h_r[0] + Mext[0];
-                    //Mr[0].Y = M2_h_r[0];
-                }
-                else if (Boundary == Boundary.End)
-                {
-                    // beam curvature regarding clamped bondary condition
-                    //κb = 2 / (Beam.l[Beam.Ne - 1] * Beam.l[Beam.Ne - 1]) * MVector.CrossProduct(Beam.e[Beam.Ne - 1], clamped_frame.ZAxis);
-
-                    //// bending moment due to the clamped boundary
-                    //κ1 = κb * Beam.ActualConfiguration[Beam.Nv - 1].XAxis;
-                    //κ2 = κb * Beam.ActualConfiguration[Beam.Nv - 1].YAxis;
-                    //M1 = κ1 * Beam.EI1[Beam.Ne - 1];
-                    //M2 = κ2 * Beam.EI2[Beam.Ne - 1];
-
-                    //Beam.Mr_m[Beam.Nvh - 1].X = -M1;
-                    //Beam.Mr_m[Beam.Nvh - 1].Y = -M2;
-
-                    //Mr[Beam.Nvh - 1].X = -M1_h_l[Beam.Nvh-1];
-                    //Mr[Beam.Nvh - 1].Y = -M2_h_l[Beam.Nvh-1];
+                    this.M = Rθ[0];  // force appliquée par la poutre sur le support
+                    Mr[0] = this.M; 
                 }
                 else
                 {
-                    // a écrire
-                }
-            }
-            public override void Enforce_Qr(MVector[] Mr, MVector[] Rθ)
-            {
-                double Qr;
-
-                if (Boundary == Boundary.Start)
-                {
-                    Qr = Rθ[0].Z;  // force appliquée par la poutre sur le support
-                    Mr[0].Z = Qr; 
-                }
-                else
-                {
-                    Qr = Rθ[Beam.Nv - 1].Z;  // force appliquée par la poutre sur le support
-                    Mr[Beam.Nvh - 1].Z = Qr; 
+                    this.M = Rθ[Beam.Nv - 1];  // force appliquée par la poutre sur le support
+                    Mr[Beam.Nvh - 1] = this.M; 
                 }
             }
             public override void Enforce_Fr(MVector[] Fr, MVector[] Rx)

@@ -140,10 +140,10 @@ namespace TMarsupilami.CoreLib3
         }
 
         // EVENT : ReactionTwistingMomentUpdating
-        public event Action<MVector[], MVector[]> ReactionTwistingMomentUpdating;
-        protected virtual void OnReactionTwistingMomentUpdating(MVector[] Mr, MVector[] Rθ)
+        public event Action<MVector[], MVector[]> ReactionMomentUpdating;
+        protected virtual void OnReactionMomentUpdating(MVector[] Mr, MVector[] Rθ)
         {
-            Action<MVector[], MVector[]> handler = ReactionTwistingMomentUpdating;
+            Action<MVector[], MVector[]> handler = ReactionMomentUpdating;
             if (handler != null)
             {
                 handler(Mr, Rθ);

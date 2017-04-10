@@ -680,7 +680,7 @@ namespace TMarsupilami.CoreLib3
                 R_θ[2 * i + 1] = Rint_θ[2 * i + 1] + (0.5 * (l[2 * i] + l[2 * i + 1])) * mext_m[i];
             }
 
-            OnReactionTwistingMomentUpdating(Mr_m, R_θ);
+            OnReactionMomentUpdating(Mr_m, R_θ);
 
             // ADD REACTION MOMENTS TO INTERNAL RESULTANT
             for (int i = 0; i < nv_h; i++)
