@@ -75,7 +75,7 @@ namespace TMarsupilami.CoreLib2
         MVector[] Rx_int { get; }
         double[] Rθ_int { get; }
         MVector[] Fext_g { get; }
-        MVector[] Mext_m { get; }
+        MVector[] Mext_m { get; set; }
 
         MVector[] Fr_g { get; }
         MVector[] Mr_m { get; }

@@ -153,7 +153,7 @@ namespace TMarsupilami.Gh.Component
             int nend = elements[0].Nv - 1;
  
 
-            var bc_list = new List<BoundaryCondition>();
+                var bc_list = new List<BoundaryCondition>();
             switch (bc_start)
             {
                 case (int)BoundaryConditionType.Free:
@@ -162,7 +162,8 @@ namespace TMarsupilami.Gh.Component
                     break;
 
                 case (int)BoundaryConditionType.Clamped:
-                    bc_list.Add(BoundaryCondition.AddClampedBoundaryCondition(elements[0], Boundary.Start));
+                    //bc_list.Add(BoundaryCondition.AddClampedBoundaryCondition(elements[0], Boundary.Start));
+                    BC.AddClampedBoundaryCondition(elements[0], Boundary.Start);
                     break;
 
                 default:
@@ -192,7 +193,7 @@ namespace TMarsupilami.Gh.Component
 
                     //loads.Add(BeamVectorLoad.Create_Fext(Fext, Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_fext(-Fext, Boundary.End, beam, false));
-                    //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 1e5, 0), Boundary.End, beam, false));
+                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 0, 1e5), Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_mext(0*new MVector(0,0,1e5), Boundary.End, beam, false));
 
 

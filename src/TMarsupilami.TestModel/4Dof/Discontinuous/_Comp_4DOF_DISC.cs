@@ -421,7 +421,7 @@ namespace TMarsupilami.Gh.Component
             switch (bc_end)
             {
                 case (int)BoundaryConditionType.Free:
-                    //elements[0].Mext[elements[0].Nn - 1] = new MVector(M1, M2,Q);
+                    elements[0].Mext[elements[0].Nn - 1] = new MVector(0, 0, 1e5);
                     //elements[0].Fext[elements[0].Nn - 1] = new MVector(0, 0, 0*1e4);
                     break;
                 case (int)BoundaryConditionType.Clamped:

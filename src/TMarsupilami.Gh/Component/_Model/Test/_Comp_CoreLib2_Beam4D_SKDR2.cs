@@ -351,8 +351,8 @@ namespace TMarsupilami.Gh.Component
             switch (bc_start)
             {
                 case (int)BoundaryConditionType.Free:
-                    elements[0].Mext_m[0] = new MVector(M1, M2, 0);
-                    elements[0].Fext_g[0] = new MVector(0, 0, 0 * 1e6);
+                    //elements[0].Mext_m[0] = new MVector(M1, M2, 0);
+                    //elements[0].Fext_g[0] = new MVector(0, 0, 0 * 1e6);
                     break;
 
                 case (int)BoundaryConditionType.Clamped:
@@ -371,6 +371,7 @@ namespace TMarsupilami.Gh.Component
                 case (int)BoundaryConditionType.Free:
                     //elements[0].Mext[elements[0].Nn - 1] = new MVector(M1, M2,Q);
                     //elements[0].Fext[elements[0].Nn - 1] = new MVector(0, 0, 0*1e4);
+                    elements[0].Mext_m[elements[0].Nv - 1] = new MVector(0, 0, 1e5);
                     break;
                 case (int)BoundaryConditionType.Clamped:
                     bc_list.Add(BoundaryCondition.AddClampedBoundaryCondition(elements[0], Boundary.End));

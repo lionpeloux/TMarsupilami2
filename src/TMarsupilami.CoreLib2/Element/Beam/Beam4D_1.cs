@@ -111,6 +111,7 @@ namespace TMarsupilami.CoreLib2
         MVector[] IDRElement.Mext_m
         {
             get { return Mext_m; }
+            set { Mext_m = value; }
         }
         MVector[] IDRElement.Fr_g
         {
