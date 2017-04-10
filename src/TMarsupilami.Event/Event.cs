@@ -22,37 +22,21 @@ namespace TMarsupilami.Event
     /// </summary>
     /// <typeparam name="TSender">The type of the sender object.</typeparam>
     /// <typeparam name="TEventArgs">>The type of the EventArgs object.</typeparam>
-    public class Event<TSender, TEventArgs> where TEventArgs : EventArgs
+    public class ParallelEventHandler<TSender, TEventArgs> where TEventArgs : EventArgs
     {
         private event EventHandler<TSender, TEventArgs> handler;
         private Delegate[] invocationList;
-        private Action<TSender, TEventArgs> raise;
         private bool isParallelModeEnabled;
 
-        public bool IsParallelModeEnabled
-        {
-            get
-            {
-                return isParallelModeEnabled;
-            }
-            set
-            {
-                isParallelModeEnabled = value;
-
-                if (isParallelModeEnabled)
-                    raise = RaiseAsync;
-                else
-                    raise = RaiseSync;
-            }
-        }
+        public bool IsParallelModeEnabled { get; set; }
         public ParallelOptions ParallelOptions { get; set; }
 
-        public Event(bool isParallelModeEnabled = false)
+        public ParallelEventHandler(bool isParallelModeEnabled = false)
         {
             IsParallelModeEnabled = isParallelModeEnabled;
             ParallelOptions = new ParallelOptions();
         }
-        public Event(ParallelOptions options, bool isParallelModeEnabled = true)
+        public ParallelEventHandler(ParallelOptions options, bool isParallelModeEnabled = true)
         {
             IsParallelModeEnabled = isParallelModeEnabled;
             ParallelOptions = options;
@@ -86,9 +70,16 @@ namespace TMarsupilami.Event
             this.invocationList = this.handler.GetInvocationList();
         }
 
-        public void Raise(TSender sender, TEventArgs e)
+        public void Raise(TSender sender, TEventArgs e, bool isParallelModeEnabled = true)
         {
-            raise(sender, e);
+            if (isParallelModeEnabled)
+            {
+                RaiseASync(sender, e);
+            }
+            else
+            {
+                RaiseSync(sender, e);
+            }
         }
         private void RaiseSync(TSender sender, TEventArgs e)
         {
@@ -101,13 +92,180 @@ namespace TMarsupilami.Event
                 }
             }
         }
-        private void RaiseAsync(TSender sender, TEventArgs e)
+        private void RaiseASync(TSender sender, TEventArgs e)
         {
             if (invocationList.Length > 0)
             {
                 object[] args = new object[2] { sender, e };
                 Parallel.For(0, invocationList.Length, ParallelOptions,
                     i => { invocationList[i].DynamicInvoke(args); }
+                );
+            }
+        }
+    }
+
+    public class ParallelActionHandler
+    {
+        private event Action handler;
+        private Delegate[] invocationList;
+        private bool isParallelModeEnabled;
+
+        public bool IsParallelModeEnabled { get; set; }
+        public ParallelOptions ParallelOptions { get; set; }
+
+        public ParallelActionHandler(bool isParallelModeEnabled = false)
+        {
+            IsParallelModeEnabled = isParallelModeEnabled;
+            ParallelOptions = new ParallelOptions();
+        }
+        public ParallelActionHandler(ParallelOptions options, bool isParallelModeEnabled = true)
+        {
+            IsParallelModeEnabled = isParallelModeEnabled;
+            ParallelOptions = options;
+        }
+
+        public void Subscribe(Action handler)
+        {
+            this.handler += handler;
+            this.invocationList = this.handler.GetInvocationList();
+        }
+        public void Subscribe(IEnumerable<Action> handlers)
+        {
+            foreach (var handler in handlers)
+            {
+                this.handler += handler;
+            }
+            this.invocationList = this.handler.GetInvocationList();
+        }
+
+        public void UnSubscribe(Action handler)
+        {
+            this.handler -= handler;
+            this.invocationList = this.handler.GetInvocationList();
+        }
+        public void UnSubscribe(IEnumerable<Action> handlers)
+        {
+            foreach (var handler in handlers)
+            {
+                this.handler -= handler;
+            }
+            this.invocationList = this.handler.GetInvocationList();
+        }
+
+        public void Raise(bool isParallelModeEnabled = true)
+        {
+            if (isParallelModeEnabled)
+            {
+                RaiseASync();
+            }
+            else
+            {
+                RaiseSync();
+            }
+        }
+        private void RaiseSync()
+        {
+            if (invocationList == null)
+                return;
+            if (invocationList.Length > 0)
+            {
+                for (int i = 0; i < invocationList.Length; i++)
+                {
+                    invocationList[i].DynamicInvoke(null);
+                }
+            }
+        }
+        private void RaiseASync()
+        {
+            if (invocationList == null)
+                return;
+            if (invocationList.Length > 0)
+            {
+                Parallel.For(0, invocationList.Length, ParallelOptions,
+                    i => { invocationList[i].DynamicInvoke(null); }
+                );
+            }
+        }
+    }
+    public class ParallelActionHandler<T>
+    {
+        private event Action<T> handler;
+        private Delegate[] invocationList;
+        private bool isParallelModeEnabled;
+
+        public bool IsParallelModeEnabled { get; set; }
+        public ParallelOptions ParallelOptions { get; set; }
+
+        public ParallelActionHandler(bool isParallelModeEnabled = false)
+        {
+            IsParallelModeEnabled = isParallelModeEnabled;
+            ParallelOptions = new ParallelOptions();
+        }
+        public ParallelActionHandler(ParallelOptions options, bool isParallelModeEnabled = true)
+        {
+            IsParallelModeEnabled = isParallelModeEnabled;
+            ParallelOptions = options;
+        }
+
+        public void Subscribe(Action<T> handler)
+        {
+            this.handler += handler;
+            this.invocationList = this.handler.GetInvocationList();
+        }
+        public void Subscribe(IEnumerable<Action<T>> handlers)
+        {
+            foreach (var handler in handlers)
+            {
+                this.handler += handler;
+            }
+            this.invocationList = this.handler.GetInvocationList();
+        }
+
+        public void UnSubscribe(Action<T> handler)
+        {
+            this.handler -= handler;
+            this.invocationList = this.handler.GetInvocationList();
+        }
+        public void UnSubscribe(IEnumerable<Action<T>> handlers)
+        {
+            foreach (var handler in handlers)
+            {
+                this.handler -= handler;
+            }
+            this.invocationList = this.handler.GetInvocationList();
+        }
+
+        public void Raise(T param, bool isParallelModeEnabled = true)
+        {
+            if (isParallelModeEnabled)
+            {
+                RaiseASync(param);
+            }
+            else
+            {
+                RaiseSync(param);
+            }
+        }
+        private void RaiseSync(T param)
+        {
+            if (invocationList == null)
+                return;
+            if (invocationList.Length > 0)
+            {
+                for (int i = 0; i < invocationList.Length; i++)
+                {
+                    invocationList[i].DynamicInvoke(param);
+                }
+            }
+        }
+        private void RaiseASync(T param)
+        {
+            if (invocationList == null)
+                return;
+            if (invocationList.Length > 0)
+            {
+                Parallel.For(0, invocationList.Length, ParallelOptions,
+                    i => { invocationList[i].DynamicInvoke(param); }
                 );
             }
         }

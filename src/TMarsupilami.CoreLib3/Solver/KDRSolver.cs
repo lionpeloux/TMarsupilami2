@@ -44,12 +44,12 @@ namespace TMarsupilami.CoreLib3
         private Cluster Init_all;
 
         // 3 & 4 DOF ELEMENTS : X
-        private Cluster Update_x_CenterlineProperties;
+        private Cluster Update_x_CenterlineProperties;      // parallel event handler
         public event Action CenterlinePropertiesChanging
         {
             add { Update_x_CenterlineProperties.Subscribe(value); }
             remove { Update_x_CenterlineProperties.UnSubscribe(value); }
-        }
+        } // facade event
         protected void OnCenterlinePropertiesChanging(bool isParallel = false)
         {
             Update_x_CenterlineProperties.Call();

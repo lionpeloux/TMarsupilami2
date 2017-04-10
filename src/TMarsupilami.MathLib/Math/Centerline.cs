@@ -46,14 +46,14 @@ namespace TMarsupilami.MathLib
         {
             if (isClosed)
             {
-                Closed_GetCurvature(frames, x, e, u, l, t, κb, τ);
+                GetCurvature_Closed(frames, x, e, u, l, t, κb, τ);
             }
             else
             {
-                Open_GetCurvature(frames, x, e, u, l, t, κb, τ);
+                GetCurvature_Open(frames, x, e, u, l, t, κb, τ);
             }
         }
-        private static void Open_GetCurvature(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ)
+        private static void GetCurvature_Open(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ)
         {
             int nv = frames.Length;
             int ne = nv - 1; // open centerline
@@ -87,7 +87,7 @@ namespace TMarsupilami.MathLib
             t[nv - 1] = frames[nv - 1].ZAxis;
             κb[nv - 1] = (2 / l[ne - 1]) * MVector.CrossProduct(u[ne - 1], t[nv - 1]);
         }
-        private static void Closed_GetCurvature(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ)
+        private static void GetCurvature_Closed(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ)
         {
             int nv = frames.Length;
             int ne = nv; // closed centerline
@@ -129,20 +129,57 @@ namespace TMarsupilami.MathLib
             κb[0] = (2 * _ll) * MVector.CrossProduct(u[ne - 1], u[0]);
         }
 
+
+        private static void GetCurvature2_Open(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, double[] τ)
+        {
+            int nv = frames.Length;
+            int ne = nv - 1; // open centerline
+
+            // i = 0
+            x[0] = frames[0].Origin;
+            e[0] = new MVector(frames[0].Origin, frames[1].Origin);
+            l[0] = e[0].Length();
+            u[0] = (1 / l[0]) * e[0];
+            t[0] = frames[0].ZAxis;
+            κb[0] = (-2 / l[0]) * MVector.CrossProduct(u[0], t[0]);
+
+            // i = 1, ..., nv-2
+            for (int i = 1; i < nv - 1; i++)
+            {
+                x[i] = frames[i].Origin;
+                e[i] = new MVector(frames[i].Origin, frames[i + 1].Origin);
+                l[i] = e[i].Length();
+                u[i] = (1 / l[i]) * e[i];
+
+                double _ll = 1 / MPoint.DistanceTo(frames[i - 1].Origin, frames[i + 1].Origin);
+                t[i] = _ll * (l[i] * u[i - 1] + l[i - 1] * u[i]);
+                κb[i] = (2 * _ll) * MVector.CrossProduct(u[i - 1], u[i]);
+            }
+
+            // i = nv-1
+            x[nv - 1] = frames[nv - 1].Origin;
+            e[ne - 1] = new MVector(frames[nv - 2].Origin, frames[nv - 1].Origin);
+            l[ne - 1] = e[ne - 1].Length();
+            u[ne - 1] = (1 / l[ne - 1]) * e[ne - 1];
+            t[nv - 1] = frames[nv - 1].ZAxis;
+            κb[nv - 1] = (2 / l[ne - 1]) * MVector.CrossProduct(u[ne - 1], t[nv - 1]);
+        }
+
+
         // Get Twist
 
         public static void GetTwist(MFrame[] frames, double[] l, double[] τ, bool isClosed)
         {
             if (isClosed)
             {
-                Closed_GetTwist(frames, l, τ);
+                GetTwist_Closed(frames, l, τ);
             }
             else
             {
-                Open_GetTwist(frames, l, τ);
+                GetTwist_Open(frames, l, τ);
             }
         }
-        private static void Open_GetTwist(MFrame[] frames, double[] l, double[] τ)
+        private static void GetTwist_Open(MFrame[] frames, double[] l, double[] τ)
         {
             int ne = l.Length; // open centerline
 
@@ -156,7 +193,7 @@ namespace TMarsupilami.MathLib
                 τ[i] = twistAngle / l[i];
             }
         }
-        private static void Closed_GetTwist(MFrame[] frames, double[] l, double[] τ)
+        private static void GetTwist_Closed(MFrame[] frames, double[] l, double[] τ)
         {
             int nv = frames.Length;
             int ne = nv; // closed centerline
@@ -175,31 +212,8 @@ namespace TMarsupilami.MathLib
             twistAngle = -Rotation.ZAngle_Rotation(frames[nv - 1], frames[nv - 1].ZAxis, frames[0], frames[0].ZAxis);
             τ[ne - 1] = twistAngle / l[ne - 1];
         }
-
-       
-        // Centerline Interpolation & Refine
-
-        /// <summary>
-        /// Applies the <see cref="Interpolate">Interpolate</see> process over a whole centerline given by its frames.
-        /// </summary>
-        /// <param name="frames">The frames that represent the intial centerline.</param>
-        /// <param name="κb">The curvature at each frame.</param>
-        /// <param name="τ">The rate of twist at each edge.</param>
-        /// <param name="isClosed">True if the centerline is closed. False otherwise.</param>
-        /// <param name="recursionCount">How many times to apply recursively the interpolation process.</param>
-        /// <returns>The set of interpolated frames representing the centerline.</returns>
-        public  static MFrame[] Interpolate(MFrame[] frames, MVector[] κb, double[] τ, bool isClosed, int recursionCount = 1)
-        {
-            if (isClosed)
-            {
-                return Closed_Interpolate(frames, κb, τ, recursionCount);
-            }
-            else
-            {
-                return Open_Interpolate(frames, κb, τ, recursionCount);
-            }
-        }
-
+   
+        // Centerline Interpolation & Refine   
         /// <summary>
         /// Interpolates a frame at mid span between two frames.
         /// </summary>
@@ -244,9 +258,29 @@ namespace TMarsupilami.MathLib
             return f;
         }
 
-        private static MFrame[] Open_Interpolate(MFrame[] frames, MVector[] κb, double[] τ, int recursionCount = 1)
+        /// <summary>
+        /// Applies the <see cref="Interpolate">Interpolate</see> process over a whole centerline given by its frames.
+        /// </summary>
+        /// <param name="frames">The frames that represent the intial centerline.</param>
+        /// <param name="κb">The curvature at each frame.</param>
+        /// <param name="τ">The rate of twist at each edge.</param>
+        /// <param name="isClosed">True if the centerline is closed. False otherwise.</param>
+        /// <param name="recursionCount">How many times to apply recursively the interpolation process.</param>
+        /// <returns>The set of interpolated frames representing the centerline.</returns>
+        public static MFrame[] Refine(MFrame[] frames, MVector[] κb, double[] τ, bool isClosed, int recursionCount = 1)
         {
-            MFrame[] framesInterp = Open_Interpolate(frames, κb, τ);
+            if (isClosed)
+            {
+                return Refine_Closed(frames, κb, τ, recursionCount);
+            }
+            else
+            {
+                return Refine_Open(frames, κb, τ, recursionCount);
+            }
+        }
+        private static MFrame[] Refine_Open(MFrame[] frames, MVector[] κb, double[] τ, int recursionCount = 1)
+        {
+            MFrame[] framesInterp = Refine_Open(frames, κb, τ);
 
             for (int i = 1; i < recursionCount; i++)
             {
@@ -261,16 +295,16 @@ namespace TMarsupilami.MathLib
                 var l_tmp = new double[ne];
                 var τ_tmp = new double[ne];
 
-                Centerline.Open_GetCurvature(framesInterp, x_tmp, e_tmp, u_tmp, l_tmp, t_tmp, κb_tmp, τ_tmp);
+                Centerline.GetCurvature_Open(framesInterp, x_tmp, e_tmp, u_tmp, l_tmp, t_tmp, κb_tmp, τ_tmp);
                 Centerline.ZAlignFrames(framesInterp, t_tmp);
-                Centerline.Open_GetTwist(framesInterp, l_tmp, τ_tmp);
+                Centerline.GetTwist_Open(framesInterp, l_tmp, τ_tmp);
 
-                framesInterp = Open_Interpolate(framesInterp, κb_tmp, τ_tmp);
+                framesInterp = Refine_Open(framesInterp, κb_tmp, τ_tmp);
             }
 
             return framesInterp;
         }
-        private static MFrame[] Open_Interpolate(MFrame[] frames, MVector[] κb, double[] τ)
+        private static MFrame[] Refine_Open(MFrame[] frames, MVector[] κb, double[] τ)
         {
             int nv = frames.Length;
             int ne = nv - 1; // open centerline
@@ -288,9 +322,9 @@ namespace TMarsupilami.MathLib
 
             return framesInterp;
         }
-        private static MFrame[] Closed_Interpolate(MFrame[] frames, MVector[] κb, double[] τ, int recursionCount = 1)
+        private static MFrame[] Refine_Closed(MFrame[] frames, MVector[] κb, double[] τ, int recursionCount = 1)
         {
-            MFrame[] framesInterp = Closed_Interpolate(frames, κb, τ);
+            MFrame[] framesInterp = Refine_Closed(frames, κb, τ);
 
             for (int i = 1; i < recursionCount; i++)
             {
@@ -305,16 +339,16 @@ namespace TMarsupilami.MathLib
                 var l_tmp = new double[ne];
                 var τ_tmp = new double[ne];
 
-                Centerline.Closed_GetCurvature(framesInterp, x_tmp, e_tmp, u_tmp, l_tmp, t_tmp, κb_tmp, τ_tmp);
+                Centerline.GetCurvature_Closed(framesInterp, x_tmp, e_tmp, u_tmp, l_tmp, t_tmp, κb_tmp, τ_tmp);
                 Centerline.ZAlignFrames(framesInterp, t_tmp);
-                Centerline.Closed_GetTwist(framesInterp, l_tmp, τ_tmp);
+                Centerline.GetTwist_Closed(framesInterp, l_tmp, τ_tmp);
 
-                framesInterp = Closed_Interpolate(framesInterp, κb_tmp, τ_tmp);
+                framesInterp = Refine_Closed(framesInterp, κb_tmp, τ_tmp);
             }
 
             return framesInterp;
         }
-        private static MFrame[] Closed_Interpolate(MFrame[] frames, MVector[] κb, double[] τ)
+        private static MFrame[] Refine_Closed(MFrame[] frames, MVector[] κb, double[] τ)
         {
             int nv = frames.Length;
             int ne = nv; // open centerline
@@ -332,7 +366,5 @@ namespace TMarsupilami.MathLib
             
             return framesInterp;
         }
-
-
     }
 }

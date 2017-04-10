@@ -91,9 +91,6 @@ namespace TMarsupilami.CoreLib3
         public Beam_4DOF_D(IEnumerable<MFrame> restFrames, IEnumerable<MFrame> actualFrames, IEnumerable<Section> sections, IEnumerable<Material> materials, bool isClosed = false)
             :base(isClosed)
         {
-
-            Update_Loads = new Cluster();
-
             // DEEP COPY of FRAMES
             mframes_0 = restFrames.ToArray();
             mframes_i = actualFrames.ToArray();
@@ -167,7 +164,6 @@ namespace TMarsupilami.CoreLib3
             l_0 = new double[ne];
             κ1_0 = new double[nv];
             κ2_0 = new double[nv];
-            twist_0 = new double[ne];
             τ_0 = new double[ne];
 
             // DEFORMED CONFIGURATION
@@ -365,8 +361,6 @@ namespace TMarsupilami.CoreLib3
             {
                 mframes[i].ZRotate(dθ[i]);
             }
-
-            Update_Loads.Call();
             OnFramesRotated(dθ);
         }
 

@@ -184,7 +184,7 @@ namespace TMarsupilami.Gh.Component
                     //loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e4), beam.Nvh/2, beam, true));
                     
                     // force suiveuse
-                    //loads.Add(BeamVectorLoad.Create_Fext(new MVector(-1e4, 0, 0), Boundary.End, beam, false));
+                    loads.Add(BeamVectorLoad.Create_Fext(new MVector(-1e4, 0, 0), Boundary.End, beam, false));
                     
                     //loads.Add(BeamVectorLoad.Create_fext(Fext, Boundary.End, beam, true));
                     //loads.Add(BeamVectorLoad.Create_Mext(Mext, Boundary.End, beam, true));
@@ -192,7 +192,7 @@ namespace TMarsupilami.Gh.Component
 
                     //loads.Add(BeamVectorLoad.Create_Fext(Fext, Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_fext(-Fext, Boundary.End, beam, false));
-                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 1e5, 0), Boundary.End, beam, false));
+                    //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 1e5, 0), Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_mext(0*new MVector(0,0,1e5), Boundary.End, beam, false));
 
 

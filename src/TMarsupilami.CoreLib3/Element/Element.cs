@@ -84,8 +84,6 @@ namespace TMarsupilami.CoreLib3
     }
     public abstract class Beam : Element
     {
-        public Cluster Update_Loads; // trigger loading update
-
         // EVENT : TopologyChanged
         public event Action<int[]> TopologyChanged;
         protected virtual void OnTopologyChanged(int[] indexMap)
@@ -182,6 +180,7 @@ namespace TMarsupilami.CoreLib3
             : base(ElementStructure.Beam, 1)
         {
             IsClosed = isClosed;
+            var options = new ParallelOptions();
         }
 
         // METHODS

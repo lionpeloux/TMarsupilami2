@@ -23,7 +23,7 @@ namespace TMarsupilami.Event
 
         public static void TestEvent(int n, int factor = 1)
         {
-            var eventBuffer = new Event<object, EventArgs>();
+            var eventBuffer = new ParallelEventHandler<object, EventArgs>();
             var handlers = new EventHandler<object, EventArgs>[n];
             var sleepTimes = new int[n];
             var rdm = new Random();
