@@ -61,7 +61,7 @@ namespace TMarsupilami.Gh.Component
             if (!DA.GetData(1, ref angle)) { }
             if (!DA.GetData(2, ref axis)) { return; }
 
-            frame.Rotate(angle, axis);
+            frame = Rotation.Rotate(frame, angle, axis);
 
             DA.SetData(0, frame);
         }

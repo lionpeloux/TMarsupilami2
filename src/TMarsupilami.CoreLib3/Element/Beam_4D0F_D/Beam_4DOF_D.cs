@@ -32,20 +32,16 @@ namespace TMarsupilami.CoreLib3
         }
 
         #region FIELDS
-        private int ne_h;                // number of handle edges
 
         // REST CONFIGURATION      
-        private double[] l_0;            // rest length of edges
-        private double[] κ1_0, κ2_0;     // material curvature in rest configuration
-        private double[] twist_0, τ_0;   // twist angle and rate of twist (τ) in rest configuration
+        private double[] l_0;           // rest length of edges
+        private double[] κ1_0, κ2_0;    // material curvature in rest configuration
+        private double[] τ_0;           // twist angle and rate of twist (τ) in rest configuration
 
         // ACTUAL CONFIGURATION
-        private MPoint[] x;                 // centerline : x[i]
         //private MVector[] e;                // edge : e[i] = x[i+1] - x[i]
         //private double[] l;                 // edge length : l[i] = |e[i]|
-        private double[] ll;                // ll[i] = |e[i] + e[i+1]|
 
-        private MVector[] t;                // tangent vector at a handle vertex
         private MVector[] d3_mid;           // tangent vector at 
         private MVector[] t_g;              // tangent vector at a ghost vertex
         private MVector[] t_h_l, t_h_r;     // tangent vector at left/right of a handle vertex
@@ -62,7 +58,7 @@ namespace TMarsupilami.CoreLib3
         private double[] κ1_h_l, κ1_h_r;
         private double[] κ2_h_l, κ2_h_r;
 
-        public double[] twist, τ;           // twist angle and rate of twist : τ[i] = twist[i] / l[i]
+        public double[] τ;           // twist angle and rate of twist : τ[i] = twist[i] / l[i]
 
         // INTERNAL FORCES & MOMENTS
         private double[] N;                                 // axial force : N = ES.ε
@@ -91,57 +87,7 @@ namespace TMarsupilami.CoreLib3
         // pour l'instant, on passe l'ensemble des frames et des sections
         public Beam_4DOF_D(IEnumerable<MFrame> restFrames, IEnumerable<MFrame> actualFrames, IEnumerable<Section> sections, IEnumerable<Material> materials, bool isClosed = false)
             :base(isClosed)
-        {
-            //CreateGhostNodes(restFrames, actualFrames);
-
-            // DEEP COPY of FRAMES
-            mframes_0 = restFrames.ToArray();
-            mframes_i = actualFrames.ToArray();
-            mframes = actualFrames.ToArray();
-
-            if (mframes_0.Length != mframes_i.Length)
-                throw new ArgumentOutOfRangeException("actualFrames", "actualFrames and restFrames must have the same number of items.");
-
-            // TOPOLOGY
-            //if (mframes.Length % 2 != 0)
-            //    throw new ArgumentOutOfRangeException("Frames", "actualFrames and restFrames must have an even number of items.");
-
-            if (IsClosed)
-            {
-                ne = mframes.Length;
-                nv_g = ne / 2;
-                nv_h = ne/2;
-                nv = nv_g + nv_h;
-
-                ne_h = nv_g;
-            }
-            else
-            {
-                ne = mframes.Length - 1;
-                nv_g = ne / 2;
-                nv_h = nv_g + 1;
-                nv = nv_g + nv_h;
-
-                ne_h = nv_g;
-            }
-
-            // DEEP COPY
-            this.sections = sections.ToArray();
-            this.materials = materials.ToArray();
-
-            // EXTERNAL FORCES & MOMENTS
-            Fext_g = new MVector[nv_h];
-            Mext_m = new MVector[nv_h];
-            fext_g = new MVector[nv_g]; // pas bien pris en compte pour le moment
-            mext_m = new MVector[nv_g];   
-
-            // REACTION MOMENT AND FORCES
-            Fr_g = new MVector[nv_h];
-            Mr_m = new MVector[nv_h];
-
-            // APPLIED LOADS
-            loadManager = new BeamLoadManager(this);
-
+        {           
             // KINEMATIC CAPABILITIES
             TranslationalDOF = 3;
             RotationalDOF = 1;
@@ -152,6 +98,107 @@ namespace TMarsupilami.CoreLib3
             IsShearCapable = true;
             IsBendingCapable = true;
             IsTorsionCapable = true;
+
+            // AUTOMATIC CREATION OF GHOST VERTICES
+            CreateGhostVertices(restFrames, actualFrames, isClosed);
+
+            // TOPOLOGY
+            if (IsClosed)
+            {
+                ne = mframes.Length;
+                nv_g = ne / 2;
+                nv_h = ne / 2;
+                nv = nv_g + nv_h;
+            }
+            else
+            {
+                ne = mframes.Length - 1;
+                nv_g = ne / 2;
+                nv_h = nv_g + 1;
+                nv = nv_g + nv_h;
+            }
+
+            // PREFORM CHECKS
+            if (mframes_0.Length != mframes_i.Length)
+                throw new ArgumentOutOfRangeException("actualFrames", "actualFrames and restFrames must have the same number of items.");
+
+            // INSTANCIATE INTERNAL ARRAYS
+            CreateInternalArrays(nv, nv_h, nv_g, ne);
+
+            // DEEP COPY
+            this.sections = sections.ToArray();
+            this.materials = materials.ToArray();
+
+            for (int i = 0; i < nv_g; i++)
+            {
+                var section = this.sections[0];
+                var material = this.materials[0];
+
+                ES[i] = material.E * section.S;
+                EI1[i] = material.E * section.I1;
+                EI2[i] = material.E * section.I2;
+                GJ[i] = material.G * section.J;
+            }
+
+            // REST CONFIGURATION
+            // pour l'instant, on assume que la courbure est continue dans la configuration au repos
+            // il faudra faire la mise à jour de cette fonction pour traitre le cas général
+            SetRestConfig(mframes_0);
+
+            // Ici, il faut commencer à traiter la discontinuité de courbure.
+            SetInitialConfig(mframes);
+
+            // Make sure l[i] is computed pour la conversion des efforts linéiques en efforts ponctuels
+            UpdateCenterlineProperties();
+        }
+        private void CreateGhostVertices(IEnumerable<MFrame> restFrames, IEnumerable<MFrame> actualFrames, bool isClosed)
+        {
+            var frames = restFrames.ToArray();
+            int nv = frames.Length;
+            int ne = IsClosed ? nv : nv - 1;
+
+            var x = new MPoint[nv];
+            var e = new MVector[ne];
+            var u = new MVector[ne];
+            var t = new MVector[nv];
+            var κb = new MVector[nv];
+            var l = new double[ne];
+            var τ = new double[ne];
+
+            // Interpolate restFrames
+            Centerline.GetCurvature(frames, x, e, u, l, t, κb, isClosed);
+            Centerline.ZAlignFrames(frames, t);
+            Centerline.GetTwist(frames, l, τ, isClosed);
+            mframes_0 = Centerline.Refine(frames, κb, τ, isClosed, 1);
+
+            // Interpolate actualFrames
+            frames = actualFrames.ToArray();
+            Centerline.GetCurvature(frames, x, e, u, l, t, κb, isClosed);
+            Centerline.ZAlignFrames(frames, t);
+            Centerline.GetTwist(frames, l, τ, isClosed);
+            mframes = Centerline.Refine(frames, κb, τ, isClosed, 1);
+            mframes_i = mframes.DeepCopy();
+        }
+        private void CreateInternalArrays(int nv, int nv_h, int nv_g, int ne)
+        {
+            // SECTION & MATERIAL 
+            ES = new double[nv_g];
+            EI1 = new double[nv_g];
+            EI2 = new double[nv_g];
+            GJ = new double[nv_g];
+
+            // EXTERNAL FORCES & MOMENTS
+            Fext_g = new MVector[nv_h];
+            Mext_m = new MVector[nv_h];
+            fext_g = new MVector[nv_g];
+            mext_m = new MVector[nv_g];
+
+            // REACTION MOMENT AND FORCES
+            Fr_g = new MVector[nv_h];
+            Mr_m = new MVector[nv_h];
+
+            // APPLIED LOADS
+            loadManager = new BeamLoadManager(this);
 
             // DYNAMIC CONFIGURATION
             lm_x = new double[nv];
@@ -173,7 +220,6 @@ namespace TMarsupilami.CoreLib3
             x = new MPoint[nv];
             e = new MVector[ne];
             l = new double[ne];
-            ll = new double[ne - 1];
 
             t = new MVector[nv];
             d3_mid = new MVector[ne];
@@ -199,7 +245,6 @@ namespace TMarsupilami.CoreLib3
 
             κ1 = new double[nv];
             κ2 = new double[nv];
-            twist = new double[ne];
             τ = new double[ne];
 
             // INTERNAL FORCES & MOMENTS
@@ -208,12 +253,10 @@ namespace TMarsupilami.CoreLib3
             N_r = new double[nv];
 
             V = new MVector[ne];
-
             V_M = new MVector[ne];
             V_M_g = new MVector[nv_g];
             V_M_h_l = new MVector[nv_h];
             V_M_h_r = new MVector[nv_h];
-
             V_Q = new MVector[ne];
             V_Q_g = new MVector[nv_g];
             V_Q_h_l = new MVector[nv_h];
@@ -222,11 +265,9 @@ namespace TMarsupilami.CoreLib3
             M_g = new MVector[nv_g];   // moment à un ghost node
             M1_g = new double[nv_g];
             M2_g = new double[nv_g];
-
             M_h_l = new MVector[nv_h];   // moment à gauche d'un handle node
             M1_h_l = new double[nv_h];
             M2_h_l = new double[nv_h];
-
             M_h_r = new MVector[nv_h];   // moment à gauche d'un handle node
             M1_h_r = new double[nv_h];
             M2_h_r = new double[nv_h];
@@ -247,62 +288,6 @@ namespace TMarsupilami.CoreLib3
             Rint_θ_torsion_Q = new double[nv];
             Rint_θ_torsion_M = new double[nv];
             Rint_θ_bending = new MVector[nv];
-
-            ES = new double[nv_g];
-            EI1 = new double[nv_g];
-            EI2 = new double[nv_g];
-            GJ = new double[nv_g];
-
-            for (int i = 0; i < nv_g; i++)
-            {
-                var section = this.sections[0];
-                var material = this.materials[0];
-
-                ES[i] = material.E * section.S;
-                EI1[i] = material.E * section.I1;
-                EI2[i] = material.E * section.I2;
-                GJ[i] = material.G * section.J;
-            }
-
-            // REST CONFIGURATION
-            // pour l'instant, on assume que la courbure est continue dans la configuration au repos
-            // il faudra faire la mise à jour de cette fonction pour traitre le cas général
-            SetRestConfig(mframes_0);
-
-            // Ici, il faut commencer à traiter la discontinuité de courbure.
-            SetInitialConfig(mframes);
-
-            // Make sure l[i] is computed pour la conversion des efforts linéiques en efforts ponctuels
-            UpdateCenterlineProperties();
-        }
-        private void CreateGhostNodes(IEnumerable<MFrame> restFrames, IEnumerable<MFrame> actualFrames)
-        {
-            var frames = restFrames.ToArray();
-            int nv = frames.Length;
-            int ne = IsClosed ? nv : nv - 1;
-
-            var x = new MPoint[nv];
-            var e = new MVector[ne];
-            var u = new MVector[ne];
-            var t = new MVector[nv];
-            var κb = new MVector[nv];
-            var l = new double[ne];
-            var τ = new double[ne];
-
-            // Interpolate restFrames
-            Centerline.GetCurvature(frames, x, e, u, l, t, κb, IsClosed);
-            Centerline.ZAlignFrames(frames, t);
-            Centerline.GetTwist(frames, l, τ, IsClosed);
-            mframes_0 = Centerline.Refine(frames, κb, τ, IsClosed, 1);
-
-            // Interpolate actualFrames
-            frames = actualFrames.ToArray();
-            Centerline.GetCurvature(frames, x, e, u, l, t, κb, IsClosed);
-            Centerline.ZAlignFrames(frames, t);
-            Centerline.GetTwist(frames, l, τ, IsClosed);
-            mframes = Centerline.Refine(frames, κb, τ, IsClosed, 1);
-            mframes_i = mframes.DeepCopy();
-
         }
 
         public override string ToString()
@@ -418,6 +403,8 @@ namespace TMarsupilami.CoreLib3
                 t[2 * i + 1] = t_g[i];
             }
 
+            //Centerline.GetCurvature(x, e, l, d3_mid, t_h_r, t_g, t_h_l, κb_g);
+
             // GET TANGENT AT HANDLE NODES
             t[0] = e[0] / l[0];
             for (int i = 1; i < nv_h - 1; i++)
@@ -426,6 +413,7 @@ namespace TMarsupilami.CoreLib3
                 t[2 * i].Normalize();
             }
             t[nv - 1] = e[ne - 1] / l[ne - 1];
+
             OnTangentVectorEnforcing(t);
         }
         public override void UpdateCurvatureBinormal()
@@ -569,7 +557,7 @@ namespace TMarsupilami.CoreLib3
 
             // calcul des courbures mid edge.
             // ici, faire le calcul avec l'interpolation parabolique
-            for (int i = 0; i < ne_h; i++)
+            for (int i = 0; i < nv_g; i++)
             {
                 κb_mid[2 * i] = 0.5 * (κb_h_r[i] + κb_g[i]);
                 κb_mid[2 * i + 1] = 0.5 * (κb_g[i] + κb_h_l[i + 1]);
@@ -584,8 +572,8 @@ namespace TMarsupilami.CoreLib3
         {
             for (int i = 0; i < Ne; i++)
             {
-                twist[i] = -Rotation.ZAngle_Rotation(mframes[i], mframes[i].ZAxis, mframes[i + 1], mframes[i + 1].ZAxis);
-                τ[i] = twist[i] / l[i];
+                double twist = -Rotation.ZAngle_Rotation(mframes[i], mframes[i].ZAxis, mframes[i + 1], mframes[i + 1].ZAxis);
+                τ[i] = twist / l[i];
                 Q[i] = GJ[i/2] * (τ[i] - τ_0[i]);
             }
 
@@ -593,7 +581,7 @@ namespace TMarsupilami.CoreLib3
             double Q_mid, dQ, m3, κM;
 
             //Interpolation du moment de torsion aux noeuds avec prise en compte de la courbure
-            for (int i = 0; i < ne_h; i++)
+            for (int i = 0; i < nv_g; i++)
             {
                 // dQ est évalué à partir de Q' + κ1M2 - κ2M1 + m3 = 0 (à l'équilibre statique)
                 // et donc Q' = dQ/ds = -m3 - (κ1M2 - κ2M1)
@@ -661,7 +649,7 @@ namespace TMarsupilami.CoreLib3
             dRθ = 0.5 * (κM + m3) * l[0];
             Rint_θ_torsion_M[1] = dRθ;
 
-            for (int i = 0; i < ne_h - 1; i++)
+            for (int i = 0; i < nv_g - 1; i++)
             {
                 // 2i + 1
                 m3 = mext_m[i].Z;
@@ -700,7 +688,6 @@ namespace TMarsupilami.CoreLib3
                 Rint_θ[i].Z = Rint_θ_torsion_Q[i] + Rint_θ_torsion_M[i];
             }
         }
-
         public override void UpdateResultantNodalMoment()
         {
             // ADD APPLIED LOADS TO INTERNAL RESULTANT
@@ -753,7 +740,7 @@ namespace TMarsupilami.CoreLib3
         /// </summary>
         public override void UpdateShearForce()
         {
-            for (int i = 0; i < ne_h; i++)
+            for (int i = 0; i < nv_g; i++)
             {
                 // ici, on peut calculer un shear à droite et à gauche des handle
                 // et un shear aux ghost
@@ -861,7 +848,6 @@ namespace TMarsupilami.CoreLib3
                 Rint_x[i] = Rint_x_axial[i] + Rint_x_shear_M[i] + Rint_x_shear_Q[i];
             }
         }
-
         public override void UpdateResultantNodalForce()
         {
             // RESULTANT FORCE
@@ -924,7 +910,7 @@ namespace TMarsupilami.CoreLib3
         {
             // interpolation de l'effort tranchant aux noeuds
             // non nécessaire pour la DR => à décplacer dans l'affichage
-            for (int i = 0; i < ne_h; i++)
+            for (int i = 0; i < nv_g; i++)
             {
                 // calcul des dérivées :
                 var M0 = M_h_r[i];

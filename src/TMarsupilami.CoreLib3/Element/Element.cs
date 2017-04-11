@@ -167,9 +167,11 @@ namespace TMarsupilami.CoreLib3
         public double[] GJ;
 
         // GEOMETRIC CONFIGURATION
+        public MPoint[] x;                 // centerline : x[i]
+        public MVector[] t;                // tangent vector at vertices
         protected MFrame[] mframes_0;
         protected MFrame[] mframes_i;
-        protected MFrame[] mframes;
+        public MFrame[] mframes;
 
         // LUMPED MASS
         protected double[] lm_x;

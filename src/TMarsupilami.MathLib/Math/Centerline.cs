@@ -129,8 +129,8 @@ namespace TMarsupilami.MathLib
             κb[0] = (2 * _ll) * MVector.CrossProduct(u[ne - 1], u[0]);
         }
 
-
-        private static void GetCurvature(
+        
+        public static void GetCurvature(
             MPoint[] x, 
             MVector[] e, double[] l, MVector[] u, 
             MVector[] t_h_r, MVector[] t_g, MVector[] t_h_l, 

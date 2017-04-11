@@ -20,8 +20,8 @@ namespace TMarsupilami.Gh.Component
         List<int> linesWidth;
         List<Color> linesColor;
 
-        Color[] linesColorDefault = new Color[3] { Color.Blue, Color.Red, Color.Lime }; // Z, X, Y
-        int[] linesWidthDefault = new int[3] { 2, 1, 1 }; // Z, X, Y
+        Color[] linesColorDefault = new Color[3] { Color.Red, Color.Lime, Color.Blue}; // X, Y, Z
+        int[] linesWidthDefault = new int[3] { 1, 1, 2 }; // X, Y, Z
 
 
         public Comp_DisplayFrame()
@@ -114,15 +114,16 @@ namespace TMarsupilami.Gh.Component
                     if (Attributes.Selected)
                     {
                         Color color = args.WireColour_Selected;
-                        args.Display.DrawLineArrow(t_line, Color.Yellow, linesWidth[0], h);
-                        args.Display.DrawLineArrow(d1_line, color, linesWidth[1], h);
-                        args.Display.DrawLineArrow(d2_line, color, linesWidth[2], h);
+                        args.Display.DrawLineArrow(d1_line, color, linesWidth[0], h);
+                        args.Display.DrawLineArrow(d2_line, color, linesWidth[1], h);
+                        args.Display.DrawLineArrow(t_line, Color.Yellow, linesWidth[2], h);
+
                     }
                     else
                     {
-                        args.Display.DrawLineArrow(t_line, linesColor[0], linesWidth[0], h);
-                        args.Display.DrawLineArrow(d1_line, linesColor[1], linesWidth[1], h);
-                        args.Display.DrawLineArrow(d2_line, linesColor[2], linesWidth[2], h);
+                        args.Display.DrawLineArrow(d1_line, linesColor[0], linesWidth[0], h);
+                        args.Display.DrawLineArrow(d2_line, linesColor[1], linesWidth[1], h);
+                        args.Display.DrawLineArrow(t_line, linesColor[2], linesWidth[2], h);
                     }
                 }            
             }              

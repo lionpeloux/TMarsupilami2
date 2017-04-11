@@ -19,13 +19,13 @@ namespace TMarsupilami.MathLib
         /// <param name="angle">Angle of rotation (in radians).</param>
         /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Rotate(ref MFrame frame, double angle, MVector axis)
+        public static MFrame Rotate(MFrame frame, double angle, MVector axis)
         {
             // warning : axis must be of unit length
 
             double cos = Math.Cos(angle);
             double sin = Math.Sin(angle);
-            Rotate(ref frame, sin, cos, axis);
+            return  Rotate(frame, sin, cos, axis);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace TMarsupilami.MathLib
         /// <param name="sin">Sinus of the angle of rotation.</param>
         /// <param name="cos">Cosinus of the angle of rotation.</param>
         /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
-        public static void Rotate(ref MFrame frame, double sin, double cos, MVector axis)
+        public static MFrame Rotate(MFrame frame, double sin, double cos, MVector axis)
         {
             // warning : axis must be of unit length
             // assumse that ZAxis = XAxis x YAxis
@@ -67,7 +67,7 @@ namespace TMarsupilami.MathLib
             double vry = vy * cos + kx * ay + ky * ay + kz * ay + saz * vx - sax * vz;
             double vrz = vz * cos + kx * az + ky * az + kz * az + sax * vy - say * vx;
 
-            frame.XAxis = new MVector(vrx, vry, vrz);
+            var xaxis = new MVector(vrx, vry, vrz);
 
             // rotate YAxis
 
@@ -83,11 +83,12 @@ namespace TMarsupilami.MathLib
             vry = vy * cos + kx * ay + ky * ay + kz * ay + saz * vx - sax * vz;
             vrz = vz * cos + kx * az + ky * az + kz * az + sax * vy - say * vx;
 
-            frame.YAxis = new MVector(vrx, vry, vrz);
+            var yaxis = new MVector(vrx, vry, vrz);
 
             // update ZAxis with cross product
+            var zaxis = MVector.CrossProduct(xaxis, yaxis);
 
-            frame.ZAxis = MVector.CrossProduct(frame.XAxis, frame.YAxis);
+            return new MFrame(frame.Origin, xaxis, yaxis, zaxis);
         }
 
         /// <summary>
@@ -127,6 +128,29 @@ namespace TMarsupilami.MathLib
             frameROT.XAxis = d1_rot;
             frameROT.YAxis = d2_rot;
         }
+        public static MFrame ZRotate(MFrame frame, double sin, double cos)
+        {
+            /* ------------------------------------
+             * TOTAL COST
+             * ------------------------------------
+             * add  | sub   | mul   | div   | sqrt
+             * 3    | 6     | 12    | 0     | 0
+             * ------------------------------------          
+             * cos  | sin   | tan   | acos  | asin
+             * 1    | 1     | 0     | 0     | 0
+             * ------------------------------------   
+             */
+
+            var d1 = frame.XAxis;
+            var d2 = frame.YAxis;
+
+            // add :  3 | sub :  3 | mul :  12 | div :  0 | sqrt :  0
+            var d1_rot = cos * d1 + sin * d2;
+            var d2_rot = cos * d2 - sin * d1;
+
+            return new MFrame(frame.Origin, d1_rot, d2_rot, frame.ZAxis, false);
+        }
+
 
         /// <summary>
         /// Rotates a frame by a small angle dθ around its ZAxis (cost index = 101).

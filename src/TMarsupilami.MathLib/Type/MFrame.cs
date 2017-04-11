@@ -64,6 +64,21 @@ namespace TMarsupilami.MathLib
             this.zaxis = MVector.CrossProduct(this.xaxis, this.yaxis);
         }
 
+        public MFrame(MPoint origin, MVector xaxis, MVector yaxis, MVector zaxis, bool normalized = false)
+        {
+            this.origin = origin;
+            this.xaxis = xaxis;
+            this.yaxis = yaxis;
+            this.zaxis = zaxis;
+
+            if (normalized)
+            {
+                this.xaxis.Normalize();
+                this.yaxis.Normalize();
+                this.zaxis.Normalize();
+            }
+        }
+
         /// <summary>
         /// Constructs a new frame with the given frame.
         /// </summary>
@@ -154,16 +169,16 @@ namespace TMarsupilami.MathLib
 #endif
         }
 
-        /// <summary>
-        /// In-place rotation of a frame around a given axis.
-        /// </summary>
-        /// <param name="angle">Angle of rotation (in radians).</param>
-        /// <param name="axis">Axis of rotation. Must be a unit vector.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Rotate(double angle, MVector axis)
-        {
-            Rotation.Rotate(ref this, angle, axis);
-        }
+        ///// <summary>
+        ///// In-place rotation of a frame around a given axis.
+        ///// </summary>
+        ///// <param name="angle">Angle of rotation (in radians).</param>
+        ///// <param name="axis">Axis of rotation. Must be a unit vector.</param>
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //public void Rotate(double angle, MVector axis)
+        //{
+        //    Rotation.Rotate(ref this, angle, axis);
+        //}
 
         public void ZRotate(double θ, ref MFrame frameROT)
         {
