@@ -309,9 +309,6 @@ namespace TMarsupilami.CoreLib3
             // apply applied displacements
             // get boundary references (after applied displacements)
             Init_all.Call();
-
-            // update config
-            UpdateDeformedConfig_x();
         }
 
         // RUN
@@ -349,8 +346,7 @@ namespace TMarsupilami.CoreLib3
         private void Reset_x()
         {
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
-            Update_x_ResultantNodalMoment.Call();
-            Update_x_ResultantNodalForce.Call();
+            UpdateDeformedConfig_x();
 
             // LUMPED MASS
             for (int ei = 0; ei < nx; ei++)
@@ -377,16 +373,15 @@ namespace TMarsupilami.CoreLib3
             ComputeEc_x();
             Ec_x_1 = Ec_x;
             Ec_x_0 = 0.0;
-
-            // POSITION
-            Move_x(dt);
-            CurrentIteration_x++;
         }
         private void Run_x()
         {
+            // MOVE TO NEW POSITION ACCORDING TO CURRENT VELOCITY
+            Move_x(dt);
+            CurrentIteration_x++;
+
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
-            Update_x_ResultantNodalMoment.Call();
-            Update_x_ResultantNodalForce.Call();
+            UpdateDeformedConfig_x();
 
             // VELOCITY
             for (int ei = 0; ei < nx; ei++)
@@ -396,7 +391,6 @@ namespace TMarsupilami.CoreLib3
                     var a = (1/ lm_x[ei][nj]) * R_x[ei][nj];
                     a_x[ei][nj] = a;
                     v_x[ei][nj] += dt * a;
-                    //v_x[ei][nj] += (dt / lm_x[ei][nj]) * R_x[ei][nj];
                 }
             }
 
@@ -408,10 +402,6 @@ namespace TMarsupilami.CoreLib3
             {
                 Ec_x_0 = Ec_x_1;
                 Ec_x_1 = Ec_x;
-
-                // POSITION
-                Move_x(dt);
-                CurrentIteration_x++;
             }
             else // KINETIC PIC REACHED
             {
@@ -435,7 +425,6 @@ namespace TMarsupilami.CoreLib3
                 }
                 elements_x[ei].Move(dx[ei]);
             }
-            UpdateDeformedConfig_x();
         }
         private void ComputeEc_x()
         {
@@ -464,16 +453,7 @@ namespace TMarsupilami.CoreLib3
                 }
             }
 
-            // COMPUTE BACKWARD DISPLACEMENT AND MOVE
-            //for (int ei = 0; ei < nx; ei++)
-            //{
-            //    for (int nj = 0; nj < elements_x[ei].Nv; nj++)
-            //    {
-            //        dx[ei][nj] = -q * dt * v_x[ei][nj];
-            //    }
-            //    elements_x[ei].Move(dx[ei]);
-            //}
-            //UpdateDeformedConfig_x();
+            // COMPUTE BACKWARD POSITION
             Move_x(-q * dt);
         }
 
@@ -481,8 +461,7 @@ namespace TMarsupilami.CoreLib3
         private void Reset_θ()
         {
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
-            Update_θ_ResultantNodalMoment.Call();
-            Update_θ_ResultantNodalForce.Call();
+            UpdateDeformedConfig_θ();
 
             // LUMPED MASS
             for (int ei = 0; ei < nθ; ei++)
@@ -509,16 +488,15 @@ namespace TMarsupilami.CoreLib3
             ComputeEc_θ();
             Ec_θ_1 = Ec_θ;
             Ec_θ_0 = 0;
-
-            // POSITION
-            Move_θ(dt);
-            CurrentIteration_θ++;
         }
         private void Run_θ()
         {
+            // MOVE TO NEW POSITION ACCORDING TO CURRENT VELOCITY
+            Move_θ(dt);
+            CurrentIteration_θ++;
+
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
-            Update_θ_ResultantNodalMoment.Call();
-            Update_θ_ResultantNodalForce.Call();
+            UpdateDeformedConfig_θ();
 
             // VELOCITY
             for (int ei = 0; ei < nθ; ei++)
@@ -528,7 +506,6 @@ namespace TMarsupilami.CoreLib3
                     var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj].Z;
                     a_θ[ei][nj].Z = a;
                     v_θ[ei][nj].Z += dt * a;
-                    //v_θ[ei][nj].Z += (dt / lm_θ[ei][nj]) * R_θ[ei][nj];
                 }
             }
 
@@ -540,10 +517,6 @@ namespace TMarsupilami.CoreLib3
             {
                 Ec_θ_0 = Ec_θ_1;
                 Ec_θ_1 = Ec_θ;
-
-                // POSITION
-                Move_θ(dt);
-                CurrentIteration_θ++;
             }
             else // KINETIC PIC REACHED
             {
@@ -566,7 +539,6 @@ namespace TMarsupilami.CoreLib3
                 }
                 elements_θ[ei].Move(dθ[ei]);
             }
-            UpdateDeformedConfig_θ();         
         }
         private void ComputeEc_θ()
         {
@@ -626,7 +598,11 @@ namespace TMarsupilami.CoreLib3
 
             // update resulting internal nodal force and internal nodal moment
             Update_x_InternalNodalMoment.Call();
-            Update_x_InternalNodalForce.Call();           
+            Update_x_InternalNodalForce.Call();
+
+            // UPDATE RESULTANT NODAL FORCE AND MOMENT
+            Update_x_ResultantNodalMoment.Call();
+            Update_x_ResultantNodalForce.Call();
         }
         private void UpdateDeformedConfig_θ()
         {
@@ -648,6 +624,10 @@ namespace TMarsupilami.CoreLib3
             // enforce nodal force and moment contraints
             foreach (var cst in constraints_x) { cst.Enforce_Qr(); }
             foreach (var cst in constraints_x) { cst.Enforce_Fr(); }
+
+            // UPDATE RESULTANT NODAL FORCE AND MOMENT
+            Update_θ_ResultantNodalMoment.Call();
+            Update_θ_ResultantNodalForce.Call();
         }
 
         private static void OnKineticEnergyPeak_x(KDRSolver solver)
