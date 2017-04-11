@@ -128,17 +128,6 @@ namespace TMarsupilami.CoreLib3
             }
         }
 
-        // EVENT : ReactionBendingMomentUpdating
-        public event Action<MVector[], double[], double[], double[], double[]> ReactionBendingMomentUpdating;
-        protected virtual void OnReactionBendingMomentUpdating(MVector[] Mr, double[] M1_h_l, double[] M2_h_l, double[] M1_h_r, double[] M2_h_r)
-        {
-            Action<MVector[], double[], double[], double[], double[]> handler = ReactionBendingMomentUpdating;
-            if (handler != null)
-            {
-                handler(Mr, M1_h_l, M2_h_l, M1_h_r, M2_h_r);
-            }
-        }
-
         // EVENT : ReactionTwistingMomentUpdating
         public event Action<MVector[], MVector[]> ReactionMomentUpdating;
         protected virtual void OnReactionMomentUpdating(MVector[] Mr, MVector[] Rθ)

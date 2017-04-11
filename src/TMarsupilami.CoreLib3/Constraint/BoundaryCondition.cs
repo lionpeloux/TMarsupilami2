@@ -136,8 +136,8 @@ namespace TMarsupilami.CoreLib3
                     // bending moment due to the clamped boundary
                     κ1 = κb * Beam.ActualConfiguration[Beam.Nv - 1].XAxis;
                     κ2 = κb * Beam.ActualConfiguration[Beam.Nv - 1].YAxis;
-                    M1 = κ1 * Beam.EI1[Beam.Ne - 1];
-                    M2 = κ2 * Beam.EI2[Beam.Ne - 1];
+                    M1 = κ1 * Beam.EI1[Beam.Nvg - 1];
+                    M2 = κ2 * Beam.EI2[Beam.Nvg - 1];
 
                     Beam.Mr_m[Beam.Nvh - 1].X = -M1;
                     Beam.Mr_m[Beam.Nvh - 1].Y = -M2;
