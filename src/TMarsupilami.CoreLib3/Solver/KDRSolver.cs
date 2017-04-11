@@ -294,6 +294,8 @@ namespace TMarsupilami.CoreLib3
 
             Init();
 
+            Reset_x();
+            Reset_θ();
         }
 
         // INIT
@@ -307,12 +309,6 @@ namespace TMarsupilami.CoreLib3
             // apply applied displacements
             // get boundary references (after applied displacements)
             Init_all.Call();
-
-            // update config
-            UpdateDeformedConfig_x();
-
-            Reset_x();
-            Reset_θ();
         }
 
         // RUN
@@ -349,7 +345,7 @@ namespace TMarsupilami.CoreLib3
         // TRANSLATION
         private void Reset_x()
         {
-            // COMPUTE INTERNAL FORCE AND MOMENT
+            // UPDATE RESULTANT NODAL FORCE AND MOMENT
             UpdateDeformedConfig_x();
 
             // LUMPED MASS
@@ -369,6 +365,7 @@ namespace TMarsupilami.CoreLib3
                     var a = (1 / lm_x[ei][nj]) * R_x[ei][nj];
                     a_x[ei][nj] = a;
                     v_x[ei][nj] = (0.5 * dt) * a;
+                    //v_x[ei][nj] = (0.5 * dt / lm_x[ei][nj]) * R_x[ei][nj];
                 }
             }
 
@@ -383,7 +380,7 @@ namespace TMarsupilami.CoreLib3
             Move_x(dt);
             CurrentIteration_x++;
 
-            // COMPUTE INTERNAL FORCE AND MOMENT
+            // UPDATE RESULTANT NODAL FORCE AND MOMENT
             UpdateDeformedConfig_x();
 
             // VELOCITY
@@ -394,7 +391,6 @@ namespace TMarsupilami.CoreLib3
                     var a = (1/ lm_x[ei][nj]) * R_x[ei][nj];
                     a_x[ei][nj] = a;
                     v_x[ei][nj] += dt * a;
-                    //v_x[ei][nj] += (dt / lm_x[ei][nj]) * R_x[ei][nj];
                 }
             }
 
@@ -409,8 +405,9 @@ namespace TMarsupilami.CoreLib3
             }
             else // KINETIC PIC REACHED
             {
-                // INTERPOLATION & BACKWARD POSITION
+                // INTERPOLATION & POSITION
                 InterpolateEc_x(Ec_x_0, Ec_x_1, Ec_x);
+
                 NumberOfKineticPeaks_x++;
                 OnEnergyPeak_x(this);
 
@@ -463,7 +460,7 @@ namespace TMarsupilami.CoreLib3
         // ROTATION (QUASISTATIC)
         private void Reset_θ()
         {
-            // COMPUTE INTERNAL FORCE AND MOMENT
+            // UPDATE RESULTANT NODAL FORCE AND MOMENT
             UpdateDeformedConfig_θ();
 
             // LUMPED MASS
@@ -498,7 +495,7 @@ namespace TMarsupilami.CoreLib3
             Move_θ(dt);
             CurrentIteration_θ++;
 
-            // COMPUTE INTERNAL FORCE AND MOMENT
+            // UPDATE RESULTANT NODAL FORCE AND MOMENT
             UpdateDeformedConfig_θ();
 
             // VELOCITY
@@ -570,7 +567,7 @@ namespace TMarsupilami.CoreLib3
                 }
             }
 
-            // COMPUTE BACKWARD POSITION
+            // COMPUTE BACKWARD DISPLACEMENT
             Move_θ(-q * dt);
         }
 
@@ -623,6 +620,10 @@ namespace TMarsupilami.CoreLib3
             // update resulting internal nodal force and internal nodal moment
             Update_θ_InternalNodalMoment.Call();
             Update_θ_InternalNodalForce.Call();
+
+            // enforce nodal force and moment contraints
+            foreach (var cst in constraints_x) { cst.Enforce_Qr(); }
+            foreach (var cst in constraints_x) { cst.Enforce_Fr(); }
 
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
             Update_θ_ResultantNodalMoment.Call();
