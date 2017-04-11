@@ -242,7 +242,7 @@ namespace TMarsupilami.Gh.Component
             beam.Load(loads);
 
             //solver = new KDRSolver2(elements, bc_list, iteration_max, Ec_x_lim, Ec_θ_lim);
-            solver = new KDRSolver(elements, bc_list,  iteration_max, Ec_x_lim, Ec_θ_lim);
+            solver = new KDRSolver(elements, bc_list, new List<Link>(), iteration_max,  Ec_x_lim, Ec_θ_lim);
             solver.OnEnergyPeak_x += OnKineticEnergyPeak_x;
             solver.OnConvergence += OnConvergence;
             solver.OnNotConvergence += OnNotConvergence;

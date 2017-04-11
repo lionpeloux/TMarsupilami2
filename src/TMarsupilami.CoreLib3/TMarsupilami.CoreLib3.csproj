@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constraint\BoundaryCondition.cs" />
+    <Compile Include="Constraint\Link.cs" />
     <Compile Include="Element\Beam_4D0F_D\BeamLoadManager.cs" />
     <Compile Include="Element\Beam_4D0F_D\Beam_4DOF_D.cs" />
     <Compile Include="Element\Element.cs" />

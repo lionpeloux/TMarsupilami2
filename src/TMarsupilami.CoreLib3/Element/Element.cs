@@ -174,8 +174,8 @@ namespace TMarsupilami.CoreLib3
         public MFrame[] mframes;
 
         // LUMPED MASS
-        protected double[] lm_x;
-        protected double[] lm_θ;
+        public double[] lm_x;
+        public double[] lm_θ;
 
         // LUMPED DAMPING FACTOR
         protected double[] ld_x;
@@ -265,6 +265,25 @@ namespace TMarsupilami.CoreLib3
                 return false;
             }
             return true;
+        }
+
+        public MVector ToMaterialCoordinateSystem(MVector valueInGCS, int vertexIndex)
+        {
+            return ToLocalCoordinateSystem(valueInGCS, mframes[vertexIndex]);
+        }
+
+        private static MVector ToGlobalCoordinateSystem(MVector valueInLCS, MFrame localFrameInGCS)
+        {
+            return valueInLCS.X * localFrameInGCS.XAxis
+                    + valueInLCS.Y * localFrameInGCS.YAxis
+                    + valueInLCS.Z * localFrameInGCS.ZAxis;
+        }
+        private static MVector ToLocalCoordinateSystem(MVector valueInGCS, MFrame localFrameInGCS)
+        {
+            return new MVector(valueInGCS * localFrameInGCS.XAxis,
+                                valueInGCS * localFrameInGCS.YAxis,
+                                valueInGCS * localFrameInGCS.ZAxis
+                              );
         }
 
         #region POINTERS

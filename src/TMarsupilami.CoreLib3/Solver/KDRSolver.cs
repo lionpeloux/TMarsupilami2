@@ -109,9 +109,10 @@ namespace TMarsupilami.CoreLib3
 
         public Beam[] elements_x, elements_θ;
         private BoundaryCondition[] constraints_x;
+        public Link[] links_x, links_θ;
 
         // BUILD
-        public KDRSolver(IEnumerable<Beam> elements, IEnumerable<BoundaryCondition> constraints, int maxIteration = 1000, double Ec_x_lim = 1e-12, double Ec_θ_lim = 1e-10)
+        public KDRSolver(IEnumerable<Beam> elements, IEnumerable<BoundaryCondition> constraints, IEnumerable<Link> links, int maxIteration = 1000, double Ec_x_lim = 1e-12, double Ec_θ_lim = 1e-10)
         {
             MaxIteration = maxIteration;
             this.Ec_x_lim = Ec_x_lim;
@@ -161,10 +162,10 @@ namespace TMarsupilami.CoreLib3
             Enforce_θ_Mr = new Cluster(ParallelOptions, IsParallelModeEnabled);
             Enforce_θ_Qr = new Cluster(ParallelOptions, IsParallelModeEnabled);
 
-            Build(elements, constraints);
+            Build(elements, constraints, links);
             SolverSetup();
         }
-        private void Build(IEnumerable<Beam> elements, IEnumerable<BoundaryCondition> constraints)
+        private void Build(IEnumerable<Beam> elements, IEnumerable<BoundaryCondition> constraints, IEnumerable<Link> links)
         {
             // ELEMENTS
             var elements_x = new List<Beam>();
@@ -228,6 +229,25 @@ namespace TMarsupilami.CoreLib3
             }
 
             this.constraints_x = constraints_x.ToArray();
+
+
+            // LINKS
+            var links_x = new List<Link>();
+            var links_θ = new List<Link>();
+            foreach (var link in links)
+            {
+                links_x.Add(link);
+                Init_all.Subscribe(link.Init);
+
+                if (link.IsTorsionCapable)
+                {
+                    links_θ.Add(link);
+                }                
+            }
+
+            this.links_x = links_x.ToArray();
+            this.links_θ = links_θ.ToArray();
+
         }
         private void SolverSetup()
         {
@@ -337,6 +357,9 @@ namespace TMarsupilami.CoreLib3
             {
                 elements_x[ei].Update_lm_x(ref lm_x[ei]);
             }
+
+            // TRANSFER MX
+            foreach (var lk in links_x) { lk.Transfer_Mx(); } // calcul des projections à partir des positions actuelles 
 
             // VELOCITY
             for (int ei = 0; ei < nx; ei++)
@@ -467,6 +490,9 @@ namespace TMarsupilami.CoreLib3
                 elements_θ[ei].Update_lm_θ(ref lm_θ[ei]);
             }
 
+            // TRANSFER MX
+            foreach (var lk in links_θ) { lk.Transfer_Mθ(); } // calcul des projections à partir des positions actuelles 
+
             // VELOCITY
             for (int ei = 0; ei < nθ; ei++)
             {
@@ -574,21 +600,21 @@ namespace TMarsupilami.CoreLib3
         }
 
         // ELEMENTS : UPDATE CONFIG WITH CONSTRAINTS
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateDeformedConfig_x()
         {
             // update centerline properties (e,l,ll,t)
             OnCenterlinePropertiesChanging();
             //Update_x_CenterlineProperties.Call();
 
-            // enforce tangent constraints (t, κb)
-            foreach (var cst in constraints_x) { cst.Enforce_Mr(); }
-
             // update curvature binormal (κb)
             Update_x_CurvatureBinormal.Call();
 
             // update material frames
             Update_x_MaterialFrame.Call();
+
+            // Now Geometry is Locked
+            foreach (var lk in links_x) { lk.Update_x(); } // calcul des projections à partir des positions actuelles 
+            foreach (var lk in links_x) { lk.Transfer_Rx(); } // calcul des projections à partir des positions actuelles 
 
             // update internal bending and twisting moments
             Update_x_BendingMoment.Call();
@@ -600,16 +626,14 @@ namespace TMarsupilami.CoreLib3
 
             // update resulting internal nodal force and internal nodal moment
             Update_x_InternalNodalMoment.Call();
-            Update_x_InternalNodalForce.Call();
-
-            // enforce nodal force and moment contraints
-            foreach (var cst in constraints_x) { cst.Enforce_Qr(); }
-            foreach (var cst in constraints_x) { cst.Enforce_Fr(); }
+            Update_x_InternalNodalForce.Call();           
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateDeformedConfig_θ()
         {
+            // Now Geometry is Locked
+            foreach (var lk in links_θ) { lk.Update_θ(); }
+            foreach (var lk in links_x) { lk.Transfer_Rθ(); }
+            
             // update internal bending and twisting moments
             Update_θ_BendingMoment.Call();
             Update_θ_TwistingMoment.Call();
