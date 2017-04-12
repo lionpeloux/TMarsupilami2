@@ -364,7 +364,7 @@ namespace TMarsupilami.CoreLib3
             }
         }
 
-        public override void Move(MVector[] dx)
+        public override void Move_x(MVector[] dx)
         {
             // x = x + dx
             for (int i = 0; i < nv; i++)
@@ -373,12 +373,12 @@ namespace TMarsupilami.CoreLib3
             }
             OnFramesTranslated(dx);
         }
-        public override void Move(double[] dθ)
+        public override void Move_θ(MVector[] dθ)
         {
             // θ = θ + dθ
             for (int i = 0; i < nv; i++)
             {
-                mframes[i].ZRotate(dθ[i]);
+                mframes[i].ZRotate(dθ[i].Z);
             }
             OnFramesRotated(dθ);
         }

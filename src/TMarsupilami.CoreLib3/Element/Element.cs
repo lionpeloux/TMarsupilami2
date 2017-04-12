@@ -107,10 +107,10 @@ namespace TMarsupilami.CoreLib3
         }
 
         // EVENT : FramesRotated
-        public event Action<double[]> FramesRotated;
-        protected virtual void OnFramesRotated(double[] dθ)
+        public event Action<MVector[]> FramesRotated;
+        protected virtual void OnFramesRotated(MVector[] dθ)
         {
-            Action<double[]> handler = FramesRotated;
+            Action<MVector[]> handler = FramesRotated;
             if (handler != null)
             {
                 handler(dθ);
@@ -271,6 +271,11 @@ namespace TMarsupilami.CoreLib3
         {
             return ToLocalCoordinateSystem(valueInGCS, mframes[vertexIndex]);
         }
+        public MVector ToGlobalCoordinateSystem(MVector valueInLCS, int vertexIndex)
+        {
+            return ToGlobalCoordinateSystem(valueInLCS, mframes[vertexIndex]);
+        }
+
 
         private static MVector ToGlobalCoordinateSystem(MVector valueInLCS, MFrame localFrameInGCS)
         {
@@ -331,8 +336,8 @@ namespace TMarsupilami.CoreLib3
             loadManager.Fill(loads);
         }
 
-        public abstract void Move(MVector[] dx);
-        public abstract void Move(double[] dθ);
+        public abstract void Move_x(MVector[] dx);
+        public abstract void Move_θ(MVector[] dθ);
 
         public abstract void UpdateCenterlineProperties();
         public abstract void UpdateCurvatureBinormal();

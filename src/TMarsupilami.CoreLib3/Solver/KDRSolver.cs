@@ -98,7 +98,7 @@ namespace TMarsupilami.CoreLib3
 
         // STEP MOVE
         private MVector[][] dx;
-        private double[][] dθ;
+        private MVector[][] dθ;
 
         // ALIAS
         private MVector[][] R_x;
@@ -275,7 +275,7 @@ namespace TMarsupilami.CoreLib3
             R_θ = new MVector[nθ][];           
             v_θ = new MVector[nθ][];
             a_θ = new MVector[nθ][];
-            dθ = new double[nθ][];
+            dθ = new MVector[nθ][];
 
             for (int i = 0; i < nθ; i++)
             {
@@ -285,7 +285,7 @@ namespace TMarsupilami.CoreLib3
                 R_θ[i] = el.Rθ;
                 v_θ[i] = el.Vθ;
                 a_θ[i] = el.Aθ;
-                dθ[i] = new double[n];
+                dθ[i] = new MVector[n];
             }
 
             // Default action on Peak
@@ -353,6 +353,10 @@ namespace TMarsupilami.CoreLib3
             {
                 elements_x[ei].Update_lm_x(ref lm_x[ei]);
             }
+            //for (int ei = 0; ei < nθ; ei++)
+            //{
+            //    elements_θ[ei].Update_lm_θ(ref lm_θ[ei]);
+            //}
 
             // TRANSFER MX
             foreach (var lk in links_x) { lk.Transfer_Mx(); } // calcul des projections à partir des positions actuelles 
@@ -423,7 +427,7 @@ namespace TMarsupilami.CoreLib3
                 {
                     dx[ei][vj] = dt * v_x[ei][vj];
                 }
-                elements_x[ei].Move(dx[ei]);
+                elements_x[ei].Move_x(dx[ei]);
             }
         }
         private void ComputeEc_x()
@@ -535,9 +539,9 @@ namespace TMarsupilami.CoreLib3
             {
                 for (int vj = 0; vj < elements_θ[ei].Nv; vj++)
                 {
-                    dθ[ei][vj] = dt * v_θ[ei][vj].Z;
+                    dθ[ei][vj] = dt * v_θ[ei][vj];
                 }
-                elements_θ[ei].Move(dθ[ei]);
+                elements_θ[ei].Move_θ(dθ[ei]);
             }
         }
         private void ComputeEc_θ()

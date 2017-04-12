@@ -12,17 +12,17 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_DisplayForce : GH_Component
+    public class Comp_DisplayCForce : GH_Component
     {
 
-        private List<GH_MForce> ghForces;
+        private List<GH_MCForce> ghForces;
         private bool isProjected, isGlobal;
         private double scale;
         private bool isNull;
 
-        public Comp_DisplayForce()
-          : base("Force Display", "FDis",
-              "Preview a force in the viewport.",
+        public Comp_DisplayCForce()
+          : base("Concentrated Force Display", "F Disp",
+              "Preview a concentrated force in the viewport.",
               "TMarsupilami", "Display")
         {
         }
@@ -48,7 +48,7 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddParameter(new Param_MForce(), "Force", "F", "Force to preview.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCForce(), "Concentrated Force", "F", "Concentrated force to preview.", GH_ParamAccess.list);
             pManager.AddBooleanParameter("Project", "P", "Draw as a single vector (False) or draw each component in the appropriate coordinate system (True).", GH_ParamAccess.item, false);
             pManager.AddBooleanParameter("Coordinate System", "CS", "The coordinate system to draw the force components ; either Global (True) or Local (False).", GH_ParamAccess.item, true);
             pManager.AddNumberParameter("Scale", "S", "Scale factor.", GH_ParamAccess.item, 1);
@@ -66,7 +66,7 @@ namespace TMarsupilami.Gh.Component
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            ghForces = new List<GH_MForce>();
+            ghForces = new List<GH_MCForce>();
             isProjected = false;
             isGlobal = true;
             scale = 1;
@@ -83,34 +83,30 @@ namespace TMarsupilami.Gh.Component
         {
             if (!isNull)
             {
-                Color color = Attributes.GetTopLevel.Selected ? args.WireColour_Selected : Color.Cyan;
-                double arrowSize = 0.15;
-                int lineWidth = 2;
+                Color color = Attributes.GetTopLevel.Selected ? args.WireColour_Selected : Settings.Default.CForceColor;
 
                 foreach (var ghForce in ghForces)
                 {
+                    var force = ghForce.Value;
+                    var applicationPoint = force.LocalFrame.Origin;
+
                     if (!isProjected)
                     {
-                        ghForce.DrawForce(ghForce.Value.ValueInGCS, args.Display, color, scale, arrowSize, lineWidth);
+                        var F = force.Value;
+                        Draw.DrawConcentratedForce(applicationPoint, F, args.Display, color, scale, true);
+                        //ghForce.DrawForce(force.LocalFrame.Origin, args.Display, color, scale, arrowSize, lineWidth);
                     }
                     else
                     {
-                        if (isGlobal)
-                        {
-                            var components = ghForce.Value.GetGlobalComponents();
+                        MVector F1, F2, F3;
+                        ghForce.Value.GetComponents(out F1, out F2, out F3, isGlobal);
+                        Draw.DrawConcentratedForce(applicationPoint, F1, args.Display, color, scale, true);
+                        Draw.DrawConcentratedForce(applicationPoint, F2, args.Display, color, scale, true);
+                        Draw.DrawConcentratedForce(applicationPoint, F3, args.Display, color, scale, true);
 
-                            ghForce.DrawForce(components.Item1, args.Display, color, scale, arrowSize, lineWidth);
-                            ghForce.DrawForce(components.Item2, args.Display, color, scale, arrowSize, lineWidth);
-                            ghForce.DrawForce(components.Item3, args.Display, color, scale, arrowSize, lineWidth);
-                        }
-                        else
-                        {
-                            var components = ghForce.Value.GetLocalComponents();
-
-                            ghForce.DrawForce(components.Item1, args.Display, color, scale, arrowSize, lineWidth);
-                            ghForce.DrawForce(components.Item2, args.Display, color, scale, arrowSize, lineWidth);
-                            ghForce.DrawForce(components.Item3, args.Display, color, scale, arrowSize, lineWidth);
-                        }
+                        //ghForce.DrawForce(F1, args.Display, color, scale, arrowSize, lineWidth);
+                        //ghForce.DrawForce(F2, args.Display, color, scale, arrowSize, lineWidth);
+                        //ghForce.DrawForce(F3, args.Display, color, scale, arrowSize, lineWidth);
                     }
                 }
             }

@@ -102,7 +102,7 @@ namespace TMarsupilami.CoreLib3
         }
 
         // dans l'hypothèse ou Fext_m est actif, il faut faire un update des efforts du repère materiel vers le repère global
-        public void Update_ptr_Fext(double[] dθ)
+        public void Update_ptr_Fext(MVector[] dθ)
         {
             for (int i = 0; i < ptr_Fext_g.Length; i++)
             {
@@ -119,7 +119,7 @@ namespace TMarsupilami.CoreLib3
         }
 
         // dans l'hypothèse ou Mext_g est actif, il faut faire un update des efforts du repère global vers le repère materiel
-        public void Update_ptr_Mext(double[] dθ)
+        public void Update_ptr_Mext(MVector[] dθ)
         {
             for (int i = 0; i < ptr_Mext_m.Length; i++)
             {

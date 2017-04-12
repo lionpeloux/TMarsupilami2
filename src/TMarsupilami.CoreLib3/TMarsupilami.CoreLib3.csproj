@@ -46,14 +46,17 @@
     <Compile Include="Element\Beam_4D0F_D\BeamLoadManager.cs" />
     <Compile Include="Element\Beam_4D0F_D\Beam_4DOF_D.cs" />
     <Compile Include="Element\Element.cs" />
-    <Compile Include="Force.cs" />
+    <Compile Include="Torsor\DForce.cs" />
+    <Compile Include="Torsor\CMoment.cs" />
+    <Compile Include="Torsor\CForce.cs" />
+    <Compile Include="Torsor\ForceTorsor.cs" />
     <Compile Include="Solver\KDRSolver.cs" />
     <Compile Include="Load\AppliedDisplacement.cs" />
     <Compile Include="Load\BeamLoad.cs" />
     <Compile Include="Load\Load.cs" />
-    <Compile Include="Material.cs" />
+    <Compile Include="Material\Material.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Section.cs" />
+    <Compile Include="Section\Section.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TMarsupilami.Event\TMarsupilami.Event.csproj">

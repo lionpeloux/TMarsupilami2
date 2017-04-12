@@ -14,14 +14,14 @@ using TMarsupilami.Gh.Properties;
 
 namespace TMarsupilami.Gh.Parameter
 {
-    public class Param_MForce : GH_Param<GH_MForce>
+    public class Param_MCForce : GH_Param<GH_MCForce>
     {
 
         // Fields
         private bool m_hidden;
 
-        public Param_MForce()
-          : base("Force", "MForce", "Contains a collection of forces.", "TMarsupilami", "Params", GH_ParamAccess.item)
+        public Param_MCForce()
+          : base("Concentrated Force", "CForce", "Contains a collection of concentrated forces.", "TMarsupilami", "Params", GH_ParamAccess.item)
         {
             this.m_hidden = false;
         }
@@ -38,7 +38,7 @@ namespace TMarsupilami.Gh.Parameter
         {
             get
             {
-                return Resources.MVector;
+                return Resources.CForce;
             }
         }
         public override string ToString()

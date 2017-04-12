@@ -91,8 +91,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Component\CoreLib\Comp_DisplayBeam.cs" />
-    <Compile Include="Component\CoreLib\Comp_DisplayForce.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayDForce.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayCMoment.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayCForce.cs" />
     <Compile Include="Component\MathLib\Arithmetic\Comp_ReNormalizeVector.cs" />
     <Compile Include="Component\MathLib\Arithmetic\Comp_NormalizeVector.cs" />
     <Compile Include="Component\MathLib\Centerline\Comp_InterpolateFrames.cs" />
@@ -122,8 +124,11 @@
     <Compile Include="Component\_Model\Test\_Comp_CoreLib3_Beam4D_SKDR_Link.cs" />
     <Compile Include="Component\_Model\Test\_Comp_CoreLib3_Beam4D_SKDR.cs" />
     <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D_SKDR1.cs" />
+    <Compile Include="Draw.cs" />
     <Compile Include="Parameter\Param_MBeam.cs" />
-    <Compile Include="Parameter\Param_MForce.cs" />
+    <Compile Include="Parameter\Param_MDForce.cs" />
+    <Compile Include="Parameter\Param_MCMoment.cs" />
+    <Compile Include="Parameter\Param_MCForce.cs" />
     <Compile Include="Parameter\Param_MFrame.cs" />
     <Compile Include="Parameter\Param_MVector.cs" />
     <Compile Include="Parameter\Param_MPoint.cs" />
@@ -141,8 +146,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Type\Convert.cs" />
     <Compile Include="Type\GH_MBeam.cs" />
+    <Compile Include="Type\GH_MDForce.cs" />
+    <Compile Include="Type\GH_MCMoment.cs" />
     <Compile Include="Type\GH_MFrame.cs" />
-    <Compile Include="Type\GH_MForce.cs" />
+    <Compile Include="Type\GH_MCForce.cs" />
     <Compile Include="Type\GH_MVector.cs" />
     <Compile Include="Type\GH_MPoint.cs" />
   </ItemGroup>
@@ -237,6 +244,18 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Component\_Test\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CForce.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CMoment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DForce.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DMoment.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

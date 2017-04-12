@@ -25,46 +25,91 @@ namespace TMarsupilami.Gh {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("128, 128, 255")]
-        public global::System.Drawing.Color ColorBlue {
+        [global::System.Configuration.DefaultSettingValueAttribute("0.15")]
+        public double CVectorArrowHeadSize {
             get {
-                return ((global::System.Drawing.Color)(this["ColorBlue"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double LineWidth_1 {
-            get {
-                return ((double)(this["LineWidth_1"]));
+                return ((double)(this["CVectorArrowHeadSize"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public double LineWidth_2 {
+        public int CVectorLineThickness {
             get {
-                return ((double)(this["LineWidth_2"]));
+                return ((int)(this["CVectorLineThickness"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Black")]
-        public global::System.Drawing.Color ColorBlack {
+        [global::System.Configuration.DefaultSettingValueAttribute("0.8")]
+        public double DVectorArrowHeadSize {
             get {
-                return ((global::System.Drawing.Color)(this["ColorBlack"]));
+                return ((double)(this["DVectorArrowHeadSize"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int DVectorLineThickness {
+            get {
+                return ((int)(this["DVectorLineThickness"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Aqua")]
+        public global::System.Drawing.Color CForceColor {
+            get {
+                return ((global::System.Drawing.Color)(this["CForceColor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Fuchsia")]
+        public global::System.Drawing.Color CMomentColor {
+            get {
+                return ((global::System.Drawing.Color)(this["CMomentColor"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Red")]
-        public global::System.Drawing.Color ColorRed {
+        public global::System.Drawing.Color XAxisColor {
             get {
-                return ((global::System.Drawing.Color)(this["ColorRed"]));
+                return ((global::System.Drawing.Color)(this["XAxisColor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Lime")]
+        public global::System.Drawing.Color YAxisColor {
+            get {
+                return ((global::System.Drawing.Color)(this["YAxisColor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Blue")]
+        public global::System.Drawing.Color ZAxisColor {
+            get {
+                return ((global::System.Drawing.Color)(this["ZAxisColor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.9")]
+        public double DoubleArrowMarkerPositionRatio {
+            get {
+                return ((double)(this["DoubleArrowMarkerPositionRatio"]));
             }
         }
     }

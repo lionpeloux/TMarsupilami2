@@ -63,6 +63,16 @@ namespace TMarsupilami.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CForce {
+            get {
+                object obj = ResourceManager.GetObject("CForce", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CircumscribedCircleCurrent {
             get {
                 object obj = ResourceManager.GetObject("CircumscribedCircleCurrent", resourceCulture);
@@ -103,9 +113,39 @@ namespace TMarsupilami.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CMoment {
+            get {
+                object obj = ResourceManager.GetObject("CMoment", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DForce {
+            get {
+                object obj = ResourceManager.GetObject("DForce", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap DisplayPlane {
             get {
                 object obj = ResourceManager.GetObject("DisplayPlane", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DMoment {
+            get {
+                object obj = ResourceManager.GetObject("DMoment", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

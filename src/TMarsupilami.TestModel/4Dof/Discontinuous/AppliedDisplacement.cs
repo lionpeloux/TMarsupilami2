@@ -131,13 +131,13 @@ namespace TMarsupilami.TestModel.Dof4.Discontinuous
             switch (axis)
             {
                 case MaterialAxis.d1:
-                    mframe_apd.Rotate(angle, mframe_apd.XAxis);
+                    mframe_apd = Rotation.Rotate(mframe_apd, angle, mframe_apd.XAxis);
                     break;
                 case MaterialAxis.d2:
-                    mframe_apd.Rotate(angle, mframe_apd.YAxis);
+                    mframe_apd = Rotation.Rotate(mframe_apd, angle, mframe_apd.YAxis);
                     break;
                 case MaterialAxis.t:
-                    mframe_apd.Rotate(angle, mframe_apd.ZAxis);
+                    mframe_apd = Rotation.Rotate(mframe_apd, angle, mframe_apd.ZAxis);
                     break;
             }
 
@@ -151,13 +151,13 @@ namespace TMarsupilami.TestModel.Dof4.Discontinuous
             switch (axis)
             {
                 case GlobalAxis.x:
-                    mframe_apd.Rotate(angle, MVector.XAxis);
+                    mframe_apd = Rotation.Rotate(mframe_apd, angle, MVector.XAxis);
                     break;
                 case GlobalAxis.y:
-                    mframe_apd.Rotate(angle, MVector.YAxis);
+                    mframe_apd = Rotation.Rotate(mframe_apd, angle, MVector.YAxis);
                     break;
                 case GlobalAxis.z:
-                    mframe_apd.Rotate(angle, MVector.ZAxis);
+                    mframe_apd = Rotation.Rotate(mframe_apd, angle, MVector.ZAxis);
                     break;
             }
 

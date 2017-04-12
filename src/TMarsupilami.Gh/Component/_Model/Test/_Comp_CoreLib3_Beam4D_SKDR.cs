@@ -192,16 +192,14 @@ namespace TMarsupilami.Gh.Component
                 
 
                 case (int)BoundaryConditionType.Free:
-                    var Fext = 1 * new MVector(0, 0, -1e5);
-                    var Mext = new MVector(1e5, 1e5, 0);
 
                     // force verticale
-                    //loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e4), beam.Nvh/2, beam, true));
-                    
+                    loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e4), Boundary.End, beam, true));
+                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 1e4, 0), beam.Nvh/2, beam, false));
                     // force suiveuse
                     //loads.Add(BeamVectorLoad.Create_Fext(new MVector(-1e4, 0, 0), Boundary.End, beam, false));
-                    
-                    //loads.Add(BeamVectorLoad.Create_fext(Fext, Boundary.End, beam, true));
+
+                    loads.Add(BeamVectorLoad.Create_fext(new MVector(0, 0, -1e4), beam.Ne/4, beam, true));
                     //loads.Add(BeamVectorLoad.Create_Mext(Mext, Boundary.End, beam, true));
                     //loads.Add(BeamVectorLoad.Create_mext(-Mext, Boundary.End, beam, true));
 

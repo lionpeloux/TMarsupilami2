@@ -43,9 +43,10 @@ namespace TMarsupilami.Gh.Component
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddParameter(new Param_MFrame(), "Frames", "F", "The material frames of the beam.", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MVector(), "N", "N", "The axial force.", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MForce(), "N", "N", "The axial force.", GH_ParamAccess.list);
-
+            pManager.AddParameter(new Param_MCForce(), "Fext", "Fext", "The applied force.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCMoment(), "Mext", "Mext", "The applied moment.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MDForce(), "fext", "fext", "The applied force.", GH_ParamAccess.list);
+            //pManager.AddParameter(new Param_MDMoment(), "mext", "mext", "The applied moment.", GH_ParamAccess.list);
         }
 
         protected override void BeforeSolveInstance()
@@ -62,16 +63,38 @@ namespace TMarsupilami.Gh.Component
 
             var beam = ghBeam.Value;
 
-            var Fext = new Force[beam.Fext_g.Length];
-
+            var Fext = new CForce[beam.Fext_g.Length];
             for (int i = 0; i < Fext.Length; i++)
             {
-                Fext[i] = new Force(beam.Fext_g[i], beam.ActualConfiguration[2 * i], true);
+                var F = beam.Fext_g[i];
+                Fext[i] = new CForce(F, beam.ActualConfiguration[2 * i]);
             }
 
+            var Mext = new CMoment[beam.Mext_m.Length];
+            for (int i = 0; i < Mext.Length; i++)
+            {
+                var M = beam.ToGlobalCoordinateSystem(beam.Mext_m[i], 2 * i);
+                Mext[i] = new CMoment(M, beam.ActualConfiguration[2 * i]);
+            }
+
+            var fext = new DForce[beam.fext_g.Length];
+            for (int i = 0; i < fext.Length; i++)
+            {
+                var f = beam.fext_g[i];
+                fext[i] = new DForce(f, beam.ActualConfiguration[2*i].Origin, beam.ActualConfiguration[2*i+1].Origin, beam.ActualConfiguration[2 * i]);
+            }
+
+            //var mext = new DMoment[beam.fext_g.Length];
+            //for (int i = 0; i < Fext.Length; i++)
+            //{
+            //    var m = beam.ToGlobalCoordinateSystem(beam.mext_m[i], 2 * i);
+            //    mext[i] = new DMoment(m, beam.ActualConfiguration[2 * i].Origin, beam.ActualConfiguration[2 * i + 1].Origin, beam.ActualConfiguration[2 * i]);
+            //}
+
             DA.SetDataList(0, beam.ActualConfiguration);
-            DA.SetDataList(1, beam.Fext_g);
-            DA.SetDataList(2, Fext);
+            DA.SetDataList(1, Fext);
+            DA.SetDataList(2, Mext);
+            DA.SetDataList(3, fext);
 
         }
 
