@@ -133,32 +133,6 @@ namespace TMarsupilami.Gh.Type
             return false;
         }
 
-        // PREVIEW
-        public void DrawMoment(MVector vector, DisplayPipeline display, Color color, double scale = 1, double arrowSize = 0.15, int lineWidth = 1)
-        {
-            var origin = Value.LocalFrame.Origin.Cast();
-            var moment = vector.Cast();
-            double l = scale * moment.Length;
-            var line_1 = new Line(origin, moment, l);
-            var line_2 = new Line(origin, moment, 0.9*l);
-            double h = l * arrowSize; // arrow head size
-
-            if (l > 1e-3)
-            {
-                if (arrowSize != 0)
-                {
-                    display.DrawLineArrow(line_1, color, lineWidth, h);
-                    display.DrawLineArrow(line_2, color, lineWidth, h);
-                }
-                else
-                {
-                    display.DrawLine(line_1, color, lineWidth);
-                    display.DrawLine(line_2, color, lineWidth);
-                }
-
-                display.Draw2dText(String.Format("{0:E3} Nm", moment.Length), color, line_1.From + 1.2 * line_1.Direction, true);
-            }          
-        }
     }
         #endregion
 }

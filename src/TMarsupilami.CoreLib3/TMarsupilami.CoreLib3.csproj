@@ -46,9 +46,8 @@
     <Compile Include="Element\Beam_4D0F_D\BeamLoadManager.cs" />
     <Compile Include="Element\Beam_4D0F_D\Beam_4DOF_D.cs" />
     <Compile Include="Element\Element.cs" />
-    <Compile Include="Torsor\DForce.cs" />
-    <Compile Include="Torsor\CMoment.cs" />
-    <Compile Include="Torsor\CForce.cs" />
+    <Compile Include="Torsor\DVector.cs" />
+    <Compile Include="Torsor\CVector.cs" />
     <Compile Include="Torsor\ForceTorsor.cs" />
     <Compile Include="Solver\KDRSolver.cs" />
     <Compile Include="Load\AppliedDisplacement.cs" />

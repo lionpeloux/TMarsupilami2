@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         private bool isNull;
 
         public Comp_DisplayCForce()
-          : base("Concentrated Force Display", "F Disp",
+          : base("Force Display - Concentrated (F)", "F Disp",
               "Preview a concentrated force in the viewport.",
               "TMarsupilami", "Display")
         {
@@ -31,14 +31,14 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.primary;
+                return GH_Exposure.secondary;
             }
         }
         protected override System.Drawing.Bitmap Icon
         {
             get
             {
-                return Resources.DisplayPlane;
+                return Resources.DisplayCForce;
             }
         }
         public override Guid ComponentGuid
@@ -83,6 +83,9 @@ namespace TMarsupilami.Gh.Component
         {
             if (!isNull)
             {
+                var minValue = 100;
+                bool pointsToApplicationPoint = false;
+
                 Color color = Attributes.GetTopLevel.Selected ? args.WireColour_Selected : Settings.Default.CForceColor;
 
                 foreach (var ghForce in ghForces)
@@ -93,20 +96,19 @@ namespace TMarsupilami.Gh.Component
                     if (!isProjected)
                     {
                         var F = force.Value;
-                        Draw.DrawConcentratedForce(applicationPoint, F, args.Display, color, scale, true);
-                        //ghForce.DrawForce(force.LocalFrame.Origin, args.Display, color, scale, arrowSize, lineWidth);
+                        if (F.Length() > minValue)
+                            Draw.DrawConcentratedForce(applicationPoint, F, args.Display, color, scale, pointsToApplicationPoint);
                     }
                     else
                     {
                         MVector F1, F2, F3;
                         ghForce.Value.GetComponents(out F1, out F2, out F3, isGlobal);
-                        Draw.DrawConcentratedForce(applicationPoint, F1, args.Display, color, scale, true);
-                        Draw.DrawConcentratedForce(applicationPoint, F2, args.Display, color, scale, true);
-                        Draw.DrawConcentratedForce(applicationPoint, F3, args.Display, color, scale, true);
-
-                        //ghForce.DrawForce(F1, args.Display, color, scale, arrowSize, lineWidth);
-                        //ghForce.DrawForce(F2, args.Display, color, scale, arrowSize, lineWidth);
-                        //ghForce.DrawForce(F3, args.Display, color, scale, arrowSize, lineWidth);
+                        if (F1.Length() > minValue)
+                            Draw.DrawConcentratedForce(applicationPoint, F1, args.Display, color, scale, pointsToApplicationPoint);
+                        if (F2.Length() > minValue)
+                            Draw.DrawConcentratedForce(applicationPoint, F2, args.Display, color, scale, pointsToApplicationPoint);
+                        if (F2.Length() > minValue)
+                            Draw.DrawConcentratedForce(applicationPoint, F3, args.Display, color, scale, pointsToApplicationPoint);
                     }
                 }
             }

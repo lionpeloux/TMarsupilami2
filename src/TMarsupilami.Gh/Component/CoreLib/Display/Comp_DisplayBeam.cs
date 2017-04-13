@@ -46,7 +46,7 @@ namespace TMarsupilami.Gh.Component
             pManager.AddParameter(new Param_MCForce(), "Fext", "Fext", "The applied force.", GH_ParamAccess.list);
             pManager.AddParameter(new Param_MCMoment(), "Mext", "Mext", "The applied moment.", GH_ParamAccess.list);
             pManager.AddParameter(new Param_MDForce(), "fext", "fext", "The applied force.", GH_ParamAccess.list);
-            //pManager.AddParameter(new Param_MDMoment(), "mext", "mext", "The applied moment.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MDMoment(), "mext", "mext", "The applied moment.", GH_ParamAccess.list);
         }
 
         protected override void BeforeSolveInstance()
@@ -81,20 +81,21 @@ namespace TMarsupilami.Gh.Component
             for (int i = 0; i < fext.Length; i++)
             {
                 var f = beam.fext_g[i];
-                fext[i] = new DForce(f, beam.ActualConfiguration[2*i].Origin, beam.ActualConfiguration[2*i+1].Origin, beam.ActualConfiguration[2 * i]);
+                fext[i] = new DForce(f, beam.ActualConfiguration[2 * i].Origin, beam.ActualConfiguration[2 * i + 2].Origin, beam.ActualConfiguration[2 * i]);
             }
 
-            //var mext = new DMoment[beam.fext_g.Length];
-            //for (int i = 0; i < Fext.Length; i++)
-            //{
-            //    var m = beam.ToGlobalCoordinateSystem(beam.mext_m[i], 2 * i);
-            //    mext[i] = new DMoment(m, beam.ActualConfiguration[2 * i].Origin, beam.ActualConfiguration[2 * i + 1].Origin, beam.ActualConfiguration[2 * i]);
-            //}
+            var mext = new DMoment[beam.mext_m.Length];
+            for (int i = 0; i < mext.Length; i++)
+            {
+                var m = beam.ToGlobalCoordinateSystem(beam.mext_m[i], 2 * i);
+                mext[i] = new DMoment(m, beam.ActualConfiguration[2 * i].Origin, beam.ActualConfiguration[2 * i + 2].Origin, beam.ActualConfiguration[2 * i]);
+            }
 
             DA.SetDataList(0, beam.ActualConfiguration);
             DA.SetDataList(1, Fext);
             DA.SetDataList(2, Mext);
             DA.SetDataList(3, fext);
+            DA.SetDataList(4, mext);
 
         }
 

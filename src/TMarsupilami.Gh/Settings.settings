@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="CVectorArrowHeadSize" Type="System.Double" Scope="Application">
-      <Value Profile="(Default)">0.15</Value>
+      <Value Profile="(Default)">0.4</Value>
     </Setting>
     <Setting Name="CVectorLineThickness" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">2</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="DVectorArrowHeadSize" Type="System.Double" Scope="Application">
-      <Value Profile="(Default)">0.8</Value>
+      <Value Profile="(Default)">0.2</Value>
     </Setting>
     <Setting Name="DVectorLineThickness" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">1</Value>
@@ -29,8 +29,23 @@
     <Setting Name="ZAxisColor" Type="System.Drawing.Color" Scope="Application">
       <Value Profile="(Default)">Blue</Value>
     </Setting>
-    <Setting Name="DoubleArrowMarkerPositionRatio" Type="System.Double" Scope="Application">
-      <Value Profile="(Default)">0.9</Value>
+    <Setting Name="DoubleArrowSpacingRatio" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="AxisArrowHeadSize" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">0,2</Value>
+    </Setting>
+    <Setting Name="DMomentColor" Type="System.Drawing.Color" Scope="Application">
+      <Value Profile="(Default)">255, 192, 255</Value>
+    </Setting>
+    <Setting Name="DForceColor" Type="System.Drawing.Color" Scope="Application">
+      <Value Profile="(Default)">192, 255, 255</Value>
+    </Setting>
+    <Setting Name="LabelFontName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Arial</Value>
+    </Setting>
+    <Setting Name="LabelFontHeightInPixel" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">12</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -14,27 +14,33 @@ using TMarsupilami.Gh.Properties;
 
 namespace TMarsupilami.Gh.Parameter
 {
-    public class Param_MBeam : GH_Param<GH_MBeam>
+    public class Param_MDMoment : GH_Param<GH_MDMoment>
     {
 
         // Fields
         private bool m_hidden;
 
-        public Param_MBeam()
-          : base("Beam", "MBeam", "Represent a beam element.", "TMarsupilami", "Params", GH_ParamAccess.item)
+        public Param_MDMoment()
+          : base("Distributed Moment", "DMoment", "Contains a collection of distributed moments.", "TMarsupilami", "Params", GH_ParamAccess.item)
         {
             this.m_hidden = false;
         }
 
         public override Guid ComponentGuid
         {
-            get { return new Guid("{6519BDE8-90A5-4879-81CC-6B0AC71CEC71}"); }
+            get { return new Guid("{C99042DA-2B33-492C-A739-D306C73A4FB6}"); }
         }
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.secondary; }
         }
-
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                return Resources.DMoment;
+            }
+        }
         public override string ToString()
         {
             return this.m_data.ToString();
@@ -57,26 +63,6 @@ namespace TMarsupilami.Gh.Parameter
         public override void ClearData()
         {
             base.ClearData();
-        }
-
-        // IGH_PreviewObject
-        public bool Hidden
-        {
-            get
-            {
-                return this.m_hidden;
-            }
-            set
-            {
-                this.m_hidden = value;
-            }
-        }
-        public bool IsPreviewCapable
-        {
-            get
-            {
-                return false;
-            }
         }
     }
 }

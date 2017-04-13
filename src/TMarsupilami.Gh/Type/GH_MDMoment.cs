@@ -14,7 +14,7 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.Gh.Type
 {
-    public class GH_MDForce : GH_Goo<DForce>
+    public class GH_MDMoment : GH_Goo<DMoment>
     {
         #region FIELDS
 
@@ -22,17 +22,17 @@ namespace TMarsupilami.Gh.Type
 
         public override string TypeDescription { get { return "A Distributed Force."; } }
 
-        public override string TypeName { get { return "MDForce"; } }
+        public override string TypeName { get { return "MDMoment"; } }
 
         #endregion
 
         #region CONSTRUCTOR
-        public GH_MDForce() { }
-        public GH_MDForce(GH_MDForce ghForce)
+        public GH_MDMoment() { }
+        public GH_MDMoment(GH_MDMoment ghForce)
         {
             this.Value = ghForce.Value;
         }
-        public GH_MDForce(DForce force)
+        public GH_MDMoment(DMoment force)
         {
             this.Value = force;
         }
@@ -49,7 +49,7 @@ namespace TMarsupilami.Gh.Type
         }
         public override IGH_Goo Duplicate()
         {
-            return new GH_MDForce(this);
+            return new GH_MDMoment(this);
         }
         
         public override bool CastFrom(object source)
@@ -58,15 +58,15 @@ namespace TMarsupilami.Gh.Type
 
             var type = source.GetType();
 
-            if (type == typeof(DForce))
+            if (type == typeof(DMoment))
             {
-                this.Value = (DForce)source;
+                this.Value = (DMoment)source;
                 return true;
             }
 
-            if (type == typeof(GH_MDForce))
+            if (type == typeof(GH_MDMoment))
             {
-                this.Value = ((GH_MDForce)source).Value;
+                this.Value = ((GH_MDMoment)source).Value;
                 return true;
             }
 

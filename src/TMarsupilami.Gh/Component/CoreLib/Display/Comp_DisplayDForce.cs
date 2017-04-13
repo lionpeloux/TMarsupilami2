@@ -21,7 +21,7 @@ namespace TMarsupilami.Gh.Component
         private bool isNull;
 
         public Comp_DisplayDForce()
-          : base("Distributed Force Display", "f Disp",
+          : base("Force Display - Distributed (f)", "f Disp",
               "Preview a distributed force in the viewport.",
               "TMarsupilami", "Display")
         {
@@ -31,14 +31,14 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.primary;
+                return GH_Exposure.secondary;
             }
         }
         protected override System.Drawing.Bitmap Icon
         {
             get
             {
-                return Resources.DisplayPlane;
+                return Resources.DisplayDForce;
             }
         }
         public override Guid ComponentGuid
@@ -83,27 +83,37 @@ namespace TMarsupilami.Gh.Component
         {
             if (!isNull)
             {
-                Color color = Attributes.GetTopLevel.Selected ? args.WireColour_Selected : Color.Cyan;
-                double arrowSize = 0.15;
-                int lineWidth = 2;
+                var minValue = 100;
+                bool pointsToApplicationPoint = false;
+                int refineCount = 4;
+
+                    Color color = Attributes.GetTopLevel.Selected ? args.WireColour_Selected : Settings.Default.DForceColor;
 
                 foreach (var ghForce in ghForces)
                 {
+                    var force = ghForce.Value;
+                    var applicationPoint = force.LocalFrame.Origin;
+
                     if (!isProjected)
                     {
-                        ghForce.Draw(ghForce.Value.Value, args.Display, color, scale, arrowSize, lineWidth);
+                        var f = force.Value;
+                        if (f.Length() > minValue)
+                            Draw.DrawDistributedForce(force.StartPoint, force.EndPoint,f, args.Display, color, scale, pointsToApplicationPoint, refineCount);
                     }
                     else
                     {
-                        MVector F1, F2, F3;
-                        ghForce.Value.GetComponents(out F1, out F2, out F3, isGlobal);
-                        ghForce.Draw(F1, args.Display, color, scale, arrowSize, lineWidth);
-                        ghForce.Draw(F2, args.Display, color, scale, arrowSize, lineWidth);
+                        MVector f1, f2, f3;
+                        force.GetComponents(out f1, out f2, out f3, isGlobal);
 
-                        if (isGlobal)
-                            ghForce.Draw(F3, args.Display, color, scale, arrowSize, lineWidth);
-                        else
-                            ghForce.DrawEdgeComponent(F3, args.Display, color, scale, arrowSize, lineWidth);
+                        if (f1.Length() > minValue)
+                            Draw.DrawDistributedForce(force.StartPoint, force.EndPoint, f1, args.Display, color, scale, pointsToApplicationPoint, refineCount);
+                        if (f2.Length() > minValue)
+                            Draw.DrawDistributedForce(force.StartPoint, force.EndPoint, f2, args.Display, color, scale, pointsToApplicationPoint, refineCount);
+                        if (f3.Length() > minValue)
+                        {
+                            MVector perpDir = force.LocalFrame.XAxis + force.LocalFrame.YAxis;
+                            Draw.DrawAxialDistributedForce(force.StartPoint, force.EndPoint, f3, perpDir, args.Display, color, scale, pointsToApplicationPoint, refineCount);
+                        }
                     }
                 }
             }

@@ -25,7 +25,7 @@ namespace TMarsupilami.Gh {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.15")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.4")]
         public double CVectorArrowHeadSize {
             get {
                 return ((double)(this["CVectorArrowHeadSize"]));
@@ -34,7 +34,7 @@ namespace TMarsupilami.Gh {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int CVectorLineThickness {
             get {
                 return ((int)(this["CVectorLineThickness"]));
@@ -43,7 +43,7 @@ namespace TMarsupilami.Gh {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.2")]
         public double DVectorArrowHeadSize {
             get {
                 return ((double)(this["DVectorArrowHeadSize"]));
@@ -106,10 +106,55 @@ namespace TMarsupilami.Gh {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.9")]
-        public double DoubleArrowMarkerPositionRatio {
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double DoubleArrowSpacingRatio {
             get {
-                return ((double)(this["DoubleArrowMarkerPositionRatio"]));
+                return ((double)(this["DoubleArrowSpacingRatio"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,2")]
+        public string AxisArrowHeadSize {
+            get {
+                return ((string)(this["AxisArrowHeadSize"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255, 192, 255")]
+        public global::System.Drawing.Color DMomentColor {
+            get {
+                return ((global::System.Drawing.Color)(this["DMomentColor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("192, 255, 255")]
+        public global::System.Drawing.Color DForceColor {
+            get {
+                return ((global::System.Drawing.Color)(this["DForceColor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Arial")]
+        public string LabelFontName {
+            get {
+                return ((string)(this["LabelFontName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("12")]
+        public int LabelFontHeightInPixel {
+            get {
+                return ((int)(this["LabelFontHeightInPixel"]));
             }
         }
     }

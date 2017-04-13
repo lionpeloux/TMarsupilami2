@@ -32,7 +32,7 @@ namespace TMarsupilami.Gh.Parameter
         }
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.secondary; }
         }
         protected override System.Drawing.Bitmap Icon
         {

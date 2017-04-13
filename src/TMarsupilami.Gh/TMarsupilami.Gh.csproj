@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayDMoment.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayDForce.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayCMoment.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayCForce.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D_SKDR1.cs" />
     <Compile Include="Draw.cs" />
     <Compile Include="Parameter\Param_MBeam.cs" />
+    <Compile Include="Parameter\Param_MDMoment.cs" />
     <Compile Include="Parameter\Param_MDForce.cs" />
     <Compile Include="Parameter\Param_MCMoment.cs" />
     <Compile Include="Parameter\Param_MCForce.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Type\Convert.cs" />
     <Compile Include="Type\GH_MBeam.cs" />
+    <Compile Include="Type\GH_MDMoment.cs" />
     <Compile Include="Type\GH_MDForce.cs" />
     <Compile Include="Type\GH_MCMoment.cs" />
     <Compile Include="Type\GH_MFrame.cs" />
@@ -256,6 +259,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\DMoment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayCForce.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayCMoment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayDForce.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayDMoment.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

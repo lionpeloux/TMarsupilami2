@@ -9,21 +9,20 @@ using Grasshopper;
 using TMarsupilami.Gh.Type;
 using TMarsupilami.Gh.Parameter;
 using TMarsupilami.MathLib;
-using TMarsupilami.CoreLib3;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_DisplayCMoment : GH_Component
+    public class Comp_DisplayDMoment : GH_Component
     {
 
-        private List<GH_MCMoment> ghMoments;
+        private List<GH_MDMoment> ghMoments;
         private bool isProjected, isGlobal;
         private double scale;
         private bool isNull;
 
-        public Comp_DisplayCMoment()
-          : base("Moment Display - Concentrated (M)", "M Disp",
-              "Preview a concentrated moment in the viewport.",
+        public Comp_DisplayDMoment()
+          : base("Moment Display - Distributed (m)", "m Disp",
+              "Preview a distributed moment in the viewport.",
               "TMarsupilami", "Display")
         {
         }
@@ -39,17 +38,17 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return Resources.DisplayCMoment;
+                return Resources.DisplayDMoment;
             }
         }
         public override Guid ComponentGuid
         {
-            get { return new Guid("{209EF586-ADF6-4DEC-BB2E-27A79E9944E7}"); }
+            get { return new Guid("{0FCF9A1E-2F38-4558-8554-8035AA8206DA}"); }
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddParameter(new Param_MCMoment(), "Concentrated Moment", "M", "Concentrated moment to preview.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MDMoment(), "Distributed Moment", "m", "Distributed moment to preview.", GH_ParamAccess.list);
             pManager.AddBooleanParameter("Project", "P", "Draw as a single vector (False) or draw each component in the appropriate coordinate system (True).", GH_ParamAccess.item, false);
             pManager.AddBooleanParameter("Coordinate System", "CS", "The coordinate system to draw the moment components ; either Global (True) or Local (False).", GH_ParamAccess.item, true);
             pManager.AddNumberParameter("Scale", "S", "Scale factor.", GH_ParamAccess.item, 1);
@@ -67,7 +66,7 @@ namespace TMarsupilami.Gh.Component
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            ghMoments = new List<GH_MCMoment>();
+            ghMoments = new List<GH_MDMoment>();
             isProjected = false;
             isGlobal = true;
             scale = 1;
@@ -86,8 +85,9 @@ namespace TMarsupilami.Gh.Component
             {
                 var minValue = 100;
                 bool pointsToApplicationPoint = false;
+                int refineCount = 4;
 
-                Color color = Attributes.GetTopLevel.Selected ? args.WireColour_Selected : Settings.Default.CMomentColor;
+                Color color = Attributes.GetTopLevel.Selected ? args.WireColour_Selected : Settings.Default.DMomentColor;
 
                 foreach (var ghMoment in ghMoments)
                 {
@@ -96,24 +96,27 @@ namespace TMarsupilami.Gh.Component
 
                     if (!isProjected)
                     {
-                        MVector M = moment.Value;
-                        if (M.Length() > minValue)
-                            Draw.DrawConcentratedMoment(applicationPoint, M, args.Display, color, scale, pointsToApplicationPoint);
+                        var m = moment.Value;
+                        if (m.Length() > minValue)
+                            Draw.DrawDistributedMoment(moment.StartPoint, moment.EndPoint,m, args.Display, color, scale, pointsToApplicationPoint, refineCount);
                     }
                     else
                     {
-                        MVector M1, M2, M3;
-                        moment.GetComponents(out M1, out M2, out M3, isGlobal);
-                        if (M1.Length() > minValue)
-                            Draw.DrawConcentratedMoment(applicationPoint, M1, args.Display, color, scale, pointsToApplicationPoint);
-                        if (M2.Length() > minValue)
-                            Draw.DrawConcentratedMoment(applicationPoint, M2, args.Display, color, scale, pointsToApplicationPoint);
-                        if (M3.Length() > minValue)
-                            Draw.DrawConcentratedMoment(applicationPoint, M3, args.Display, color, scale, pointsToApplicationPoint);
+                        MVector m1, m2, m3;
+                        moment.GetComponents(out m1, out m2, out m3, isGlobal);
+
+                        if (m1.Length() > minValue)
+                            Draw.DrawDistributedMoment(moment.StartPoint, moment.EndPoint, m1, args.Display, color, scale, pointsToApplicationPoint, refineCount);
+                        if (m2.Length() > minValue)
+                            Draw.DrawDistributedMoment(moment.StartPoint, moment.EndPoint, m2, args.Display, color, scale, pointsToApplicationPoint, refineCount);
+                        if (m3.Length() > minValue)
+                        {
+                            MVector perpDir = moment.LocalFrame.XAxis + moment.LocalFrame.YAxis;
+                            Draw.DrawAxialDistributedMoment(moment.StartPoint, moment.EndPoint, m3, perpDir, args.Display, color, scale, pointsToApplicationPoint, refineCount);
+                        }
                     }
                 }
             }
-         
         }
         public override bool IsPreviewCapable
         {

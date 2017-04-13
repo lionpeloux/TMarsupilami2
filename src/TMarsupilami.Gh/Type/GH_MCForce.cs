@@ -133,26 +133,6 @@ namespace TMarsupilami.Gh.Type
             return false;
         }
 
-        // PREVIEW
-        public void DrawForce(MVector vector, DisplayPipeline display, Color color, double scale = 1, double arrowSize = 0.15, int lineWidth = 1)
-        {
-            var origin = Value.LocalFrame.Origin.Cast();
-            var force = vector.Cast();
-            double l = scale * force.Length;
-            var line = new Line(origin, force, l);
-            double h = l * arrowSize; // arrow head size
-
-            if (l > 1e-3)
-            {
-                if (arrowSize != 0)
-                    display.DrawLineArrow(line, color, lineWidth, h);
-                else
-                    display.DrawLine(line, color, lineWidth);
-
-                display.Draw2dText(String.Format("{0:E3} N", force.Length), color, line.From + 1.2 * line.Direction, true);
-            }
-            
-        }
     }
         #endregion
 }
