@@ -107,7 +107,7 @@ namespace TMarsupilami.Gh.Component
                             Draw.DrawConcentratedForce(applicationPoint, F1, args.Display, color, scale, pointsToApplicationPoint);
                         if (F2.Length() > minValue)
                             Draw.DrawConcentratedForce(applicationPoint, F2, args.Display, color, scale, pointsToApplicationPoint);
-                        if (F2.Length() > minValue)
+                        if (F3.Length() > minValue)
                             Draw.DrawConcentratedForce(applicationPoint, F3, args.Display, color, scale, pointsToApplicationPoint);
                     }
                 }
