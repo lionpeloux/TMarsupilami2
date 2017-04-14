@@ -461,7 +461,7 @@ namespace TMarsupilami.CoreLib3
             Move_x(-q * dt);
         }
 
-        // ROTATION (QUASISTATIC)
+        // ROTATION
         private void Reset_θ()
         {
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
@@ -578,15 +578,6 @@ namespace TMarsupilami.CoreLib3
         // ELEMENTS : UPDATE CONFIG WITH CONSTRAINTS
         private void UpdateDeformedConfig_x()
         {
-            // update centerline properties (e,l,ll,t)
-            //Update_x_CenterlineProperties.Call();
-
-            // update curvature binormal (κb)
-            //Update_x_CurvatureBinormal.Call();
-
-            // update material frames
-            //Update_x_MaterialFrame.Call();
-
             // Now Geometry is Locked
             foreach (var lk in links_x) { lk.Update_x(); } // calcul des projections à partir des positions actuelles 
             foreach (var lk in links_x) { lk.Transfer_Rx(); } // calcul des projections à partir des positions actuelles 
@@ -595,21 +586,6 @@ namespace TMarsupilami.CoreLib3
             {
                 elements_x[i].Calculate_x();
             }
-
-            //OnCenterlinePropertiesChanging();
-
-
-            //// update internal bending and twisting moments
-            //Update_x_BendingMoment.Call();
-            //Update_x_TwistingMoment.Call();
-
-            //// update internal axial and shear forces
-            //Update_x_AxialForce.Call();
-            //Update_x_ShearForce.Call();
-
-            //// update resulting internal nodal force and internal nodal moment
-            //Update_x_InternalNodalMoment.Call();
-            //Update_x_InternalNodalForce.Call();
 
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
             Update_x_ResultantNodalMoment.Call();
@@ -620,21 +596,8 @@ namespace TMarsupilami.CoreLib3
             // Now Geometry is Locked
             foreach (var lk in links_θ) { lk.Update_θ(); }
             foreach (var lk in links_x) { lk.Transfer_Rθ(); }
-            
-            // update internal bending and twisting moments
-            Update_θ_BendingMoment.Call();
-            Update_θ_TwistingMoment.Call();
 
-            // update internal shear forces
-            Update_θ_ShearForce.Call();
-
-            // update resulting internal nodal force and internal nodal moment
-            Update_θ_InternalNodalMoment.Call();
-            Update_θ_InternalNodalForce.Call();
-
-            // enforce nodal force and moment contraints
-            foreach (var cst in constraints_x) { cst.Enforce_Qr(); }
-            foreach (var cst in constraints_x) { cst.Enforce_Fr(); }
+            for (int i = 0; i < elements_θ.Length; i++){ elements_θ[i].Calculate_θ(); }
 
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
             Update_θ_ResultantNodalMoment.Call();

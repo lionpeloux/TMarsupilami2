@@ -149,11 +149,6 @@ namespace TMarsupilami.CoreLib3
 
             // Ici, il faut commencer à traiter la discontinuité de courbure.
             SetInitialConfig(mframes);
-
-            // Make sure l[i] is computed pour la conversion des efforts linéiques en efforts ponctuels
-            //UpdateCenterlineProperties();
-            Centerline.GetCurvature(x, e, d3_mid, l, t, κb_g, IsClosed);
-            Centerline.GetTwist(mframes, l, τ, IsClosed);
         }
         private void CreateGhostVertices(IEnumerable<MFrame> restFrames, IEnumerable<MFrame> actualFrames, bool isClosed)
         {
@@ -369,6 +364,8 @@ namespace TMarsupilami.CoreLib3
                 x[i] = initialFrames[i].Origin;
                 mframes[i] = initialFrames[i];
             }
+            Centerline.GetCurvature(x, e, d3_mid, l, t, κb_g, IsClosed);
+            Centerline.GetTwist(mframes, l, τ, IsClosed);
         }
 
         public override void Init()
@@ -425,7 +422,16 @@ namespace TMarsupilami.CoreLib3
             UpdateInternalNodalMoment();
             UpdateInternalNodalForce();
         }
-        public override void Calculate_θ() {
+        public override void Calculate_θ()
+        {
+            UpdateBendingMoment();
+            UpdateTwistingMoment();
+
+            UpdateAxialForce();
+            UpdateShearForce();
+
+            UpdateInternalNodalMoment();
+            UpdateInternalNodalForce();
         }
 
 
@@ -540,8 +546,6 @@ namespace TMarsupilami.CoreLib3
         {
             for (int i = 0; i < Ne; i++)
             {
-                double twist = -Rotation.ZAngle_Rotation(mframes[i], mframes[i].ZAxis, mframes[i + 1], mframes[i + 1].ZAxis);
-                τ[i] = twist / l[i];
                 Q[i] = GJ[i/2] * (τ[i] - τ_0[i]);
             }
 
