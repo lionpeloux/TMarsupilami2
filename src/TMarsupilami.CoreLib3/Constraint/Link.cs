@@ -12,8 +12,8 @@ namespace TMarsupilami.CoreLib3
         public abstract bool IsTorsionCapable { get; }
 
         public virtual void Init() { }
-        public virtual void Update_x() { }
-        public virtual void Update_θ() { }
+        public virtual void Calculate_x() { }
+        public virtual void Calculate_θ() { }
         public virtual void Enforce_x() { }
         public virtual void Enforce_t() { }
         public virtual void Enforce_frames() { }
@@ -44,7 +44,7 @@ namespace TMarsupilami.CoreLib3
 
         public double lm_x;
         public double K;
-        public MVector u, F12, F21;
+        public MVector u12, F12;
 
         public override bool IsTorsionCapable { get { return false; } }
 
@@ -58,24 +58,22 @@ namespace TMarsupilami.CoreLib3
         }
 
 
-        public override void Update_x()
+        public override void Calculate_x()
         {
-            var u = new MVector(b1.x[n1], b2.x[n2]);
+            u12 = new MVector(b1.x[n1], b2.x[n2]);
 
-            if (u.LengthSquared() == 0)
+            if (u12.LengthSquared() == 0)
             {
                 F12 = MVector.Zero;
-                F21 = MVector.Zero;
             }
             else
             {
-                F12 = -K * u;
-                F21 = -F12;
+                F12 = -K * u12;
             }
         }
         public override void Transfer_Rx()
         {
-            b1.Fr_g[n1/2] = -F21;
+            b1.Fr_g[n1/2] = F12;
             b2.Fr_g[n2/2] = -F12;
         }
         public override void Transfer_Mx()
@@ -96,8 +94,8 @@ namespace TMarsupilami.CoreLib3
 
         public double C, K;
         public double lm_x, lm_θ;
-        public MVector M12, M21;
-        public MVector u, F12, F21;
+        public MVector M12;
+        public MVector u12, F12;
 
         public override bool IsTorsionCapable { get { return true; } }
 
@@ -113,37 +111,34 @@ namespace TMarsupilami.CoreLib3
             this.C = C;
         }
 
-        public override void Update_x()
+        public override void Calculate_x()
         {
-            var u = new MVector(b1.x[n1], b2.x[n2]);
+            u12 = new MVector(b1.x[n1], b2.x[n2]);
 
-            if (u.LengthSquared() == 0)
+            if (u12.LengthSquared() == 0)
             {
                 F12 = MVector.Zero;
-                F21 = MVector.Zero;
             }
             else
             {
-                F12 = -K * u;
-                F21 = -F12;
+                F12 = -K * u12;
             }
         }
-        public override void Update_θ()
+        public override void Calculate_θ()
         {
             var v1 = b1.mframes[n1].XAxis;
             var v2 = b2.mframes[n2].XAxis;
-            M21 = C * MVector.CrossProduct(v1, v2);
-            M12 = -M21;
+            M12 = -C * MVector.CrossProduct(v1, v2); ;
         }
 
         public override void Transfer_Rx()
         {
-            b1.Fr_g[n1 / 2] = -F21;
+            b1.Fr_g[n1 / 2] = F12;
             b2.Fr_g[n2 / 2] = -F12;
         }
         public override void Transfer_Rθ()
         {
-            b1.Mr_m[n1_h] = b1.ToMaterialCoordinateSystem(-M21, n1_h);
+            b1.Mr_m[n1_h] = b1.ToMaterialCoordinateSystem(M12, n1_h);
             b2.Mr_m[n2_h] = b1.ToMaterialCoordinateSystem(-M12, n2_h);
         }
 
@@ -165,9 +160,9 @@ namespace TMarsupilami.CoreLib3
             b1.lm_θ[n1] = lm_θ;
             b2.lm_θ[n2] = lm_θ;
         }
-
     }
 
+    // Version par projection qui ne marche pas.
     public class ClampedLink : Link
     {
         private Beam b1, b2;
@@ -209,7 +204,7 @@ namespace TMarsupilami.CoreLib3
             pf1 = f1;
             pf2 = f2;
         }
-        public override void Update_x()
+        public override void Calculate_x()
         {
             var x1 = b1.x[n1];
             var x2 = b2.x[n2];
@@ -218,7 +213,7 @@ namespace TMarsupilami.CoreLib3
             pf1.Origin = rf.Origin + (u1.X * rf.XAxis + u1.Y * rf.YAxis + u1.Z * rf.ZAxis);
             pf2.Origin = rf.Origin + (u2.X * rf.XAxis + u2.Y * rf.YAxis + u2.Z * rf.ZAxis);
         }
-        public override void Update_θ()
+        public override void Calculate_θ()
         {
             var f1 = b1.ActualConfiguration[n1];
             var f2 = b2.ActualConfiguration[n2];

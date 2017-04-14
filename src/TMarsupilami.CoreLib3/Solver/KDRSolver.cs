@@ -579,7 +579,7 @@ namespace TMarsupilami.CoreLib3
         private void UpdateDeformedConfig_x()
         {
             // Now Geometry is Locked
-            foreach (var lk in links_x) { lk.Update_x(); } // calcul des projections à partir des positions actuelles 
+            foreach (var lk in links_x) { lk.Calculate_x(); } // calcul des projections à partir des positions actuelles 
             foreach (var lk in links_x) { lk.Transfer_Rx(); } // calcul des projections à partir des positions actuelles 
 
             for (int i = 0; i < elements_x.Length; i++)
@@ -588,20 +588,20 @@ namespace TMarsupilami.CoreLib3
             }
 
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
-            Update_x_ResultantNodalMoment.Call();
-            Update_x_ResultantNodalForce.Call();
+            //Update_x_ResultantNodalMoment.Call();
+            //Update_x_ResultantNodalForce.Call();
         }
         private void UpdateDeformedConfig_θ()
         {
             // Now Geometry is Locked
-            foreach (var lk in links_θ) { lk.Update_θ(); }
+            foreach (var lk in links_θ) { lk.Calculate_θ(); }
             foreach (var lk in links_x) { lk.Transfer_Rθ(); }
 
             for (int i = 0; i < elements_θ.Length; i++){ elements_θ[i].Calculate_θ(); }
 
-            // UPDATE RESULTANT NODAL FORCE AND MOMENT
-            Update_θ_ResultantNodalMoment.Call();
-            Update_θ_ResultantNodalForce.Call();
+            //// UPDATE RESULTANT NODAL FORCE AND MOMENT
+            //Update_θ_ResultantNodalMoment.Call();
+            //Update_θ_ResultantNodalForce.Call();
         }
 
         private static void OnKineticEnergyPeak_x(KDRSolver solver)

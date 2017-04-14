@@ -392,6 +392,7 @@ namespace TMarsupilami.CoreLib3
             OnTangentsUpdated(t);
 
             // realign material frames to stick to the centerline (this is a rotation by dθ[i] = MVector.CrossProduct(mframes[i].ZAxis, t[i]);
+            // if the tangent vector has not changed, the frame remains unchanged.
             for (int i = 0; i < nv; i++)
             {
                 dθ[i] = MVector.CrossProduct(mframes[i].ZAxis, t[i]);
@@ -421,6 +422,9 @@ namespace TMarsupilami.CoreLib3
 
             UpdateInternalNodalMoment();
             UpdateInternalNodalForce();
+
+            UpdateResultantNodalMoment();
+            UpdateResultantNodalForce();
         }
         public override void Calculate_θ()
         {
@@ -432,8 +436,24 @@ namespace TMarsupilami.CoreLib3
 
             UpdateInternalNodalMoment();
             UpdateInternalNodalForce();
+
+            UpdateResultantNodalMoment();
+            UpdateResultantNodalForce();
         }
 
+        public void ClearAppliedReactions()
+        {
+            for (int i = 0; i < nv_h; i++)
+            {
+                Fext_g[i] = MVector.Zero;
+                Mext_m[i] = MVector.Zero;
+            }
+            for (int i = 0; i < nv_g; i++)
+            {
+                fext_g[i] = MVector.Zero;
+                mext_m[i] = MVector.Zero;
+            }
+        }
 
         // MOMENTS
 
@@ -660,6 +680,7 @@ namespace TMarsupilami.CoreLib3
                 Rint_θ[i].Z = Rint_θ_torsion_Q[i] + Rint_θ_torsion_M[i];
             }
         }
+
         public override void UpdateResultantNodalMoment()
         {
             // ADD APPLIED LOADS TO INTERNAL RESULTANT
@@ -820,6 +841,7 @@ namespace TMarsupilami.CoreLib3
                 Rint_x[i] = Rint_x_axial[i] + Rint_x_shear_M[i] + Rint_x_shear_Q[i];
             }
         }
+
         public override void UpdateResultantNodalForce()
         {
             // RESULTANT FORCE
@@ -846,7 +868,7 @@ namespace TMarsupilami.CoreLib3
         }
 
         // ENERGIES
-        protected double UpdateAxialElasticEnergy()
+        public double GetAxialElasticEnergy()
         {
             double E_axial = 0;
             for (int i = 0; i < ne; i++)
@@ -856,7 +878,7 @@ namespace TMarsupilami.CoreLib3
             E_axial = E_axial / 2;
             return E_axial;
         }
-        protected double UpdateBendingElasticEnergy()
+        public double GetBendingElasticEnergy()
         {
             double E_bending = 0;
             E_bending += (EI1[0] * Math.Pow((κ1[0] - κ1_0[0]), 2) + EI2[0] * Math.Pow((κ2[0] - κ2_0[0]), 2)) * (l[0] / 4);
@@ -867,11 +889,12 @@ namespace TMarsupilami.CoreLib3
             E_bending += (EI1[nv_g - 1] * Math.Pow((κ1[nv - 1] - κ1_0[nv - 1]), 2) + EI2[nv_g - 1] * Math.Pow((κ2[nv - 1] - κ2_0[nv - 1]), 2)) * (l[ne - 1] / 4);
             return E_bending;
         }
-        protected double UpdateTwistingElasticEnergy()
+        public double GetTwistingElasticEnergy()
         {
             double E_twisting = 0;
             for (int i = 0; i < ne; i++)
             {
+                double τ2 = (τ[i] - τ_0[i]) * (τ[i] - τ_0[i]);
                 E_twisting += GJ[i/2] * Math.Pow((τ[i] - τ_0[i]), 2) * l[i];
             }
             E_twisting = E_twisting / 2;
