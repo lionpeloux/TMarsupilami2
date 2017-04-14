@@ -343,23 +343,6 @@ namespace TMarsupilami.CoreLib3
         public abstract void Calculate_x();
         public abstract void Calculate_θ();
 
-
-        //public abstract void UpdateCenterlineProperties();
-        //public abstract void UpdateCurvatureBinormal();
-        //public abstract void UpdateMaterialFrame();
-
-        // MOMENTS
-        public abstract void UpdateBendingMoment();
-        public abstract void UpdateTwistingMoment();
-        public abstract void UpdateInternalNodalMoment();
-        public abstract void UpdateResultantNodalMoment();
-
-        // FORCES
-        public abstract void UpdateAxialForce();
-        public abstract void UpdateShearForce();
-        public abstract void UpdateInternalNodalForce();
-        public abstract void UpdateResultantNodalForce();
-
         // LUMPED MASSES
         public abstract void Update_lm_x(ref double[] lm_x);
         public abstract void Update_lm_θ(ref double[] lm_θ);

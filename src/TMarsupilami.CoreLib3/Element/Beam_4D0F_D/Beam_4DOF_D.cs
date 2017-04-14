@@ -461,7 +461,7 @@ namespace TMarsupilami.CoreLib3
         /// M : M1, M2, κ1, κ2
         /// M is given at each frame/node i
         /// </summary>
-        public override void UpdateBendingMoment()
+        private void UpdateBendingMoment()
         {
             MVector d1, d2;
 
@@ -562,7 +562,7 @@ namespace TMarsupilami.CoreLib3
         /// Q : twist, τ
         /// Q is given at each mid-edge i+1/2
         /// </summary>
-        public override void UpdateTwistingMoment()
+        private void UpdateTwistingMoment()
         {
             for (int i = 0; i < Ne; i++)
             {
@@ -605,7 +605,7 @@ namespace TMarsupilami.CoreLib3
         /// Q : twist, τ
         /// Q is given at each mid-edge i+1/2
         /// </summary>
-        public override void UpdateInternalNodalMoment()
+        private void UpdateInternalNodalMoment()
         {
             // BENDING MOMENT
             Rint_θ_bending[0] = M_h_r[0];
@@ -681,7 +681,7 @@ namespace TMarsupilami.CoreLib3
             }
         }
 
-        public override void UpdateResultantNodalMoment()
+        private void UpdateResultantNodalMoment()
         {
             // ADD APPLIED LOADS TO INTERNAL RESULTANT
             R_θ[0] = Rint_θ[0] + Mext_m[0] + (0.5 * l[0]) * mext_m[0];
@@ -712,7 +712,7 @@ namespace TMarsupilami.CoreLib3
         /// N : axial force
         /// N is given for each mid edge i+1/2. Its size is ne.         
         /// </summary>
-        public override void UpdateAxialForce()
+        private void UpdateAxialForce()
         {
             for (int i = 0; i < ne; i++)
             {
@@ -733,7 +733,7 @@ namespace TMarsupilami.CoreLib3
         /// V_Q is the twisting contribution
         /// V, V_M and V_Q are given for each mid edge i+1/2. Their size is ne.
         /// </summary>
-        public override void UpdateShearForce()
+        private void UpdateShearForce()
         {
             for (int i = 0; i < nv_g; i++)
             {
@@ -800,7 +800,7 @@ namespace TMarsupilami.CoreLib3
         /// Rx_int is given at each node frame/node i.
         /// </summary>
         /// 
-        public override void UpdateInternalNodalForce()
+        private void UpdateInternalNodalForce()
         {
             // AXIAL FORCE : attention à ne pas répéter cette opération pour les variations sur θ
 
@@ -844,7 +844,7 @@ namespace TMarsupilami.CoreLib3
             }
         }
 
-        public override void UpdateResultantNodalForce()
+        private void UpdateResultantNodalForce()
         {
             // RESULTANT FORCE
 

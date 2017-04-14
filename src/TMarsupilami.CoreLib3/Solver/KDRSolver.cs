@@ -193,15 +193,16 @@ namespace TMarsupilami.CoreLib3
             // LINKS
             var links_x = new List<Link>();
             var links_θ = new List<Link>();
-            //foreach (var link in links)
-            //{
-            //    links_x.Add(link);
-            //    InitConstraints += link.Init;
-            //    if (link.IsTorsionCapable)
-            //    {
-            //        links_θ.Add(link);
-            //    }                
-            //}
+            foreach (var link in links)
+            {
+                links_x.Add(link);
+                InitConstraints += link.Init;
+
+                if (link.IsTorsionCapable)
+                {
+                    links_θ.Add(link);
+                }
+            }
 
             this.links_x = links_x.ToArray();
             this.links_θ = links_θ.ToArray();
