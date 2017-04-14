@@ -33,17 +33,35 @@ namespace TMarsupilami.CoreLib3
         public int NumberOfKineticPeaks_x { get; protected set; }
         public int NumberOfKineticPeaks_θ { get; protected set; }
 
-        // EVENTS
+        // SOLVER STATE EVENTS
         public event Action<KDRSolver> OnEnergyPeak_x;
         public event Action<KDRSolver> OnEnergyPeak_θ;
         public event Action<KDRSolver> OnConvergence;
         public event Action<KDRSolver> OnNotConvergence;
 
-
-        // INIT
-        private Cluster Init_all;
-
         // EVENTS
+        private ParallelActionHandler InitElementsHandler;
+        protected void OnInitElements(bool parallel = false)
+        {
+            InitElementsHandler.Raise(parallel);
+        }
+        public event Action InitElements
+        {
+            add { InitElementsHandler.Subscribe(value); }
+            remove { InitElementsHandler.UnSubscribe(value); }
+        }
+
+        private ParallelActionHandler InitConstraintsHandler;
+        protected void OnInitConstraints(bool parallel = false)
+        {
+            InitConstraintsHandler.Raise(parallel);
+        }
+        public event Action InitConstraints
+        {
+            add { InitConstraintsHandler.Subscribe(value); }
+            remove { InitConstraintsHandler.UnSubscribe(value); }
+        }
+
         private ParallelActionHandler CalculateElementsHandler_x;
         protected void OnCalculateElements_x(bool parallel = false)
         {
@@ -126,8 +144,8 @@ namespace TMarsupilami.CoreLib3
             ParallelOptions = new ParallelOptions();
             IsParallelModeEnabled = false;
 
-            Init_all = new Cluster(ParallelOptions, IsParallelModeEnabled);
-
+            InitElementsHandler = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
+            InitConstraintsHandler = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
             CalculateElementsHandler_x = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
             CalculateElementsHandler_θ = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
             CalculateConstraintsHandler_x = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
@@ -166,7 +184,7 @@ namespace TMarsupilami.CoreLib3
             foreach (var cst in constraints)
             {
                 constraints_x.Add(cst);
-                Init_all.Subscribe(cst.Init);
+                InitConstraints += cst.Init;
             }
 
             this.constraints_x = constraints_x.ToArray();
@@ -175,16 +193,15 @@ namespace TMarsupilami.CoreLib3
             // LINKS
             var links_x = new List<Link>();
             var links_θ = new List<Link>();
-            foreach (var link in links)
-            {
-                links_x.Add(link);
-                Init_all.Subscribe(link.Init);
-
-                if (link.IsTorsionCapable)
-                {
-                    links_θ.Add(link);
-                }                
-            }
+            //foreach (var link in links)
+            //{
+            //    links_x.Add(link);
+            //    InitConstraints += link.Init;
+            //    if (link.IsTorsionCapable)
+            //    {
+            //        links_θ.Add(link);
+            //    }                
+            //}
 
             this.links_x = links_x.ToArray();
             this.links_θ = links_θ.ToArray();
@@ -249,7 +266,8 @@ namespace TMarsupilami.CoreLib3
 
             // apply applied displacements
             // get boundary references (after applied displacements)
-            Init_all.Call();
+            OnInitConstraints();
+            OnInitElements();
         }
 
         // RUN
