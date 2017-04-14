@@ -82,6 +82,8 @@ namespace TMarsupilami.CoreLib3
         private double[] Rint_θ_torsion_Q, Rint_θ_torsion_M;
         private MVector[] Rint_θ_bending;
 
+        private MVector[] dθ;
+
         #endregion
 
         // pour l'instant, on passe l'ensemble des frames et des sections
@@ -149,7 +151,9 @@ namespace TMarsupilami.CoreLib3
             SetInitialConfig(mframes);
 
             // Make sure l[i] is computed pour la conversion des efforts linéiques en efforts ponctuels
-            UpdateCenterlineProperties();
+            //UpdateCenterlineProperties();
+            Centerline.GetCurvature(x, e, d3_mid, l, t, κb_g, IsClosed);
+            Centerline.GetTwist(mframes, l, τ, IsClosed);
         }
         private void CreateGhostVertices(IEnumerable<MFrame> restFrames, IEnumerable<MFrame> actualFrames, bool isClosed)
         {
@@ -288,9 +292,12 @@ namespace TMarsupilami.CoreLib3
             Rint_θ_torsion_Q = new double[nv];
             Rint_θ_torsion_M = new double[nv];
             Rint_θ_bending = new MVector[nv];
-        }
 
-        public override string ToString()
+            // internal rotation to realign frames with the centerline at each x step.
+            dθ = new MVector[nv];
+    }
+
+    public override string ToString()
         {
             return "Beam_4DOF_D";
         }
@@ -364,6 +371,10 @@ namespace TMarsupilami.CoreLib3
             }
         }
 
+        public override void Init()
+        {
+        }
+
         public override void Move_x(MVector[] dx)
         {
             // x = x + dx
@@ -372,6 +383,25 @@ namespace TMarsupilami.CoreLib3
                 x[i] = mframes[i].Origin + dx[i];
             }
             OnFramesTranslated(dx);
+
+            Centerline.GetCurvature(x, e, d3_mid, l, t, κb_g, IsClosed);
+            if (!IsClosed) // assumes that edges are free (default) before imposing any tangent constraint
+            {
+                t[0] = e[0] / l[0];
+                t[nv - 1] = e[ne - 1] / l[ne - 1];
+            }
+
+            // call for tangent constraint
+            OnTangentsUpdated(t);
+
+            // realign material frames to stick to the centerline (this is a rotation by dθ[i] = MVector.CrossProduct(mframes[i].ZAxis, t[i]);
+            for (int i = 0; i < nv; i++)
+            {
+                dθ[i] = MVector.CrossProduct(mframes[i].ZAxis, t[i]);
+                ParallelTransportation.ZPT_Rotation(mframes[i], mframes[i].ZAxis, x[i], t[i], ref mframes[i]);
+            }
+            //OnFramesRotated(dθ);
+            Centerline.GetTwist(mframes, l, τ, IsClosed);
         }
         public override void Move_θ(MVector[] dθ)
         {
@@ -380,89 +410,27 @@ namespace TMarsupilami.CoreLib3
             {
                 mframes[i].ZRotate(dθ[i].Z);
             }
-            OnFramesRotated(dθ);
+            //OnFramesRotated(dθ);
+            Centerline.GetTwist(mframes, l, τ, IsClosed);
         }
 
-        // GEOMETRY
-        /// <summary>
-        /// Compute the centerlines properties assumming Mext_m = 0 and ends are pinved
-        /// Constraints may be applied separately to enforced t[0] or t[nv-1]
-        /// </summary>
-        public override void UpdateCenterlineProperties()
+        public override void Calculate_x()
         {
-            // GET GHOST PROPERTIES WITH CIRCLE 3PTS
-            for (int i = 0; i < nv_g; i++)
-            {
-                OsculatingCircle.Circle3Pts(x[2 * i], x[2 * i + 1], x[2 * i + 2],
-                    ref κb_g[i],
-                    ref e[2 * i], ref e[2 * i + 1],
-                    ref l[2 * i], ref l[2 * i + 1],
-                    ref d3_mid[2 * i], ref d3_mid[2 * i + 1],
-                    ref t_h_r[i], ref t_g[i], ref t_h_l[i + 1]
-                    );
-                t[2 * i + 1] = t_g[i];
-            }
+            UpdateBendingMoment();
+            UpdateTwistingMoment();
 
-            //Centerline.GetCurvature(x, e, l, d3_mid, t_h_r, t_g, t_h_l, κb_g);
+            UpdateAxialForce();
+            UpdateShearForce();
 
-            // GET TANGENT AT HANDLE NODES
-            t[0] = e[0] / l[0];
-            for (int i = 1; i < nv_h - 1; i++)
-            {
-                t[2 * i] = t_h_r[i] + t_h_l[i];
-                t[2 * i].Normalize();
-            }
-            t[nv - 1] = e[ne - 1] / l[ne - 1];
-
-            OnTangentVectorEnforcing(t);
+            UpdateInternalNodalMoment();
+            UpdateInternalNodalForce();
         }
-        public override void UpdateCurvatureBinormal()
-        {
-            // Cette fonction n'a plus vraiment de sens
-            // Il faut la dispatcher ailleur
-            // Elle ne fait plus que le calcul des courbures et tangentes en 
-            // début /fin de poutre
-
-            double κ, α;
-            MVector κb;
-            // i = 0
-            // κb[0] = 2 / (l[0] * l[0]) * MVector.CrossProduct(t[0], e[0]);
-            // κb is given by applied external moment
-            //κb_h_r[0] = (-(Mext_m[0].X - Mr_m[0].X) / EI1[0]) * mframes[0].XAxis + (-(Mext_m[0].Y - Mr_m[0].Y) / EI2[0]) * mframes[0].YAxis;
-
-            //κb = (-(Mext_m[0].X - Mr_m[0].X) / EI1[0]) * mframes[0].XAxis + (-(Mext_m[0].Y - Mr_m[0].Y) / EI2[0]) * mframes[0].YAxis;
-            //κ = κb.Length();
-
-            //if (κ > 0)
-            //{
-            //    α = -Math.Asin(κ * l[0] / 2);
-            //    Rotation.Rotate(ref t[0], α, κb / κ);
-            //}
-
-            // i = nv-1
-            //κb[nv - 1] = 2 / (l[ne - 1] * l[ne - 1]) * MVector.CrossProduct(e[ne - 1], t[nv - 1]);
-            // κb is given by applied external moment
-            //κb_h_l[nv_h - 1] = ((Mext_m[nv_h - 1].X - Mr_m[nv_h - 1].X) / EI1[nv_g - 1]) * mframes[nv - 1].XAxis + ((Mext_m[nv_h - 1].Y - Mr_m[nv_h - 1].Y) / EI2[nv_g - 1]) * mframes[nv - 1].YAxis;
-
-            //κb = ((Mext_m[nv_h - 1].X - Mr_m[nv_h - 1].X) / EI1[nv_g - 1]) * mframes[nv - 1].XAxis + ((Mext_m[nv_h - 1].Y - Mr_m[nv_h - 1].Y) / EI2[nv_g - 1]) * mframes[nv - 1].YAxis;      
-            //κ = κb.Length();
-
-            //if (κ > 0)
-            //{
-            //    α = Math.Asin(κ * l[ne - 1] / 2);
-            //    Rotation.Rotate(ref t[nv - 1], α, κb / κ);
-            //}
+        public override void Calculate_θ() {
         }
-        public override void UpdateMaterialFrame()
-        {
-            // i = 0, ..., nv-1
-            for (int i = 0; i < nv; i++)
-            {
-                ParallelTransportation.ZPT_Rotation(mframes[i], mframes[i].ZAxis, x[i], t[i], ref mframes[i]);
-            }
-        }
+
 
         // MOMENTS
+
         /// <summary>
         /// M : M1, M2, κ1, κ2
         /// M is given at each frame/node i

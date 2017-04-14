@@ -28,7 +28,7 @@ namespace TMarsupilami.MathLib
             }
         }
 
-        // Get Curvature and other geometric properties
+        // CURVATURE FOR CONIINUOUS CENTERLINE
 
         /// <summary>
         /// Gets the curvature and geometric invariants of a standard centerline (no ghost vertices).
@@ -46,7 +46,11 @@ namespace TMarsupilami.MathLib
         /// <param name="κb">The centerline curvature binormal vector.</param>
         /// <param name="τ">The centerline rate of twist.</param>
         /// <param name="isClosed">True if the centerline is closed. False otherwise.</param>
-        public static void GetCurvature(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb, bool isClosed)
+        public static void GetCurvature(
+            MFrame[] frames, MPoint[] x, 
+            MVector[] e, MVector[] u, double[] l, 
+            MVector[] t, MVector[] κb, 
+            bool isClosed)
         {
             if (isClosed)
             {
@@ -57,7 +61,11 @@ namespace TMarsupilami.MathLib
                 GetCurvature_Open(frames, x, e, u, l, t, κb);
             }
         }
-        private static void GetCurvature_Open(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb)
+
+        private static void GetCurvature_Open(
+            MFrame[] frames, MPoint[] x, 
+            MVector[] e, MVector[] u, double[] l, 
+            MVector[] t, MVector[] κb)
         {
             int nv = frames.Length;
             int ne = nv - 1; // open centerline
@@ -91,7 +99,11 @@ namespace TMarsupilami.MathLib
             t[nv - 1] = frames[nv - 1].ZAxis;
             κb[nv - 1] = (2 / l[ne - 1]) * MVector.CrossProduct(u[ne - 1], t[nv - 1]);
         }
-        private static void GetCurvature_Closed(MFrame[] frames, MPoint[] x, MVector[] e, MVector[] u, double[] l, MVector[] t, MVector[] κb)
+
+        private static void GetCurvature_Closed
+            (MFrame[] frames, MPoint[] x, 
+            MVector[] e, MVector[] u, double[] l, 
+            MVector[] t, MVector[] κb)
         {
             int nv = frames.Length;
             int ne = nv; // closed centerline
@@ -133,6 +145,8 @@ namespace TMarsupilami.MathLib
             κb[0] = (2 * _ll) * MVector.CrossProduct(u[ne - 1], u[0]);
         }
 
+        // CURVATURE FOR DICONTINUOUS CENTERLINE
+
         /// <summary>
         /// Gets the curvature and geometric invariants of a centerline with ghost vertices.
         /// </summary>
@@ -153,8 +167,7 @@ namespace TMarsupilami.MathLib
         public static void GetCurvature(
             MPoint[] x,
             MVector[] e, MVector[] u, double[] l,
-            MVector[] t_h_r, MVector[] t_g, MVector[] t_h_l,
-            MVector[] κb_g,
+            MVector[] t_h_r, MVector[] t_g, MVector[] t_h_l, MVector[] κb_g,
             bool isClosed)
         {
             if (isClosed)
@@ -176,6 +189,8 @@ namespace TMarsupilami.MathLib
             int nv_g = e.Length / 2; // must have an even number of edges (either open or closed centerline).
 
             int index;
+            double l1, l2, _ll;
+            MVector u1, u2, t;
 
             // i = 0, ..., nv_g-1
             for (int i = 0; i < nv_g; i++)
@@ -183,24 +198,24 @@ namespace TMarsupilami.MathLib
                 // 2i
                 index = 2 * i;
                 e[index] = new MVector(x[index], x[index + 1]);
-                var l1 = e[index].Length();
+                l1 = e[index].Length();
                 l[index] = l1;
-                var u1 = (1 / l[index]) * e[index];
+                u1 = (1 / l[index]) * e[index];
                 u[index] = u1;
 
                 // 2i+1
                 index += 1;
                 e[index] = new MVector(x[index], x[index + 1]);
-                var l2 = e[index].Length();
+                l2 = e[index].Length();
                 l[index] = l2;
-                var u2 = (1 / l[index]) * e[index];
+                u2 = (1 / l[index]) * e[index];
                 u[index] = u2;
 
                 // i
-                double _ll = 1 / new MVector(x[index - 1], x[index + 1]).Length();
+                _ll = 1 / new MVector(x[index - 1], x[index + 1]).Length();
                 κb_g[i] = (2 * _ll) * MVector.CrossProduct(u1, u2);
 
-                var t = (l2 * _ll) * u1 + (l1 * _ll) * u2;
+                t = (l2 * _ll) * u1 + (l1 * _ll) * u2;
                 t_h_r[i] = (2 * (t * u1)) * u1 - t;
                 t_g[i] = t;
                 t_h_l[i + 1] = (2 * (t * u2)) * u2 - t;
@@ -277,6 +292,167 @@ namespace TMarsupilami.MathLib
             t_h_l[i + 1] = (2 * (t * u2)) * u2 - t;
         }
 
+        // CURVATURE FOR DICONTINUOUS CENTERLINE (V2)
+
+        /// <summary>
+        /// Gets the curvature and geometric invariants of a centerline with ghost vertices (V2).
+        /// </summary>
+        /// <remarks>
+        /// The total number of edges is always even for such a centerline.
+        /// If it is closed, Nv = Ne, Nvg = Ne/2, Nvh = Nvg.
+        /// If it is open, Nv = Ne + 1, Nvg = Ne/2, Nvh = Nvg + 1.
+        /// </remarks>
+        /// <param name="x">The centerline vertices composed of handle and ghost vertices.</param>
+        /// <param name="e">The centerline edge vector.</param>
+        /// <param name="u">The centerline unit edge vector.</param>
+        /// <param name="l">The centerline edge length.</param>
+        /// <param name="t">The tangent vector at handle or ghost vertex.</param>
+        /// <param name="κb_g">The curvature binormal vector at ghost vertex.</param>
+        /// <param name="isClosed">True if the centerline is closed. False otherwise.</param>
+        public static void GetCurvature(
+            MPoint[] x,
+            MVector[] e, MVector[] u, double[] l,
+            MVector[] t, MVector[] κb_g,
+            bool isClosed)
+        {
+            if (isClosed)
+            {
+                GetCurvature_Closed(x, e, u, l, t, κb_g);
+            }
+            else
+            {
+                GetCurvature_Open(x, e, u, l, t, κb_g);
+            }
+        }
+
+        private static void GetCurvature_Open(
+            MPoint[] x,
+            MVector[] e, MVector[] u, double[] l,
+            MVector[] t, MVector[] κb_g)
+        {
+            int nv_g = e.Length / 2; // must have an even number of edges (either open or closed centerline).
+
+            int index;
+            double l1, l2, _ll;
+            MVector u1, u2, t_h_r, t_g, t_h_l;
+
+            // necessary
+            t[0] = MVector.Zero;
+
+            // i = 0, ..., nv_g-1
+            for (int i = 0; i < nv_g; i++)
+            {
+                // 2i
+                index = 2 * i;
+                e[index] = new MVector(x[index], x[index + 1]);
+                l1 = e[index].Length();
+                l[index] = l1;
+                u1 = (1 / l[index]) * e[index];
+                u[index] = u1;
+
+                // 2i+1
+                index += 1;
+                e[index] = new MVector(x[index], x[index + 1]);
+                l2 = e[index].Length();
+                l[index] = l2;
+                u2 = (1 / l[index]) * e[index];
+                u[index] = u2;
+
+                // i
+                _ll = 1 / new MVector(x[index - 1], x[index + 1]).Length();
+                κb_g[i] = (2 * _ll) * MVector.CrossProduct(u1, u2);
+
+                t_g = (l2 * _ll) * u1 + (l1 * _ll) * u2;    // = t_g[i]
+                t_h_r = (2 * (t_g * u1)) * u1 - t_g;        // = t_h_r[i]
+                t_h_l = (2 * (t_g * u2)) * u2 - t_g;        // = t_h_l[i + 1]
+
+                t[index] = t_g;
+                t[index - 1] += t_h_r;
+                t[index - 1].Normalize();  // t[2i] = (t_h_l[i] + t_h_r[i]) / | t_h_l[i] + t_h_r[i] |
+                t[index + 1] = t_h_l;
+            }
+        }
+
+        private static void GetCurvature_Closed(
+            MPoint[] x,
+            MVector[] e, MVector[] u, double[] l,
+            MVector[] t, MVector[] κb_g)
+        {
+            int nv_g = e.Length / 2; // must have an even number of edges (either open or closed centerline).
+
+            int i, index;
+            double l1, l2, _ll;
+            MVector u1, u2, t_h_r, t_g, t_h_l;
+
+            // necessary
+            t[0] = MVector.Zero;
+
+            // i = 0, ..., nv_g-2
+            for (i = 0; i < nv_g - 1; i++)
+            {
+                // 2i
+                index = 2 * i;
+                e[index] = new MVector(x[index], x[index + 1]);
+                l1 = e[index].Length();
+                l[index] = l1;
+                u1 = (1 / l[index]) * e[index];
+                u[index] = u1;
+
+                // 2i+1
+                index += 1;
+                e[index] = new MVector(x[index], x[index + 1]);
+                l2 = e[index].Length();
+                l[index] = l2;
+                u2 = (1 / l[index]) * e[index];
+                u[index] = u2;
+
+                // i
+                _ll = 1 / new MVector(x[index - 1], x[index + 1]).Length();
+                κb_g[i] = (2 * _ll) * MVector.CrossProduct(u1, u2);
+
+                t_g = (l2 * _ll) * u1 + (l1 * _ll) * u2;    // = t_g[i]
+                t_h_r = (2 * (t_g * u1)) * u1 - t_g;        // = t_h_r[i]
+                t_h_l = (2 * (t_g * u2)) * u2 - t_g;        // = t_h_l[i + 1]
+
+                t[index] = t_g;
+                t[index - 1] += t_h_r;
+                t[index - 1].Normalize();   // t[2i] = (t_h_l[i] + t_h_r[i]) / | t_h_l[i] + t_h_r[i] |
+                t[index + 1] = t_h_l;
+            }
+
+            // i = nv_g-1
+            i = nv_g - 1;
+
+            // 2i
+            index = 2 * i;
+            e[index] = new MVector(x[index], x[index + 1]);
+            l1 = e[index].Length();
+            l[index] = l1;
+            u1 = (1 / l[index]) * e[index];
+            u[index] = u1;
+
+            // 2i+1
+            index += 1;
+            e[index] = new MVector(x[index], x[0]);
+            l2 = e[index].Length();
+            l[index] = l2;
+            u2 = (1 / l[index]) * e[index];
+            u[index] = u2;
+
+            // i
+            _ll = 1 / new MVector(x[index - 1], x[0]).Length();
+            κb_g[i] = (2 * _ll) * MVector.CrossProduct(u1, u2);
+
+            t_g = (l2 * _ll) * u1 + (l1 * _ll) * u2;    // = t_g[nv_g-1]
+            t_h_r = (2 * (t_g * u1)) * u1 - t_g;        // = t_h_r[nv_h-1]
+            t_h_l = (2 * (t_g * u2)) * u2 - t_g;        // = t_h_l[0]
+
+            t[index] = t_g;
+            t[index - 1] += t_h_r;
+            t[index - 1].Normalize(); 
+            t[0] += t_h_l;
+            t[0].Normalize();
+        }
 
         // Get Twist
 

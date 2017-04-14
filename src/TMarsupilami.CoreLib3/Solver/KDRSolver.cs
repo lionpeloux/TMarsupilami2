@@ -177,11 +177,11 @@ namespace TMarsupilami.CoreLib3
 
                 elements_x.Add(beam);
 
-                CenterlinePropertiesChanging += beam.UpdateCenterlineProperties;
+                CenterlinePropertiesChanging += beam.Calculate_x;
                 //Update_x_CenterlineProperties.Subscribe(beam.UpdateCenterlineProperties);
 
-                Update_x_CurvatureBinormal.Subscribe(beam.UpdateCurvatureBinormal);
-                Update_x_MaterialFrame.Subscribe(beam.UpdateMaterialFrame);
+                //Update_x_CurvatureBinormal.Subscribe(beam.UpdateCurvatureBinormal);
+                //Update_x_MaterialFrame.Subscribe(beam.UpdateMaterialFrame);
 
                 Update_x_TwistingMoment.Subscribe(beam.UpdateTwistingMoment);
                 Update_x_BendingMoment.Subscribe(beam.UpdateBendingMoment);
@@ -198,9 +198,9 @@ namespace TMarsupilami.CoreLib3
                 {
                     elements_θ.Add(element);
 
-                    Update_θ_CenterlineProperties.Subscribe(beam.UpdateCenterlineProperties);
-                    Update_θ_CurvatureBinormal.Subscribe(beam.UpdateCurvatureBinormal);
-                    Update_θ_MaterialFrame.Subscribe(beam.UpdateMaterialFrame);
+                    Update_θ_CenterlineProperties.Subscribe(beam.Calculate_x);
+                    //Update_θ_CurvatureBinormal.Subscribe(beam.UpdateCurvatureBinormal);
+                    //Update_θ_MaterialFrame.Subscribe(beam.UpdateMaterialFrame);
 
                     Update_θ_TwistingMoment.Subscribe(beam.UpdateTwistingMoment);
                     Update_θ_BendingMoment.Subscribe(beam.UpdateBendingMoment);
@@ -579,30 +579,37 @@ namespace TMarsupilami.CoreLib3
         private void UpdateDeformedConfig_x()
         {
             // update centerline properties (e,l,ll,t)
-            OnCenterlinePropertiesChanging();
             //Update_x_CenterlineProperties.Call();
 
             // update curvature binormal (κb)
-            Update_x_CurvatureBinormal.Call();
+            //Update_x_CurvatureBinormal.Call();
 
             // update material frames
-            Update_x_MaterialFrame.Call();
+            //Update_x_MaterialFrame.Call();
 
             // Now Geometry is Locked
             foreach (var lk in links_x) { lk.Update_x(); } // calcul des projections à partir des positions actuelles 
             foreach (var lk in links_x) { lk.Transfer_Rx(); } // calcul des projections à partir des positions actuelles 
 
-            // update internal bending and twisting moments
-            Update_x_BendingMoment.Call();
-            Update_x_TwistingMoment.Call();
+            for (int i = 0; i < elements_x.Length; i++)
+            {
+                elements_x[i].Calculate_x();
+            }
 
-            // update internal axial and shear forces
-            Update_x_AxialForce.Call();
-            Update_x_ShearForce.Call();
+            //OnCenterlinePropertiesChanging();
 
-            // update resulting internal nodal force and internal nodal moment
-            Update_x_InternalNodalMoment.Call();
-            Update_x_InternalNodalForce.Call();
+
+            //// update internal bending and twisting moments
+            //Update_x_BendingMoment.Call();
+            //Update_x_TwistingMoment.Call();
+
+            //// update internal axial and shear forces
+            //Update_x_AxialForce.Call();
+            //Update_x_ShearForce.Call();
+
+            //// update resulting internal nodal force and internal nodal moment
+            //Update_x_InternalNodalMoment.Call();
+            //Update_x_InternalNodalForce.Call();
 
             // UPDATE RESULTANT NODAL FORCE AND MOMENT
             Update_x_ResultantNodalMoment.Call();

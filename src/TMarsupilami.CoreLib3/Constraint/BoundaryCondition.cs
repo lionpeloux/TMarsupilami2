@@ -254,7 +254,7 @@ namespace TMarsupilami.CoreLib3
                 : base(beam, BoundaryConditionType.Clamped, boundary)
             {
                 Init();
-                beam.TangentVectorEnforcing += Enforce_t;
+                beam.TangentsUpdated += Enforce_t;
                 beam.ReactionForceUpdating += Enforce_Fr;
                 beam.ReactionMomentUpdating += Enforce_Mr;
             }

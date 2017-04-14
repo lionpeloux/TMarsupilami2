@@ -194,16 +194,18 @@ namespace TMarsupilami.Gh.Component
                 case (int)BoundaryConditionType.Free:
 
                     // force verticale
-                    loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e4), Boundary.End, beam, true));
-                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 1e4, 0), beam.Nvh/2 + 1, beam, false));
+                    //loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e4), Boundary.End, beam, true));
+                    //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 1e4, 0), beam.Nvh/2 + 1, beam, false));
+                    //loads.Add(BeamVectorLoad.Create_fext(new MVector(0, 0, -1e4), 3, beam, true));
+                    //loads.Add(BeamVectorLoad.Create_fext(new MVector(0, 0, 1e4), 4, beam, true));
+                    //loads.Add(BeamVectorLoad.Create_mext(new MVector(0, -0.5 * 1e4, 0), beam.Nvh / 2 - 1, beam, false));
+
                     // force suiveuse
                     //loads.Add(BeamVectorLoad.Create_Fext(new MVector(-1e4, 0, 0), Boundary.End, beam, false));
 
-                    loads.Add(BeamVectorLoad.Create_fext(new MVector(0, 0, -1e4), 3, beam, true));
-                    loads.Add(BeamVectorLoad.Create_fext(new MVector(0, 0, 1e4), 4, beam, true));
+
 
                     //loads.Add(BeamVectorLoad.Create_Mext(Mext, Boundary.End, beam, true));
-                    loads.Add(BeamVectorLoad.Create_mext(new MVector(0, -0.5*1e4, 0), beam.Nvh / 2 - 1, beam, false));
 
                     //loads.Add(BeamVectorLoad.Create_Fext(Fext, Boundary.End, beam, false));
                     //loads.Add(BeamVectorLoad.Create_fext(-Fext, Boundary.End, beam, false));

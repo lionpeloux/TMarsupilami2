@@ -118,10 +118,10 @@ namespace TMarsupilami.CoreLib3
         }
 
         // EVENT : TangentVectorEnforcing
-        public event Action<MVector[]> TangentVectorEnforcing;
-        protected virtual void OnTangentVectorEnforcing(MVector[] t)
+        public event Action<MVector[]> TangentsUpdated;
+        protected virtual void OnTangentsUpdated(MVector[] t)
         {
-            Action<MVector[]> handler = TangentVectorEnforcing;
+            Action<MVector[]> handler = TangentsUpdated;
             if (handler != null)
             {
                 handler(t);
@@ -336,12 +336,16 @@ namespace TMarsupilami.CoreLib3
             loadManager.Fill(loads);
         }
 
+        public abstract void Init();
         public abstract void Move_x(MVector[] dx);
         public abstract void Move_θ(MVector[] dθ);
+        public abstract void Calculate_x();
+        public abstract void Calculate_θ();
 
-        public abstract void UpdateCenterlineProperties();
-        public abstract void UpdateCurvatureBinormal();
-        public abstract void UpdateMaterialFrame();
+
+        //public abstract void UpdateCenterlineProperties();
+        //public abstract void UpdateCurvatureBinormal();
+        //public abstract void UpdateMaterialFrame();
 
         // MOMENTS
         public abstract void UpdateBendingMoment();
