@@ -197,6 +197,7 @@ namespace TMarsupilami.CoreLib3
         protected MVector[] R_θ, Rint_θ;
 
         // EXTERNAL FORCES & MOMENTS
+        // applied by supports and constraints to the element
         public MVector[] Fext_g;
         public MVector[] Mext_m;
         public MVector[] fext_g;

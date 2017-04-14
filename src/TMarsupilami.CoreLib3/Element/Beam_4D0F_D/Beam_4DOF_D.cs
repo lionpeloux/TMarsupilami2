@@ -515,12 +515,12 @@ namespace TMarsupilami.CoreLib3
                 double κb1_r_0 = κ1_0[2 * i];
                 double κb2_r_0 = κ2_0[2 * i];
 
-                // left/right moment that verify the static dondition -Ml + Mr_m + Mext_m - Mr_m = 0
+                // left/right moment that verify the static dondition -Ml + Mr + Mext_m + Mr_m = 0
                 MVector M;
                 M = 0.5 * (EI1[i - 1] * (κb1_l - κb1_l_0) + EI1[i] * (κb1_r - κb1_r_0)) * d1;
                 M += 0.5 * (EI2[i - 1] * (κb2_l - κb2_l_0) + EI2[i] * (κb2_r - κb2_r_0)) * d2;
 
-                MVector dM = 0.5 * ((Mext_m[i].X - Mr_m[i].X) * d1 + (Mext_m[i].Y - Mr_m[i].Y) * d2);
+                MVector dM = 0.5 * ((Mext_m[i].X + Mr_m[i].X) * d1 + (Mext_m[i].Y + Mr_m[i].Y) * d2);
                 M_h_l[i] = M + dM;
                 M_h_r[i] = M - dM;
 
@@ -687,7 +687,9 @@ namespace TMarsupilami.CoreLib3
             R_θ[0] = Rint_θ[0] + Mext_m[0] + (0.5 * l[0]) * mext_m[0];
             for (int i = 1; i < nv_h - 1; i++)
             {
-                R_θ[2 * i] = Rint_θ[2 * i] + Mext_m[i] + 0.5 * (mext_m[i - 1] * l[2 * i - 1] + mext_m[i] * l[2 * i]);
+                R_θ[2 * i] = Rint_θ[2 * i] 
+                           + Mr_m[i] + Mext_m[i] 
+                           + 0.5 * (mext_m[i - 1] * l[2 * i - 1] + mext_m[i] * l[2 * i]);
             }
             R_θ[nv - 1] = Rint_θ[nv - 1] + Mext_m[nv_h - 1] + (0.5 * l[2 * nv_g - 1]) * mext_m[nv_g - 1];
 
@@ -699,10 +701,10 @@ namespace TMarsupilami.CoreLib3
             OnReactionMomentUpdating(Mr_m, R_θ);
 
             // ADD REACTION MOMENTS TO INTERNAL RESULTANT
-            for (int i = 0; i < nv_h; i++)
-            {
-                R_θ[2 * i].Z += -Mr_m[i].Z;
-            }
+            //for (int i = 0; i < nv_h; i++)
+            //{
+            //    R_θ[2 * i].Z += Mr_m[i].Z;
+            //}
         }
 
         // FORCES
@@ -850,7 +852,9 @@ namespace TMarsupilami.CoreLib3
             R_x[0] = Rint_x[0] + Fext_g[0] + (0.5 * l[0]) * fext_g[0];
             for (int i = 1; i < nv_h - 1; i++)
             {
-                R_x[2 * i] = Rint_x[2 * i] + Fext_g[i] + 0.5 * (fext_g[i - 1] * l[2 * i - 1] + fext_g[i] * l[2 * i]);
+                R_x[2 * i] = Rint_x[2 * i] 
+                           + Fr_g[i] + Fext_g[i] 
+                           + 0.5 * (fext_g[i - 1] * l[2 * i - 1] + fext_g[i] * l[2 * i]);
             }
             R_x[nv - 1] = Rint_x[nv - 1] + Fext_g[nv_h - 1] + (0.5 * l[2 * nv_g - 1]) * fext_g[nv_g - 1];
             for (int i = 0; i < nv_g; i++)
@@ -861,10 +865,10 @@ namespace TMarsupilami.CoreLib3
             OnReactionForceUpdating(Fr_g, R_x);
 
             // ADD REACTION FORCES TO INTERNAL RESULTANT
-            for (int i = 0; i < nv_h; i++)
-            {
-                R_x[2 * i] += -Fr_g[i];
-            }
+            //for (int i = 0; i < nv_h; i++)
+            //{
+            //    R_x[2 * i] += Fr_g[i];
+            //}
         }
 
         // ENERGIES

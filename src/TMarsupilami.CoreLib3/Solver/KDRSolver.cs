@@ -43,51 +43,51 @@ namespace TMarsupilami.CoreLib3
         // INIT
         private Cluster Init_all;
 
-        // 3 & 4 DOF ELEMENTS : X
-        private Cluster Update_x_CenterlineProperties;      // parallel event handler
-        public event Action CenterlinePropertiesChanging
+        // EVENTS
+        private ParallelActionHandler CalculateElementsHandler_x;
+        protected void OnCalculateElements_x(bool parallel = false)
         {
-            add { Update_x_CenterlineProperties.Subscribe(value); }
-            remove { Update_x_CenterlineProperties.UnSubscribe(value); }
-        } // facade event
-        protected void OnCenterlinePropertiesChanging(bool isParallel = false)
+            CalculateElementsHandler_x.Raise(parallel);
+        }
+        public event Action CalculateElements_x
         {
-            Update_x_CenterlineProperties.Call();
+            add { CalculateElementsHandler_x.Subscribe(value); }
+            remove { CalculateElementsHandler_x.UnSubscribe(value); }
         }
 
-        private Cluster Update_x_CurvatureBinormal;
-        private Cluster Update_x_MaterialFrame;
-        private Cluster Update_x_TwistingMoment;
-        private Cluster Update_x_BendingMoment;
-        private Cluster Update_x_AxialForce;
-        private Cluster Update_x_ShearForce;
-        private Cluster Update_x_InternalNodalMoment;
-        private Cluster Update_x_InternalNodalForce;
-        private Cluster Update_x_ResultantNodalMoment;
-        private Cluster Update_x_ResultantNodalForce;
+        private ParallelActionHandler CalculateElementsHandler_θ;
+        protected void OnCalculateElements_θ(bool parallel = false)
+        {
+            CalculateElementsHandler_θ.Raise(parallel);
+        }
+        public event Action CalculateElements_θ
+        {
+            add { CalculateElementsHandler_θ.Subscribe(value); }
+            remove { CalculateElementsHandler_θ.UnSubscribe(value); }
+        }
 
-        // 4 DOF ELEMENTS : θ
-        private Cluster Update_θ_CenterlineProperties;
-        private Cluster Update_θ_CurvatureBinormal;
-        private Cluster Update_θ_MaterialFrame;
-        private Cluster Update_θ_TwistingMoment;
-        private Cluster Update_θ_BendingMoment;
-        private Cluster Update_θ_AxialForce;
-        private Cluster Update_θ_ShearForce;
-        private Cluster Update_θ_InternalNodalMoment;
-        private Cluster Update_θ_InternalNodalForce;
-        private Cluster Update_θ_ResultantNodalMoment;
-        private Cluster Update_θ_ResultantNodalForce;
+        private ParallelActionHandler CalculateConstraintsHandler_x;
+        protected void OnCalculateConstraints_x(bool parallel = false)
+        {
+            CalculateConstraintsHandler_x.Raise(parallel);
+        }
+        public event Action CalculateConstraints_x
+        {
+            add { CalculateConstraintsHandler_x.Subscribe(value); }
+            remove { CalculateConstraintsHandler_x.UnSubscribe(value); }
+        }
 
-        // CONSTRAINTS : X
-        private Cluster Enforce_x_Fr;
-        private Cluster Enforce_x_Mr;
-        private Cluster Enforce_x_Qr;
+        private ParallelActionHandler CalculateConstraintsHandler_θ;
+        protected void OnCalculateConstraints_θ(bool parallel = false)
+        {
+            CalculateConstraintsHandler_θ.Raise(parallel);
+        }
+        public event Action CalculateConstraints_θ
+        {
+            add { CalculateConstraintsHandler_θ.Subscribe(value); }
+            remove { CalculateConstraintsHandler_θ.UnSubscribe(value); }
+        }
 
-        // CONSTRAINTS : θ
-        private Cluster Enforce_θ_Fr;
-        private Cluster Enforce_θ_Mr;
-        private Cluster Enforce_θ_Qr;
 
         // RELAX
         private int nx, nθ;
@@ -108,11 +108,11 @@ namespace TMarsupilami.CoreLib3
         private MVector[][] a_x, a_θ;
 
         public Beam[] elements_x, elements_θ;
-        private BoundaryCondition[] constraints_x;
+        private Support[] constraints_x;
         public Link[] links_x, links_θ;
 
         // BUILD
-        public KDRSolver(IEnumerable<Beam> elements, IEnumerable<BoundaryCondition> constraints, IEnumerable<Link> links, int maxIteration = 1000, double Ec_x_lim = 1e-12, double Ec_θ_lim = 1e-10)
+        public KDRSolver(IEnumerable<Beam> elements, IEnumerable<Support> constraints, IEnumerable<Link> links, int maxIteration = 1000, double Ec_x_lim = 1e-12, double Ec_θ_lim = 1e-10)
         {
             MaxIteration = maxIteration;
             this.Ec_x_lim = Ec_x_lim;
@@ -128,44 +128,15 @@ namespace TMarsupilami.CoreLib3
 
             Init_all = new Cluster(ParallelOptions, IsParallelModeEnabled);
 
-            Update_x_CenterlineProperties = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_CurvatureBinormal = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_MaterialFrame = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_TwistingMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_BendingMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_AxialForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_ShearForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_InternalNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_InternalNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_ResultantNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_x_ResultantNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
-
-            Update_θ_CenterlineProperties = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_CurvatureBinormal = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_MaterialFrame = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_TwistingMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_BendingMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_AxialForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_ShearForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_InternalNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_InternalNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_ResultantNodalMoment = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Update_θ_ResultantNodalForce = new Cluster(ParallelOptions, IsParallelModeEnabled);
-
-            // CONSTRAINTS : X
-            Enforce_x_Fr = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Enforce_x_Mr = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Enforce_x_Qr = new Cluster(ParallelOptions, IsParallelModeEnabled);
-
-            // CONSTRAINTS : θ
-            Enforce_θ_Fr = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Enforce_θ_Mr = new Cluster(ParallelOptions, IsParallelModeEnabled);
-            Enforce_θ_Qr = new Cluster(ParallelOptions, IsParallelModeEnabled);
+            CalculateElementsHandler_x = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
+            CalculateElementsHandler_θ = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
+            CalculateConstraintsHandler_x = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
+            CalculateConstraintsHandler_θ = new ParallelActionHandler(ParallelOptions, IsParallelModeEnabled);
 
             Build(elements, constraints, links);
             SolverSetup();
         }
-        private void Build(IEnumerable<Beam> elements, IEnumerable<BoundaryCondition> constraints, IEnumerable<Link> links)
+        private void Build(IEnumerable<Beam> elements, IEnumerable<Support> constraints, IEnumerable<Link> links)
         {
             // ELEMENTS
             var elements_x = new List<Beam>();
@@ -176,42 +147,12 @@ namespace TMarsupilami.CoreLib3
                 var beam = element as Beam_4DOF_D;
 
                 elements_x.Add(beam);
-
-                CenterlinePropertiesChanging += beam.Calculate_x;
-                //Update_x_CenterlineProperties.Subscribe(beam.UpdateCenterlineProperties);
-
-                //Update_x_CurvatureBinormal.Subscribe(beam.UpdateCurvatureBinormal);
-                //Update_x_MaterialFrame.Subscribe(beam.UpdateMaterialFrame);
-
-                Update_x_TwistingMoment.Subscribe(beam.UpdateTwistingMoment);
-                Update_x_BendingMoment.Subscribe(beam.UpdateBendingMoment);
-                Update_x_AxialForce.Subscribe(beam.UpdateAxialForce);
-                Update_x_ShearForce.Subscribe(beam.UpdateShearForce);
-
-                Update_x_InternalNodalMoment.Subscribe(beam.UpdateInternalNodalMoment);
-                Update_x_InternalNodalForce.Subscribe(beam.UpdateInternalNodalForce);
-
-                Update_x_ResultantNodalMoment.Subscribe(beam.UpdateResultantNodalMoment);
-                Update_x_ResultantNodalForce.Subscribe(beam.UpdateResultantNodalForce);
+                CalculateElements_x += beam.Calculate_x;
 
                 if (beam.IsTorsionCapable)
                 {
                     elements_θ.Add(element);
-
-                    Update_θ_CenterlineProperties.Subscribe(beam.Calculate_x);
-                    //Update_θ_CurvatureBinormal.Subscribe(beam.UpdateCurvatureBinormal);
-                    //Update_θ_MaterialFrame.Subscribe(beam.UpdateMaterialFrame);
-
-                    Update_θ_TwistingMoment.Subscribe(beam.UpdateTwistingMoment);
-                    Update_θ_BendingMoment.Subscribe(beam.UpdateBendingMoment);
-                    Update_θ_AxialForce.Subscribe(beam.UpdateAxialForce);
-                    Update_θ_ShearForce.Subscribe(beam.UpdateShearForce);
-
-                    Update_θ_InternalNodalMoment.Subscribe(beam.UpdateInternalNodalMoment);
-                    Update_θ_InternalNodalForce.Subscribe(beam.UpdateInternalNodalForce);
-
-                    Update_θ_ResultantNodalMoment.Subscribe(beam.UpdateResultantNodalMoment);
-                    Update_θ_ResultantNodalForce.Subscribe(beam.UpdateResultantNodalForce);
+                    CalculateElements_θ += beam.Calculate_θ;
                 }
             }
 
@@ -219,7 +160,7 @@ namespace TMarsupilami.CoreLib3
             this.elements_θ = elements_θ.ToArray();
 
             // CONSTRAINTS
-            var constraints_x = new List<BoundaryCondition>();
+            var constraints_x = new List<Support>();
 
             // INIT
             foreach (var cst in constraints)
@@ -582,14 +523,12 @@ namespace TMarsupilami.CoreLib3
             foreach (var lk in links_x) { lk.Calculate_x(); } // calcul des projections à partir des positions actuelles 
             foreach (var lk in links_x) { lk.Transfer_Rx(); } // calcul des projections à partir des positions actuelles 
 
-            for (int i = 0; i < elements_x.Length; i++)
-            {
-                elements_x[i].Calculate_x();
-            }
+            //for (int i = 0; i < elements_x.Length; i++)
+            //{
+            //    elements_x[i].Calculate_x();
+            //}
 
-            // UPDATE RESULTANT NODAL FORCE AND MOMENT
-            //Update_x_ResultantNodalMoment.Call();
-            //Update_x_ResultantNodalForce.Call();
+            OnCalculateElements_x();
         }
         private void UpdateDeformedConfig_θ()
         {
@@ -597,11 +536,9 @@ namespace TMarsupilami.CoreLib3
             foreach (var lk in links_θ) { lk.Calculate_θ(); }
             foreach (var lk in links_x) { lk.Transfer_Rθ(); }
 
-            for (int i = 0; i < elements_θ.Length; i++){ elements_θ[i].Calculate_θ(); }
+            //for (int i = 0; i < elements_θ.Length; i++){ elements_θ[i].Calculate_θ(); }
 
-            //// UPDATE RESULTANT NODAL FORCE AND MOMENT
-            //Update_θ_ResultantNodalMoment.Call();
-            //Update_θ_ResultantNodalForce.Call();
+            OnCalculateElements_θ();
         }
 
         private static void OnKineticEnergyPeak_x(KDRSolver solver)

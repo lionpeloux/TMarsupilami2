@@ -139,7 +139,7 @@ namespace TMarsupilami.Gh.Component
             var Ec_θ_lim = 1e-6;
 
             // INIT
-            var bc_list = new List<BoundaryCondition>();
+            var bc_list = new List<Support>();
 
             materials = new List<Material>() { new Material(StandardMaterials.GFRP) };
 
@@ -172,46 +172,46 @@ namespace TMarsupilami.Gh.Component
             // BC
             switch (bc1_start)
             {
-                case (int)BoundaryConditionType.Free:
+                case (int)SupportCondition.Free:
                     break;
-                case (int)BoundaryConditionType.Clamped:
-                    BC.AddClampedBoundaryCondition(elements[0], Boundary.Start);
+                case (int)SupportCondition.Clamped:
+                    Support.AddClampedSupport(elements[0], Boundary.Start);
                     break;
                 default:
-                    BC.AddPinnedBoundaryCondition(elements[0], Boundary.Start);
+                    Support.AddPinnedSupport(elements[0], Boundary.Start);
                     break;
             }
             switch (bc1_end)
             {
-                case (int)BoundaryConditionType.Free:
+                case (int)SupportCondition.Free:
                     break;
-                case (int)BoundaryConditionType.Clamped:
-                    BC.AddClampedBoundaryCondition(elements[0], Boundary.End);
+                case (int)SupportCondition.Clamped:
+                    Support.AddClampedSupport(elements[0], Boundary.End);
                     break;
                 default:
-                    BC.AddPinnedBoundaryCondition(elements[0], Boundary.End);
+                    Support.AddPinnedSupport(elements[0], Boundary.End);
                     break;
             }
             switch (bc2_start)
             {
-                case (int)BoundaryConditionType.Free:
+                case (int)SupportCondition.Free:
                     break;
-                case (int)BoundaryConditionType.Clamped:
-                    BC.AddClampedBoundaryCondition(elements[1], Boundary.Start);
+                case (int)SupportCondition.Clamped:
+                    Support.AddClampedSupport(elements[1], Boundary.Start);
                     break;
                 default:
-                    BC.AddPinnedBoundaryCondition(elements[1], Boundary.Start);
+                    Support.AddPinnedSupport(elements[1], Boundary.Start);
                     break;
             }
             switch (bc2_end)
             {
-                case (int)BoundaryConditionType.Free:
+                case (int)SupportCondition.Free:
                     break;
-                case (int)BoundaryConditionType.Clamped:
-                    BC.AddClampedBoundaryCondition(elements[1], Boundary.End);
+                case (int)SupportCondition.Clamped:
+                    Support.AddClampedSupport(elements[1], Boundary.End);
                     break;
                 default:
-                    BC.AddPinnedBoundaryCondition(elements[1], Boundary.End);
+                    Support.AddPinnedSupport(elements[1], Boundary.End);
                     break;
             }
 

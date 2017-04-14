@@ -7,23 +7,34 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.CoreLib3
 {
-    public struct ForceTorsor : IDeepCopy<ForceTorsor>, IShallowCopy<ForceTorsor>
+    public struct Torsor : IDeepCopy<Torsor>, IShallowCopy<Torsor>
     {
         public MFrame LocalFrame { get; private set; }
         public MVector Force { get; private set; }
         public MVector Moment { get; private set; }
 
-        public ForceTorsor(MVector forceInGCS, MVector momentInGCS, MFrame localFrameInGCS)
+        public Torsor(MVector forceInGCS, MVector momentInGCS, MFrame localFrameInGCS)
         {
-            this.LocalFrame = localFrameInGCS;
-            this.Force = forceInGCS;
-            this.Moment = momentInGCS;
+            LocalFrame = localFrameInGCS;
+            Force = forceInGCS;
+            Moment = momentInGCS;
         }
-        public ForceTorsor(MVector forceInGCS, MVector momentInGCS) :this(forceInGCS, momentInGCS, MFrame.XY)
+        public Torsor(MVector forceInGCS, MVector momentInGCS, MPoint applicationPoint)
+        {
+            var localFrame = MFrame.XY;
+            localFrame.Origin = applicationPoint;
+            LocalFrame = localFrame;
+            Force = forceInGCS;
+            Moment = momentInGCS;
+        }
+        public Torsor(MFrame localFrameInGCS) : this(MVector.Zero, MVector.Zero, localFrameInGCS)
+        {
+        }
+        public Torsor(MPoint applicationPoint) : this(MVector.Zero, MVector.Zero, applicationPoint)
         {
         }
 
-        public ForceTorsor Move(MPoint toPoint)
+        public Torsor Move(MPoint toPoint)
         {
             var localFrame = LocalFrame;
             localFrame.Origin = toPoint;
@@ -32,9 +43,9 @@ namespace TMarsupilami.CoreLib3
             var force = Force;
             var moment = Moment + MVector.CrossProduct(Force, u);
 
-            return new ForceTorsor(force, moment, localFrame);
+            return new Torsor(force, moment, localFrame);
         }
-        public ForceTorsor Move(MFrame toFrame)
+        public Torsor Move(MFrame toFrame)
         {
             var localFrame = toFrame;
 
@@ -42,7 +53,7 @@ namespace TMarsupilami.CoreLib3
             var force = Force;
             var moment = Moment + MVector.CrossProduct(Force, u);
 
-            return new ForceTorsor(force, moment, localFrame);
+            return new Torsor(force, moment, localFrame);
         }
 
         public void GetForceComponents(out MVector F1, out MVector F2, out MVector F3, bool inGCS)
@@ -134,11 +145,11 @@ namespace TMarsupilami.CoreLib3
             return "[T] = { O : " + LocalFrame.Origin + " | F : " + Force + " | M : " + Moment + " }";
         }
 
-        public ForceTorsor DeepCopy()
+        public Torsor DeepCopy()
         {
-            return new ForceTorsor(Force, Moment, LocalFrame);
+            return new Torsor(Force, Moment, LocalFrame);
         }
-        public ForceTorsor ShallowCopy()
+        public Torsor ShallowCopy()
         {
             return DeepCopy();
         }

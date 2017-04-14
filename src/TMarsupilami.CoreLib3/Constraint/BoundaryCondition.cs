@@ -8,7 +8,7 @@ namespace TMarsupilami.CoreLib3
     {
         BoundaryCondition = 000,
     }
-    public enum BoundaryConditionType
+    public enum SupportCondition
     {
         Free,
         Pinned,     // fixed (x,y,z) & free (xx,yy,zz) + eventual end moments
@@ -19,7 +19,7 @@ namespace TMarsupilami.CoreLib3
     {
         #region PROPERTIES
         public ConstraintLayoutType Type { get { return ConstraintLayoutType.BoundaryCondition; } }
-        public BoundaryConditionType SubType { get; protected set; }
+        public SupportCondition SubType { get; protected set; }
         public MVector F { get; protected set; }
         public MVector M { get; protected set; }
         public Beam Beam { get; protected set; }
@@ -29,7 +29,7 @@ namespace TMarsupilami.CoreLib3
         #endregion
 
         #region CONSTRUCTORS
-        protected BoundaryCondition(Beam beam, BoundaryConditionType subType, Boundary boundary) : base()
+        protected BoundaryCondition(Beam beam, SupportCondition subType, Boundary boundary) : base()
         {
             Beam = beam;
             SubType = subType;
@@ -56,7 +56,7 @@ namespace TMarsupilami.CoreLib3
         private class Pinned : BoundaryCondition
         {
             public Pinned(Beam beam, Boundary boundary)
-                : base(beam, BoundaryConditionType.Pinned, boundary)
+                : base(beam, SupportCondition.Pinned, boundary)
             {}
 
             public override string ToString()
@@ -86,7 +86,7 @@ namespace TMarsupilami.CoreLib3
             private MFrame clamped_frame;    // clamped configuration storage
 
             public Clamped(Beam beam, Boundary boundary)
-                : base(beam, BoundaryConditionType.Clamped, boundary)
+                : base(beam, SupportCondition.Clamped, boundary)
             {
             }
 
@@ -181,35 +181,120 @@ namespace TMarsupilami.CoreLib3
         }
     }
 
-    public abstract class BC
+    public abstract class Support
     {
+        protected int nv, nv_h;
+        protected Torsor torsor;
+        protected MFrame frame;
+
         #region PROPERTIES
-        public BoundaryConditionType Type { get; protected set; }
-        public MVector F { get; protected set; }
-        public MVector M { get; protected set; }
         public Beam Beam { get; protected set; }
-        public Boundary Boundary { get; protected set; }
-        public int VertexIndex { get; protected set; }
+        public int VertexIndex { get { return nv_h; }}
+        public int GlobalVertexIndex { get { return nv; } }
+        public SupportCondition Type { get; protected set; }
+
+        /// <summary>
+        /// The local frame of the support.
+        /// </summary>
+        public MFrame Frame { get { return frame; } }
+
+        /// <summary>
+        /// Support reaction force (Fr) towards the element.
+        /// </summary>
+        public MVector F { get; protected set; }
+
+        /// <summary>
+        /// Support reaction moment (Mr) towards the element. 
+        /// </summary>
+        public MVector M { get; protected set; }
+
+        /// <summary>
+        /// Gets the support reaction torsor (Tr) towards the element at the local frame.
+        /// </summary>
+        public Torsor Torsor
+        {
+            get
+            {
+                return GetTorsor();
+            }
+        }
 
         #endregion
 
         #region CONSTRUCTORS
-        protected BC(Beam beam, BoundaryConditionType type, Boundary boundary) : base()
+        protected Support(Beam beam, int vertexIndex, SupportCondition type)
         {
             Beam = beam;
             Type = type;
-            Boundary = boundary;
-            VertexIndex = beam.BoundaryToVertexIndex(Boundary);
+            nv_h = vertexIndex;
+            nv = Beam.HandleToGlobalVertexIndex(VertexIndex);
+            frame = beam.ActualConfiguration[GlobalVertexIndex];
+        }
+        protected Support(Beam beam, int vertexIndex, SupportCondition type, MFrame supportFrame):this(beam, vertexIndex, type)
+        {
+            Beam = beam;
+            Type = type;
+            nv_h = vertexIndex;
+            nv = Beam.HandleToGlobalVertexIndex(VertexIndex);
+            frame = supportFrame;
+        }
+        protected Support(Beam beam, Boundary boundary, SupportCondition type)
+        {
+            Beam = beam;
+            Type = type;
+            nv_h = beam.BoundaryToVertexIndex(boundary);
+            nv = Beam.HandleToGlobalVertexIndex(VertexIndex);
+            frame = beam.ActualConfiguration[GlobalVertexIndex];
+        }
+        protected Support(Beam beam, Boundary boundary, SupportCondition type, MFrame supportFrame) : this(beam, boundary, type)
+        {
+            Beam = beam;
+            Type = type;
+            nv_h = beam.BoundaryToVertexIndex(boundary);
+            nv = Beam.HandleToGlobalVertexIndex(VertexIndex);
+            frame = supportFrame;
         }
         #endregion
 
-        public static BC AddPinnedBoundaryCondition(Beam beam, Boundary boundary)
+        // FACTORY
+        public static Support AddPinnedSupport(Beam beam, int vertexIndex)
+        {
+            return new Pinned(beam, vertexIndex);
+        }
+        public static Support AddPinnedSupport(Beam beam, Boundary boundary)
         {
             return new Pinned(beam, boundary);
         }
-        public static BC AddClampedBoundaryCondition(Beam beam, Boundary boundary)
+        public static Support AddPinnedSupport(Beam beam, int vertexIndex, MFrame supportFrame)
+        {
+            return new Pinned(beam, vertexIndex, supportFrame);
+        }
+        public static Support AddPinnedSupport(Beam beam, Boundary boundary, MFrame supportFrame)
+        {
+            return new Pinned(beam, boundary, supportFrame);
+        }
+
+        public static Support AddClampedSupport(Beam beam, int vertexIndex)
+        {
+            return new Clamped(beam, vertexIndex);
+        }
+        public static Support AddClampedSupport(Beam beam, Boundary boundary)
         {
             return new Clamped(beam, boundary);
+        }
+        public static Support AddClampedSupport(Beam beam, int vertexIndex, MFrame supportFrame)
+        {
+            return new Clamped(beam, vertexIndex, supportFrame);
+        }
+        public static Support AddClampedSupport(Beam beam, Boundary boundary, MFrame supportFrame)
+        {
+            return new Clamped(beam, boundary, supportFrame);
+        }
+
+        private Torsor GetTorsor()
+        {
+            var torsor = new Torsor(F, M, Beam.ActualConfiguration[nv].Origin);
+            return torsor.Move(Frame);
         }
 
         public virtual void Init() { }
@@ -218,45 +303,68 @@ namespace TMarsupilami.CoreLib3
         public virtual void Enforce_Fr(MVector[] Fr, MVector[] Rx) { }
 
         // internal class
-        private class Pinned : BC
+        private class Pinned : Support
         {
-            public Pinned(Beam beam, Boundary boundary)
-                : base(beam, BoundaryConditionType.Pinned, boundary)
+
+            private void Subscribe()
             {
-                beam.ReactionForceUpdating += Enforce_Fr;
+                Init();
+                Beam.ReactionForceUpdating += Enforce_Fr;
+            }
+            public Pinned(Beam beam, int vertexIndex) : base(beam, vertexIndex, SupportCondition.Pinned)
+            {
+                Subscribe();
+            }
+            public Pinned(Beam beam, int vertexIndex, MFrame supportFrame) : base(beam, vertexIndex, SupportCondition.Pinned, supportFrame)
+            {
+                Subscribe();
+            }
+            public Pinned(Beam beam, Boundary boundary) : base(beam, boundary, SupportCondition.Pinned)
+            {
+                Subscribe();
+            }
+            public Pinned(Beam beam, Boundary boundary, MFrame supportFrame) : base(beam, boundary, SupportCondition.Pinned, supportFrame)
+            {
+                Subscribe();
             }
 
             public override string ToString()
             {
                 return "[BOUNDARY CONDITION] : pinned";
             }
-
             public override void Enforce_Fr(MVector[] Fr, MVector[] Rx)
             {
-                if (Boundary == Boundary.Start)
-                {
-                    this.F = Rx[0];  // force appliquée par la poutre sur le support
-                    Fr[0] = this.F;
-                }
-                else
-                {
-                    this.F = Rx[Beam.Nv - 1];  // force appliquée par la poutre sur le support
-                    Fr[Beam.Nvh - 1] = this.F;
-                }
-
+                F = -Rx[nv];    // réaction du support sur la poutre
+                Rx[nv] += F;    // => Rx[nv] = 0
+                Fr[nv_h] = F;
             }
         }
-        private class Clamped : BC
+        private class Clamped : Support
         {
             private MFrame clamped_frame;    // clamped configuration storage
 
-            public Clamped(Beam beam, Boundary boundary)
-                : base(beam, BoundaryConditionType.Clamped, boundary)
+            private void Subscribe()
             {
                 Init();
-                beam.TangentsUpdated += Enforce_t;
-                beam.ReactionForceUpdating += Enforce_Fr;
-                beam.ReactionMomentUpdating += Enforce_Mr;
+                Beam.TangentsUpdated += Enforce_t;
+                Beam.ReactionForceUpdating += Enforce_Fr;
+                Beam.ReactionMomentUpdating += Enforce_Mr;
+            }
+            public Clamped(Beam beam, int vertexIndex) : base(beam, vertexIndex, SupportCondition.Clamped)
+            {
+                Subscribe();
+            }
+            public Clamped(Beam beam, int vertexIndex, MFrame supportFrame) : base(beam, vertexIndex, SupportCondition.Clamped, supportFrame)
+            {
+                Subscribe();
+            }
+            public Clamped(Beam beam, Boundary boundary) : base(beam, boundary, SupportCondition.Clamped)
+            {
+                Subscribe();
+            }
+            public Clamped(Beam beam, Boundary boundary, MFrame supportFrame) : base(beam, boundary, SupportCondition.Clamped, supportFrame)
+            {
+                Subscribe();
             }
 
             public override string ToString()
@@ -266,54 +374,23 @@ namespace TMarsupilami.CoreLib3
 
             public override void Init()
             {
-                if (Boundary == Boundary.Start)
-                {
-                    clamped_frame = Beam.ActualConfiguration[0];
-                }
-                else
-                {
-                    clamped_frame = Beam.ActualConfiguration[Beam.Nv - 1];
-                }
+                clamped_frame = Beam.ActualConfiguration[nv];
             }
             public override void Enforce_t(MVector[] t)
             {
-                if (Boundary == Boundary.Start)
-                {
-                    t[0] = clamped_frame.ZAxis;
-                }
-                else if (Boundary == Boundary.End)
-                {
-                    t[Beam.Nv - 1] = clamped_frame.ZAxis;
-                }
-                else
-                {
-                }
+                t[nv] = clamped_frame.ZAxis;
             }
             public override void Enforce_Mr(MVector[] Mr, MVector[] Rθ)
             {
-                if (Boundary == Boundary.Start)
-                {
-                    this.M = Rθ[0];  // force appliquée par la poutre sur le support
-                    Mr[0] = this.M; 
-                }
-                else
-                {
-                    this.M = Rθ[Beam.Nv - 1];  // force appliquée par la poutre sur le support
-                    Mr[Beam.Nvh - 1] = this.M; 
-                }
+                M = -Rθ[nv];    // réaction du support sur la poutre
+                Rθ[nv] += M;    // => Rθ[nv] = 0
+                Mr[nv_h] = M;
             }
             public override void Enforce_Fr(MVector[] Fr, MVector[] Rx)
             {
-                if (Boundary == Boundary.Start)
-                {
-                    this.F = Rx[0];  // force appliquée par la poutre sur le support
-                    Fr[0] = this.F;
-                }
-                else
-                {
-                    this.F = Rx[Beam.Nv - 1];  // force appliquée par la poutre sur le support
-                    Fr[Beam.Nvh - 1] = this.F;
-                }
+                F = -Rx[nv];    // réaction du support sur la poutre
+                Rx[nv] += F;    // => Rx[nv] = 0
+                Fr[nv_h] = F;
             }
         }
     }
