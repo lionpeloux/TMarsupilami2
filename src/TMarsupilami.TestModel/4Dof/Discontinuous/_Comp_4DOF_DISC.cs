@@ -422,7 +422,7 @@ namespace TMarsupilami.Gh.Component
             {
                 case (int)BoundaryConditionType.Free:
                     //elements[0].Mext[elements[0].Nn - 1] = new MVector(0, 0, 1e5);
-                    //elements[0].Fext[elements[0].Nn - 1] = new MVector(0, 0, 0*1e4);
+                    elements[0].Fext[elements[0].Nn - 1] = new MVector(0, 0, -1e4);
                     break;
                 case (int)BoundaryConditionType.Clamped:
                     constraints_list.Add(BoundaryCondition.AddClampedBoundaryCondition(ref elements[0], Boundary.End));

@@ -194,8 +194,17 @@ namespace TMarsupilami.Gh.Component
                 case (int)SupportCondition.Free:
 
                     // force verticale
-                    //loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e4), Boundary.End, beam, true));
-                    //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 1e4, 0), beam.Nvh/2 + 1, beam, false));
+                    loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e5), Boundary.End, beam, true));
+                    //loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e5), beam.Nvg / 2, beam, true));
+                    //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, -1e5,0), beam.Nvg/2, beam, false));
+                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 0,1e4), beam.Nvg/2, beam, false));
+
+
+                    for (int i = 0; i < beam.Nvg; i++)
+                    {
+                        loads.Add(BeamVectorLoad.Create_mext(new MVector(0, 0, 5e3), i, beam, false));
+                    }
+
                     //loads.Add(BeamVectorLoad.Create_fext(new MVector(0, 0, -1e4), 3, beam, true));
                     //loads.Add(BeamVectorLoad.Create_fext(new MVector(0, 0, 1e4), 4, beam, true));
                     //loads.Add(BeamVectorLoad.Create_mext(new MVector(0, -0.5 * 1e4, 0), beam.Nvh / 2 - 1, beam, false));

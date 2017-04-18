@@ -294,7 +294,7 @@ namespace TMarsupilami.CoreLib3
 
         #region POINTERS
         // GEOMETRIC CONFIGURATION
-        internal MFrame[] RestConfiguration { get { return mframes_0; } }
+        public MFrame[] RestConfiguration { get { return mframes_0; } }
         internal MFrame[] InitialConfiguration { get { return mframes_i; } }
         public MFrame[] ActualConfiguration { get { return mframes; } }
 
