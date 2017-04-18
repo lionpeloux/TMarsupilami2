@@ -545,8 +545,8 @@ namespace TMarsupilami.CoreLib3
                 // dQ est évalué à partir de Q' + κ1M2 - κ2M1 + m3 = 0 (à l'équilibre statique)
                 // et donc Q' = dQ/ds = -m3 - (κ1M2 - κ2M1)
                 // on remarque que κb x M = (κ1M2 - κ2M1) * d3
-                m3 = mext_m[i].Z;
 
+                m3 = mext_m[i].Z;
 
                 // 2i
                 M_mid = 0.5 * (M_h_r[i] + M_g[i]);
@@ -574,30 +574,20 @@ namespace TMarsupilami.CoreLib3
         /// </summary>
         private void UpdateInternalNodalMoment()
         {
-            // BENDING MOMENT
-            Rint_θ_bending[0] = M_h_r[0];
-            for (int i = 1; i < nv_h-1; i++)
-            {
-                Rint_θ_bending[2 * i] = M_h_r[i] - M_h_l[i];
-            }
-            Rint_θ_bending[nv - 1] = -M_h_l[nv_h - 1];
-
-            // TWISTING MOMENT | torsion contribution (Q)
-            Rint_θ_torsion_M[0] = 0;
-            Rint_θ_torsion_Q[0] = 0;
+            Rint_θ[0] = MVector.Zero;
             for (int i = 0; i < nv_g; i++)
             {
-                Rint_θ_torsion_Q[2 * i] += Q_r[2 * i];
-                Rint_θ_torsion_Q[2 * i + 1] = Q_r[2 * i + 1] - Q_l[2 * i + 1];
-                Rint_θ_torsion_Q[2 * i + 2] = -Q_l[2 * i + 2];
-            }
+                Rint_θ[2 * i].X += M_h_r[i].X;
+                Rint_θ[2 * i].Y += M_h_r[i].Y;
+                Rint_θ[2 * i].Z += Q_r[2 * i];
 
-            // RESULTING MOMENT
-            for (int i = 0; i < nv; i++)
-            {
-                Rint_θ[i].X = Rint_θ_bending[i].X;
-                Rint_θ[i].Y = Rint_θ_bending[i].Y;
-                Rint_θ[i].Z = Rint_θ_torsion_Q[i] + Rint_θ_torsion_M[i];
+                Rint_θ[2 * i + 1].X = 0;
+                Rint_θ[2 * i + 1].Y = 0;
+                Rint_θ[2 * i + 1].Z = Q_r[2 * i + 1] - Q_l[2 * i + 1];
+
+                Rint_θ[2 * i + 2].X = -M_h_r[i + 1].X;
+                Rint_θ[2 * i + 2].Y = -M_h_r[i + 1].Y;
+                Rint_θ[2 * i + 2].Z = -Q_l[2 * i + 2];
             }
         }
 
