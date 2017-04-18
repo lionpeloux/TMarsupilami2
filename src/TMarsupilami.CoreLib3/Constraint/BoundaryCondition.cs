@@ -309,7 +309,7 @@ namespace TMarsupilami.CoreLib3
             private void Subscribe()
             {
                 Init();
-                Beam.ReactionForceUpdating += Enforce_Fr;
+                Beam.ReactionForceUpdated += Enforce_Fr;
             }
             public Pinned(Beam beam, int vertexIndex) : base(beam, vertexIndex, SupportCondition.Pinned)
             {
@@ -347,8 +347,8 @@ namespace TMarsupilami.CoreLib3
             {
                 Init();
                 Beam.TangentsUpdated += Enforce_t;
-                Beam.ReactionForceUpdating += Enforce_Fr;
-                Beam.ReactionMomentUpdating += Enforce_Mr;
+                Beam.ReactionForceUpdated += Enforce_Fr;
+                Beam.ReactionMomentUpdated += Enforce_Mr;
             }
             public Clamped(Beam beam, int vertexIndex) : base(beam, vertexIndex, SupportCondition.Clamped)
             {

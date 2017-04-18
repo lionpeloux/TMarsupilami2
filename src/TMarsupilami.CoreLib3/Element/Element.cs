@@ -129,10 +129,10 @@ namespace TMarsupilami.CoreLib3
         }
 
         // EVENT : ReactionTwistingMomentUpdating
-        public event Action<MVector[], MVector[]> ReactionMomentUpdating;
+        public event Action<MVector[], MVector[]> ReactionMomentUpdated;
         protected virtual void OnReactionMomentUpdating(MVector[] Mr, MVector[] Rθ)
         {
-            Action<MVector[], MVector[]> handler = ReactionMomentUpdating;
+            Action<MVector[], MVector[]> handler = ReactionMomentUpdated;
             if (handler != null)
             {
                 handler(Mr, Rθ);
@@ -140,10 +140,10 @@ namespace TMarsupilami.CoreLib3
         }
 
         // EVENT : ReactionForceEnforcing
-        public event Action<MVector[], MVector[]> ReactionForceUpdating;
+        public event Action<MVector[], MVector[]> ReactionForceUpdated;
         protected virtual void OnReactionForceUpdating(MVector[] Fr, MVector[] Rx)
         {
-            Action<MVector[], MVector[]> handler = ReactionForceUpdating;
+            Action<MVector[], MVector[]> handler = ReactionForceUpdated;
             if (handler != null)
             {
                 handler(Fr, Rx);
