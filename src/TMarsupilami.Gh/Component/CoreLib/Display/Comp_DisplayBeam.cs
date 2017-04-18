@@ -43,10 +43,13 @@ namespace TMarsupilami.Gh.Component
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddParameter(new Param_MFrame(), "Frames", "F", "The material frames of the beam.", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MCForce(), "Fext", "Fext", "The applied force.", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MCMoment(), "Mext", "Mext", "The applied moment.", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MDForce(), "fext", "fext", "The applied force.", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MDMoment(), "mext", "mext", "The applied moment.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MFrame(), "Frames Mid", "Fmid", "The material frames of the beam.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCForce(), "Fext (G)", "Fext", "The applied force.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCMoment(), "Mext (L)", "Mext", "The applied moment.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MDForce(), "fext (G)", "fext", "The applied force.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MDMoment(), "mext (L)", "mext", "The applied moment.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCForce(), "Fr (G)", "Fr", "The applied force reaction.", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCMoment(), "Mr (L)", "Mr", "The applied moment reaction.", GH_ParamAccess.list);
         }
 
         protected override void BeforeSolveInstance()
@@ -61,7 +64,7 @@ namespace TMarsupilami.Gh.Component
 
             if (!DA.GetData(0, ref ghBeam)){ return; }
 
-            var beam = ghBeam.Value;
+            var beam = ghBeam.Value as Beam_4DOF_D;
 
             var Fext = new CForce[beam.Fext_g.Length];
             for (int i = 0; i < Fext.Length; i++)
@@ -91,11 +94,29 @@ namespace TMarsupilami.Gh.Component
                 mext[i] = new DMoment(m, beam.ActualConfiguration[2 * i].Origin, beam.ActualConfiguration[2 * i + 2].Origin, beam.ActualConfiguration[2 * i]);
             }
 
+            var Fr = new CForce[beam.Fr_g.Length];
+            for (int i = 0; i < Fr.Length; i++)
+            {
+                var F = beam.Fr_g[i];
+                Fr[i] = new CForce(F, beam.ActualConfiguration[2 * i]);
+            }
+
+            var Mr = new CMoment[beam.Mr_m.Length];
+            for (int i = 0; i < Mr.Length; i++)
+            {
+                var M = beam.ToGlobalCoordinateSystem(beam.Mr_m[i], 2 * i);
+                Mr[i] = new CMoment(M, beam.ActualConfiguration[2 * i]);
+            }
+
+
             DA.SetDataList(0, beam.ActualConfiguration);
-            DA.SetDataList(1, Fext);
-            DA.SetDataList(2, Mext);
-            DA.SetDataList(3, fext);
-            DA.SetDataList(4, mext);
+            DA.SetDataList(1, beam.mframes_mid);
+            DA.SetDataList(2, Fext);
+            DA.SetDataList(3, Mext);
+            DA.SetDataList(4, fext);
+            DA.SetDataList(5, mext);
+            DA.SetDataList(6, Fr);
+            DA.SetDataList(7, Mr);
 
         }
 
