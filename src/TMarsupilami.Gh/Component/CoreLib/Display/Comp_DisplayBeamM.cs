@@ -85,15 +85,15 @@ namespace TMarsupilami.Gh.Component
             var Ml = new CMoment[beam.Nv];
             for (int i = 0; i < beam.Nvh; i++)
             {
-                var M = beam.ToGlobalCoordinateSystem(beam.M_h_l[i], 2 * i);
+                var M = beam.M_h_l[i];
                 Ml[2 * i] = new CMoment(M, beam.ActualConfiguration[2 * i]);
 
-                M = beam.ToGlobalCoordinateSystem(beam.M_h_r[i], 2 * i);
+                M = beam.M_h_r[i];
                 Mr[2 * i] = new CMoment(M, beam.ActualConfiguration[2 * i]);
             }
             for (int i = 0; i < beam.Nvg; i++)
             {
-                var M = beam.ToGlobalCoordinateSystem(beam.M_g[i], 2 * i + 1);
+                var M =beam.M_g[i];
                 Ml[2 * i + 1] = new CMoment(M, beam.ActualConfiguration[2 * i + 1]);
                 Mr[2 * i + 1] = new CMoment(M, beam.ActualConfiguration[2 * i + 1]);
             }
@@ -120,19 +120,19 @@ namespace TMarsupilami.Gh.Component
                 var d1 = frame.XAxis;
                 var d2 = frame.YAxis;
 
-                var pt_l = (frame.Origin + scale * Ml[i].Value.X * d1).Cast();
+                var pt_l = (frame.Origin + scale * (Ml[i].Value *d1) * d1).Cast();
                 pts_1.Add(pt_l);
                 diagram_1.Add((new Line(frame.Origin.Cast(), pt_l)).ToNurbsCurve());
 
-                var pt_r = (frame.Origin + scale * Mr[i].Value.X * d1).Cast();
+                var pt_r = (frame.Origin + scale * (Mr[i].Value*d1) * d1).Cast();
                 pts_1.Add(pt_r);
                 diagram_1.Add((new Line(frame.Origin.Cast(), pt_r)).ToNurbsCurve());
 
-                pt_l = (frame.Origin + scale * Ml[i].Value.Y * d2).Cast();
+                pt_l = (frame.Origin + scale * (Ml[i].Value * d2) * d2).Cast();
                 pts_2.Add(pt_l);
                 diagram_2.Add((new Line(frame.Origin.Cast(), pt_l)).ToNurbsCurve());
 
-                pt_r = (frame.Origin + scale * Mr[i].Value.Y * d2).Cast();
+                pt_r = (frame.Origin + scale * (Mr[i].Value *d2) * d2).Cast();
                 pts_2.Add(pt_r);
                 diagram_2.Add((new Line(frame.Origin.Cast(), pt_r)).ToNurbsCurve());
             }

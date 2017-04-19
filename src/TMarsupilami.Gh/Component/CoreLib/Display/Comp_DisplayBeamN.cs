@@ -77,14 +77,14 @@ namespace TMarsupilami.Gh.Component
             var Nr = new CForce[beam.Nv];
             for (int i = 0; i < beam.Nv; i++)
             {
-                var N = beam.N_r[i];
+                var N = beam.N_r[i] * beam.ActualConfiguration[i].ZAxis;
                 Nr[i] = new CForce(N, beam.ActualConfiguration[i]);
             }
 
             var Nl = new CForce[beam.Nv];
             for (int i = 0; i < beam.Nv; i++)
             {
-                var N = beam.N_l[i];
+                var N = beam.N_l[i] * beam.ActualConfiguration[i].ZAxis;
                 Nl[i] = new CForce(N, beam.ActualConfiguration[i]);
             }
 
