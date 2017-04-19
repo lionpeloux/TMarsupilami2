@@ -477,6 +477,7 @@ namespace TMarsupilami.MathLib
             for (int i = 0; i < ne; i++)
             {
                 // compute twist
+
                 twistAngle = -Rotation.ZAngle_Rotation(frames[i], frames[i].ZAxis, frames[i + 1], frames[i + 1].ZAxis);
                 τ[i] = twistAngle / l[i];
             }

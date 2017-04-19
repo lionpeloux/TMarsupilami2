@@ -70,9 +70,8 @@ namespace TMarsupilami.Gh.Component
             DA.GetData(1, ref scale);
             DA.GetData(2, ref isRest);
 
-
-
             var beam = ghBeam.Value as Beam_4DOF_D;
+            CMoment[] Mr, Ml;
 
             var Mext = new CMoment[beam.Mext_m.Length];
             for (int i = 0; i < Mext.Length; i++)
@@ -81,24 +80,7 @@ namespace TMarsupilami.Gh.Component
                 Mext[i] = new CMoment(M, beam.ActualConfiguration[2 * i]);
             }
 
-            var Mr = new CMoment[beam.Nv];
-            var Ml = new CMoment[beam.Nv];
-            for (int i = 0; i < beam.Nvh; i++)
-            {
-                var M = beam.M_h_l[i];
-                Ml[2 * i] = new CMoment(M, beam.ActualConfiguration[2 * i]);
-
-                M = beam.M_h_r[i];
-                Mr[2 * i] = new CMoment(M, beam.ActualConfiguration[2 * i]);
-            }
-            for (int i = 0; i < beam.Nvg; i++)
-            {
-                var M =beam.M_g[i];
-                Ml[2 * i + 1] = new CMoment(M, beam.ActualConfiguration[2 * i + 1]);
-                Mr[2 * i + 1] = new CMoment(M, beam.ActualConfiguration[2 * i + 1]);
-            }
-
-         
+            beam.Get_M(out Ml, out Mr);
 
             var pts_1 = new List<Point3d>();
             var diagram_1 = new List<NurbsCurve>();

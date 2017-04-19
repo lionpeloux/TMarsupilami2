@@ -596,12 +596,12 @@ namespace TMarsupilami.CoreLib3
             // Calcul les frames au milieu des edges
             // GJ * dθ_mid = li/8 *(3*Qr + Ql)
 
-            for (int i = 0; i < ne; i++)
-            {
-                var dθ_mid = l[i] / (8 * GJ[i/2]) * (3 * Q_r[i] + Q_l[i + 1]);
-                ParallelTransportation.ZPT_Rotation(mframes[i], mframes[i].ZAxis, 0.5 * (x[i] + x[i + 1]), t_mid[i], ref mframes_mid[i]); // la position ne tient pas compte de la courbure. Mais ce n'est pas nécessaire pour la suite
-                mframes_mid[i].ZRotate(dθ_mid);
-            }
+            //for (int i = 0; i < ne; i++)
+            //{
+            //    var dθ_mid = l[i] / (8 * GJ[i/2]) * (3 * Q_r[i] + Q_l[i + 1]);
+            //    ParallelTransportation.ZPT_Rotation(mframes[i], mframes[i].ZAxis, 0.5 * (x[i] + x[i + 1]), t_mid[i], ref mframes_mid[i]); // la position ne tient pas compte de la courbure. Mais ce n'est pas nécessaire pour la suite
+            //    mframes_mid[i].ZRotate(dθ_mid);
+            //}
 
         }
 
@@ -625,7 +625,7 @@ namespace TMarsupilami.CoreLib3
 
                 Rint_θ[2 * i].X += M_h_r[i].X;
                 Rint_θ[2 * i].Y += M_h_r[i].Y;
-                Rint_θ[2 * i].Z += Q_mid[2 * i] + l0/4 * (κM0 + κM1);
+                Rint_θ[2 * i].Z += Q_mid[2 * i] + l0 / 4 * (κM0 + κM1);
 
                 Rint_θ[2 * i + 1].X = 0;
                 Rint_θ[2 * i + 1].Y = 0;
@@ -635,6 +635,34 @@ namespace TMarsupilami.CoreLib3
                 Rint_θ[2 * i + 2].Y = -M_h_l[i + 1].Y;
                 Rint_θ[2 * i + 2].Z = -Q_mid[2 * i + 1] + l1 / 4 * (κM1 + κM2);
             }
+
+            //Rint_θ[0] = MVector.Zero;
+            //for (int i = 0; i < nv_g; i++)
+            //{
+            //    var l0 = l[2 * i];
+            //    var l1 = l[2 * i + 1];
+
+            //    // au repos, nécessairement τ_0(s) est uniforme sur [x_h_r, x_g, x_h_l]
+            //    // et donc on a bien Q' = GJτ' = -(κbxM + m).d3 sur cet intervalle (et non Q' = GJ(τ'-τ_0')
+            //    var M01 = 0.5 * (M_h_r[i] + M_g[i]);            // a corriger avec l'interpolation parablolique
+            //    var M12 = 0.5 * (M_g[i] + M_h_l[i + 1]);        // a corriger avec l'interpolation parablolique
+
+            //    var R0 = M01 + Q_mid[2 * i] * t_mid[2 * i];
+            //    //var R1 = -M01 - Q_mid[2 * i] * t_mid[2 * i] + M12 + Q_mid[2 * i + 1] * t_mid[2 * i + 1];
+            //    var R2 = M12 + Q_mid[2 * i + 1] * t_mid[2 * i + 1];
+
+            //    Rint_θ[2 * i].X += M_h_r[i].X;
+            //    Rint_θ[2 * i].Y += M_h_r[i].Y;
+            //    Rint_θ[2 * i].Z += R0 * mframes[2 * i].ZAxis;
+
+            //    Rint_θ[2 * i + 1].X = 0;
+            //    Rint_θ[2 * i + 1].Y = 0;
+            //    Rint_θ[2 * i + 1].Z = (-R0+R2) * mframes[2 * i+1].ZAxis;
+
+            //    Rint_θ[2 * i + 2].X = -M_h_l[i + 1].X;
+            //    Rint_θ[2 * i + 2].Y = -M_h_l[i + 1].Y;
+            //    Rint_θ[2 * i + 2].Z = -R2 * mframes[2 * i + 2].ZAxis;
+            //}
         }
 
         private void UpdateResultantNodalMoment()
@@ -693,68 +721,21 @@ namespace TMarsupilami.CoreLib3
                 var GJ = this.GJ[i];
                 var m = this.mext_m[i];
 
+                mframe = mframes[2 * i + 1];
+                var Vm = -m.Y * mframe.XAxis + m.X * mframe.YAxis;
+
                 // At mid
-                mframe = mframes[2 * i];
                 Vmid = MVector.CrossProduct(t_mid[2 * i], dM01);        // d3 x M'
-                Vmid += -m.Y * mframe.XAxis + m.X * mframe.YAxis;       // d3 x m
+                Vmid += Vm;                                             // d3 x m
                 Vmid += Q_mid[2 * i] * κb_mid[2 * i];                   // Qκb
                 Vmid += -0.5 * τ_mid[2 * i] * (M0 + M1);                // -τM
                 V_mid[2 * i] = Vmid;
 
-                mframe = mframes[2 * i + 1];
                 Vmid = MVector.CrossProduct(t_mid[2 * i + 1], dM12);    // d3 x M'
-                Vmid += -m.Y * mframe.XAxis + m.X * mframe.YAxis;       // d3 x m
+                Vmid += Vm;                                             // d3 x m
                 Vmid += Q_mid[2 * i + 1] * κb_mid[2 * i + 1];           // Qκb
                 Vmid += -0.5 * τ_mid[2 * i + 1] * (M1 + M2);            // -τM
                 V_mid[2 * i + 1] = Vmid;
-
-                // at vertices
-                var dM0 = -(2 * l0 + l1) / (l0 * (l0 + l1)) * M0 + (l0 + l1) / (l0 * l1) * M1 - l0 / (l1 * (l0 + l1)) * M2;
-                var dM1 = -l1 / (l0 * (l1 + l0)) * M0 - (l0 - l1) / (l0 * l1) * M1 + l0 / (l1 * (l0 + l1)) * M2;
-                var dM2 = l1 / (l0 * (l0 + l1)) * M0 - (l1 + l0) / (l0 * l1) * M1 + (2 * l1 + l0) / (l1 * (l1 + l0)) * M2;
-
-                mframe = mframes[2 * i];
-                Vr = MVector.CrossProduct(mframe.ZAxis, dM0);       // d3 x M'
-                Vr += -m.Y * mframe.XAxis + m.X * mframe.YAxis;     // d3 x m
-                Vr += Q_r[2 * i] * κb_h_r[i];                       // Qκb
-                Vr += -0.5 * τ_r[2 * i] * M_h_r[i];                 // -τM
-                V_r[2 * i] = Vr;
-
-                mframe = mframes[2 * i + 1];
-                Vl = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
-                Vl += -m.Y * mframe.XAxis + m.X * mframe.YAxis;     // d3 x m
-                Vl += Q_l[2 * i + 1] * κb_g[i];                     // Qκb
-                //Vl += -0.5 * τ_l[2 * i + 1] * M_g[i];               // -τM
-                V_l[2 * i + 1] = Vl;
-
-                mframe = mframes[2 * i + 1];
-                Vr = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
-                Vr += -m.Y * mframe.XAxis + m.X * mframe.YAxis;     // d3 x m
-                Vr += Q_r[2 * i + 1] * κb_g[i];                     // Qκb
-                //Vr += -0.5 * τ_r[2 * i + 1] * M_g[i];               // -τM
-                V_r[2 * i + 1] = Vr;
-
-                mframe = mframes[2 * i + 2];
-                Vl = MVector.CrossProduct(mframe.ZAxis, dM2);       // d3 x M'
-                Vl += -m.Y * mframe.XAxis + m.X * mframe.YAxis;     // d3 x m
-                Vl += Q_l[2 * i + 2] * κb_h_l[i + 1];               // Qκb
-                Vl += -0.5 * τ_l[2 * i + 2] * M_h_l[i + 1];         // -τM
-                V_l[2 * i + 2] = Vl;
-
-                // OLD
-
-                //V_M_h_r[i] = MVector.CrossProduct(mframes[2 * i].ZAxis, dM0 + mext_m[i]);
-                //V_M_g[i] = MVector.CrossProduct(mframes[2 * i + 1].ZAxis, dM1 + mext_m[i]);
-                //V_M_h_l[i + 1] = MVector.CrossProduct(mframes[2 * i + 2].ZAxis, dM2 + mext_m[i]);
-
-                //V_Q_h_r[i] = Q_r[2 * i] * κb_h_r[i];
-                //V_Q_g[i] = 0.5 * (Q_l[2 * i + 1] + Q_r[2 * i + 1]) * κb_g[i];
-                //V_Q_h_l[i + 1] = Q_l[2 * i + 2] * κb_h_l[i + 1]; ;
-
-                //V_r[2 * i] = V_M_h_r[i] + V_Q_h_r[i];
-                //V_r[2 * i + 1] = V_M_g[i] + V_Q_g[i];
-                //V_l[2 * i + 1] = V_M_g[i] + V_Q_g[i];
-                //V_l[2 * i + 2] = V_M_h_l[i + 1] + V_Q_h_l[i + 1];
             }
         }
 
@@ -833,42 +814,6 @@ namespace TMarsupilami.CoreLib3
                 ε_l[2 * i + 2] = ε2;
                 N_l[2 * i + 2] = ES * ε2;
             }
-        }
-
-        private void UpdateInternalNodalForce2()
-        {         
-            // RESULTANT FORCE
-            for (int i = 1; i < nv - 1; i++)
-            {
-                var N = -N_mid[i - 1] * t_mid[i - 1] + N_mid[i] * t_mid[i];
-                Rint_x[i] = N - V_mid[i - 1] + V_mid[i];
-            }
-
-            Rint_x[0] = MVector.Zero;
-            for (int i = 0; i < nv_g; i++)
-            {
-                var l0 = l[2 * i];
-                var l1 = l[2 * i + 1];
-
-                var κV0 = MVector.CrossProduct(κb_h_r[i], V_r[2 * i]) * mframes[2 * i].ZAxis;
-                var κV1 = MVector.CrossProduct(κb_g[i], 0.5 * (V_l[2 * i + 1] + V_r[2 * i + 1])) * mframes[2 * i + 1].ZAxis;
-                var κV2 = MVector.CrossProduct(κb_h_l[i + 1], V_l[2 * i + 2]) * mframes[2 * i + 2].ZAxis;
-
-                Rint_x[2 * i] += (N_mid[2 * i] + l0 / 4 * (κV0 + κV1)) * mframes[2 * i].ZAxis;
-                Rint_x[2 * i] += V_mid[2 * i];
-
-                Rint_x[2 * i + 1] = (-N_mid[2 * i] + N_mid[2 * i + 1] + l0 / 4 * (κV0 + κV1) + l1 / 4 * (κV1 + κV2)) * mframes[2 * i + 1].ZAxis;
-                Rint_x[2 * i + 1] += -V_mid[2 * i] + V_mid[2 * i + 1];
-
-                Rint_x[2 * i+2] = (-N_mid[2 * i+1] + l1 / 4 * (κV1 + κV2)) * mframes[2 * i].ZAxis;
-                Rint_x[2 * i + 2] += -V_mid[2 * i + 1];
-            }
-
-            //// RESULTANT FORCE
-            //for (int i = 1; i < nv - 1; i++)
-            //{
-            //    Rint_x[i] = (N_r[i] - N_l[i - 1]) + (V_r[i] - V_l[i - 1]);
-            //}
         }
 
         private void UpdateInternalNodalForce()
@@ -1008,140 +953,275 @@ namespace TMarsupilami.CoreLib3
             E_twisting = E_twisting / 2;
             return E_twisting;
         }
-        public MVector GetReactionForce(Boundary boundary)
+
+        public void Get_Q(out CMoment[] Ql, out CMoment[] Qr, out CMoment[] Qmid)
         {
-            if (boundary == Boundary.Start)
+            Ql = new CMoment[Nv];
+            Qr = new CMoment[Nv];
+            Qmid = new CMoment[Ne];
+
+            if (IsClosed)
+                throw new NotImplementedException();
+                       
+
+            double l0, l1;
+            double τmean, τ0, τ1, τ2, τmid;
+
+            Ql[0] = new CMoment(MVector.Zero, mframes[0]);
+            for (int i = 0; i < nv_g; i++)
             {
-                return -(Rint_x_axial[0] + Rint_x_shear_M[0] + Rint_x_shear_Q[0]);
+                l0 = l[2 * i];
+                l1 = l[2 * i + 1];
+
+                var GJ = this.GJ[i];
+                var m3 = mext_m[i].Z;
+
+                // au repos, nécessairement τ_0(s) est uniforme sur [x_h_r, x_g, x_h_l]
+                // et donc on a bien Q' = GJτ' = -(κbxM + m).d3 sur cet intervalle (et non Q' = GJ(τ'-τ_0')
+                var dτ0 = -(1 / GJ) * (MVector.CrossProduct(κb_h_r[i], M_h_r[i]) * mframes[2 * i].ZAxis + m3);
+                var dτ1 = -(1 / GJ) * (MVector.CrossProduct(κb_g[i], M_g[i]) * mframes[2 * i + 1].ZAxis + m3);
+                var dτ2 = -(1 / GJ) * (MVector.CrossProduct(κb_h_l[i + 1], M_h_l[i + 1]) * mframes[2 * i + 2].ZAxis + m3);
+
+                // 0-1
+                τmean = τ[2 * i];
+                τ0 = τmean - l0 / 6 * (2 * dτ0 + dτ1);
+                τ1 = τmean + l0 / 6 * (dτ0 + 2 * dτ1);
+                τmid = τmean + l0 / 24 * (dτ0 - dτ1);
+                Qr[2 * i] = new CMoment((GJ * (τ0 - τ_0[2 * i])) * mframes[2 * i].ZAxis, mframes[2 * i]);
+                Qmid[2 * i] = new CMoment((GJ * (τmid - τ_0[2 * i])) * t_mid[2 * i], mframes[2 * i + 1]); // better to create mid frames
+                Ql[2 * i + 1] = new CMoment((GJ * (τ1 - τ_0[2 * i])) * mframes[2 * i + 1].ZAxis, mframes[2 * i + 1]);
+
+                // 1-2
+                τmean = τ[2 * i + 1];
+                τ1 = τmean - l1 / 6 * (2 * dτ1 + dτ2);
+                τ2 = τmean + l1 / 6 * (dτ1 + 2 * dτ2);
+                τmid = τmean + l1 / 24 * (dτ1 - dτ2);
+                Qr[2 * i + 1] = new CMoment((GJ * (τ1 - τ_0[2 * i + 1])) * mframes[2 * i + 1].ZAxis, mframes[2 * i + 1]);
+                Qmid[2 * i + 1] = new CMoment((GJ * (τmid - τ_0[2 * i + 1])) * t_mid[2 * i + 1], mframes[2 * i + 1]); // better to create mid frames
+                Ql[2 * i + 2] = new CMoment((GJ * (τ2 - τ_0[2 * i + 1])) * mframes[2 * i + 2].ZAxis, mframes[2 * i + 2]);
             }
-            else
+            Qr[nv - 1] = new CMoment(MVector.Zero, mframes[nv - 1]);
+
+
+        }
+
+        public void Get_M(out CMoment[] Ml, out CMoment[] Mr)
+        {
+            MVector[] Ml_base, Mr_base;
+            this.Get_M(out Ml_base, out Mr_base);
+
+            Ml = new CMoment[Nv];
+            Mr = new CMoment[Nv];
+
+            for (int i = 0; i < nv; i++)
             {
-                return -(Rint_x_axial[nv - 1] + Rint_x_shear_M[nv - 1] + Rint_x_shear_Q[nv - 1]);
+                var frame = mframes[i];
+                Ml[i] = new CMoment(Ml_base[i], frame);
+                Mr[i] = new CMoment(Mr_base[i], frame);
             }
 
         }
-        public MVector GetReactionMoment(Boundary boundary)
+        public void Get_M(out MVector[] Ml, out MVector[] Mr)
         {
-            if (boundary == Boundary.Start)
-            {
-                return -(M_h_r[0] + Q_r[0] * mframes[0].ZAxis);
-            }
-            else
-            {
-                return (M_h_l[nv_h - 1] + Q_l[nv - 1] * mframes[nv - 1].ZAxis);
-            }
-        }
-        public MVector[] GetMext(CoordinateSystem cs)
-        {
-            if (cs == CoordinateSystem.Material)
-            {
-                return this.Mext_m;
-            }
-            else
-            {
-                MVector[] Mext_m = new MVector[nv];
-                for (int i = 0; i < Mext_m.Length; i++)
-                {
-                    Mext_m[i] = this.Mext_m[i].X * mframes[i].XAxis
-                                + this.Mext_m[i].Y * mframes[i].YAxis
-                                + this.Mext_m[i].Z * mframes[i].ZAxis;
-                }
+            if (IsClosed)
+                throw new NotImplementedException();
 
-                return Mext_m;
-            }
-        }
-        public MVector[] Getmext(CoordinateSystem cs)
-        {
-            if (cs == CoordinateSystem.Material)
-            {
-                return this.mext_m;
-            }
-            else
-            {
-                MVector[] mext_m = new MVector[ne];
-                for (int i = 0; i < mext_m.Length; i++)
-                {
-                    mext_m[i] = this.mext_m[i].X * mframes[i].XAxis
-                                + this.mext_m[i].Y * mframes[i].YAxis
-                                + this.mext_m[i].Z * mframes[i].ZAxis;
-                }
+            Ml = new MVector[Nv];
+            Mr = new MVector[Nv];
 
-                return mext_m;
-            }
-        }
-        public MVector[] GetFext(CoordinateSystem cs)
-        {
-            if (cs == CoordinateSystem.Global)
+            Ml[0] = MVector.Zero;
+            for (int i = 0; i < nv_g; i++)
             {
-                return this.Fext_g;
+                Mr[2 * i] = M_h_r[i];
+                Ml[2 * i + 1] = M_g[i];
+                Mr[2 * i + 1] = M_g[i];
+                Ml[2 * i + 2] = M_h_l[i + 1];
             }
-            else
-            {
-                MVector[] Fext_g = new MVector[nv];
-                for (int i = 0; i < nv; i++)
-                {
-                    Fext_g[i].X = this.Fext_g[i] * mframes[i].XAxis;
-                    Fext_g[i].Y = this.Fext_g[i] * mframes[i].YAxis;
-                    Fext_g[i].Z = this.Fext_g[i] * mframes[i].ZAxis;
-                }
-                return Fext_g;
-            }
-        }
-        public MVector[] Getfext(CoordinateSystem cs)
-        {
-            if (cs == CoordinateSystem.Global)
-            {
-                return this.fext_g;
-            }
-            else
-            {
-                MVector[] Fext_g = new MVector[nv];
-                for (int i = 0; i < nv; i++)
-                {
-                    Fext_g[i].X = this.Fext_g[i] * mframes[i].XAxis;
-                    Fext_g[i].Y = this.Fext_g[i] * mframes[i].YAxis;
-                    Fext_g[i].Z = this.Fext_g[i] * mframes[i].ZAxis;
-                }
-                return Fext_g;
-            }
+            Mr[nv - 1] = MVector.Zero;
+
         }
 
-        public MVector[] GetFr(CoordinateSystem cs)
+        public void Get_V(out CForce[] Vl, out CForce[] Vr, out CForce[] Vmid)
         {
-            if (cs == CoordinateSystem.Global)
+            MVector[] Vl_base, Vr_base, Vmid_base;
+            this.Get_V(out Vl_base, out Vr_base, out Vmid_base);
+
+            Vl = new CForce[nv];
+            Vr = new CForce[nv];
+            Vmid = new CForce[ne];
+
+            for (int i = 0; i < nv; i++)
             {
-                return this.Fr_g;
+                var frame = mframes[i];
+                Vl[i] = new CForce(Vl_base[i], frame);
+                Vr[i] = new CForce(Vr_base[i], frame);
             }
-            else
+            for (int i = 0; i < nv_g; i++)
             {
-                MVector[] Fr_g = new MVector[nv];
-                for (int i = 0; i < Fr_g.Length; i++)
-                {
-                    Fr_g[i].X = this.Fr_g[i] * mframes[i].XAxis;
-                    Fr_g[i].Y = this.Fr_g[i] * mframes[i].YAxis;
-                    Fr_g[i].Z = this.Fr_g[i] * mframes[i].ZAxis;
-                }
-                return Fr_g;
+                var frame = mframes[2 * i + 1];
+                Vmid[2 * i] = new CForce(Vmid_base[2 * i], frame);
+                Vmid[2 * i + 1] = new CForce(Vmid_base[2 * i + 1], frame);
             }
         }
-        public MVector[] GetMr(CoordinateSystem cs)
+        public void Get_V(out MVector[] Vl, out MVector[] Vr, out MVector[] Vmid)
         {
-            if (cs == CoordinateSystem.Material)
+            if (IsClosed)
+                throw new NotImplementedException();
+
+            Vl = new MVector[nv];
+            Vr = new MVector[nv];
+            Vmid = new MVector[ne];
+
+            MVector M0, M1, M2, V;
+            MVector dM01, dM12;
+            MFrame mframe;
+            double l0, l1;
+
+            Vl[0] = MVector.Zero;
+            for (int i = 0; i < nv_g; i++)
             {
-                return this.Mr_m;
+                // calcul des dérivées :
+                M0 = M_h_r[i];
+                M1 = M_g[i];
+                M2 = M_h_l[i + 1];
+
+                l0 = l[2 * i];
+                l1 = l[2 * i + 1];
+
+                dM01 = (M1 - M0) / l0; // dérivée en i+1/2 selon interpolation parabolique
+                dM12 = (M2 - M1) / l1; // dérivée en i+3/2 selon interpolation parabolique
+
+                var GJ = this.GJ[i];
+                var m = this.mext_m[i];
+
+                mframe = mframes[2 * i + 1];
+                var Vm = -m.Y * mframe.XAxis + m.X * mframe.YAxis;
+
+                // At mid
+                V = MVector.CrossProduct(t_mid[2 * i], dM01);        // d3 x M'
+                V += Vm;                                             // d3 x m
+                V += Q_mid[2 * i] * κb_mid[2 * i];                   // Qκb
+                V += -0.5 * τ_mid[2 * i] * (M0 + M1);                // -τM
+                Vmid[2 * i] = V;
+
+                mframe = mframes[2 * i + 1];
+                V = MVector.CrossProduct(t_mid[2 * i + 1], dM12);    // d3 x M'
+                V += Vm;                                             // d3 x m
+                V += Q_mid[2 * i + 1] * κb_mid[2 * i + 1];           // Qκb
+                V += -0.5 * τ_mid[2 * i + 1] * (M1 + M2);            // -τM
+                Vmid[2 * i + 1] = V;
+
+                // parabolic interpolation of M
+                var dM0 = -(2 * l0 + l1) / (l0 * (l0 + l1)) * M0 + (l0 + l1) / (l0 * l1) * M1 - l0 / (l1 * (l0 + l1)) * M2;
+                var dM1 = -l1 / (l0 * (l1 + l0)) * M0 - (l0 - l1) / (l0 * l1) * M1 + l0 / (l1 * (l0 + l1)) * M2;
+                var dM2 = l1 / (l0 * (l0 + l1)) * M0 - (l1 + l0) / (l0 * l1) * M1 + (2 * l1 + l0) / (l1 * (l1 + l0)) * M2;
+
+                mframe = mframes[2 * i];
+                V = MVector.CrossProduct(mframe.ZAxis, dM0);       // d3 x M'
+                V += Vm;                                           // d3 x m
+                V += Q_r[2 * i] * κb_h_r[i];                       // Qκb
+                V += -0.5 * τ_r[2 * i] * M_h_r[i];                 // -τM
+                Vr[2 * i] = V;
+
+                mframe = mframes[2 * i + 1];
+                V = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
+                V += Vm;                                           // d3 x m
+                V += Q_l[2 * i + 1] * κb_g[i];                     // Qκb
+                V += -0.5 * τ_l[2 * i + 1] * M_g[i];               // -τM
+                Vl[2 * i + 1] = V;
+
+                mframe = mframes[2 * i + 1];
+                V = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
+                V += Vm;                                           // d3 x m
+                V += Q_r[2 * i + 1] * κb_g[i];                     // Qκb
+                V += -0.5 * τ_r[2 * i + 1] * M_g[i];               // -τM
+                Vr[2 * i + 1] = V;
+
+                mframe = mframes[2 * i + 2];
+                V = MVector.CrossProduct(mframe.ZAxis, dM2);       // d3 x M'
+                V += Vm;                                           // d3 x m
+                V += Q_l[2 * i + 2] * κb_h_l[i + 1];               // Qκb
+                V += -0.5 * τ_l[2 * i + 2] * M_h_l[i + 1];         // -τM
+                Vl[2 * i + 2] = V;
             }
-            else
+            Vr[nv - 1] = MVector.Zero;
+
+        }
+
+        public void Get_N(out CForce[] Nl, out CForce[] Nr, out CForce[] Nmid)
+        {
+            MVector[] Nl_base, Nr_base, Nmid_base;
+            this.Get_V(out Nl_base, out Nr_base, out Nmid_base);
+
+            Nl = new CForce[nv];
+            Nr = new CForce[nv];
+            Nmid = new CForce[ne];
+
+            for (int i = 0; i < nv; i++)
             {
-                MVector[] Mr_m = new MVector[nv];
-                for (int i = 0; i < Mr_m.Length; i++)
-                {
-                    Mr_m[i] = this.Mr_m[i].X * mframes[i].XAxis
-                                + this.Mr_m[i].Y * mframes[i].YAxis
-                                + this.Mr_m[i].Z * mframes[i].ZAxis;
-                }
-                return Mr_m;
+                var frame = mframes[i];
+                Nl[i] = new CForce(Nl_base[i], frame);
+                Nr[i] = new CForce(Nr_base[i], frame);
+            }
+            for (int i = 0; i < nv_g; i++)
+            {
+                var frame = mframes[2 * i + 1];
+                Nmid[2 * i] = new CForce(Nmid_base[2 * i], frame);
+                Nmid[2 * i + 1] = new CForce(Nmid_base[2 * i + 1], frame);
             }
         }
+        public void Get_N(out MVector[] Nl, out MVector[] Nr, out MVector[] Nmid)
+        {
+            if (IsClosed)
+                throw new NotImplementedException();
+
+            Nl = new MVector[Nv];
+            Nr = new MVector[Nv];
+            Nmid = new MVector[Ne];
+
+            double l0, l1;
+            double εmean, ε0, ε1, ε2, εmid;
+
+            Nl[0] = MVector.Zero;
+            for (int i = 0; i < nv_g; i++)
+            {
+                l0 = l[2 * i];
+                l1 = l[2 * i + 1];
+
+                var ES = this.ES[i];
+                var f = fext_g[i];
+
+                var f3 = f * mframes[2 * i + 1].ZAxis;
+
+                // au repos, nécessairement τ_0(s) est uniforme sur [x_h_r, x_g, x_h_l]
+                // et donc on a bien Q' = GJτ' = -(κbxM + m).d3 sur cet intervalle (et non Q' = GJ(τ'-τ_0')
+                var dε0 = -(1 / ES) * (MVector.CrossProduct(κb_h_r[i], V_r[2 * i]) * mframes[2 * i].ZAxis + f3);
+                var dε1 = -(1 / ES) * (MVector.CrossProduct(κb_g[i], 0.5 * (V_l[2 * i + 1] + V_r[2 * i + 1])) * mframes[2 * i + 1].ZAxis + f3);
+                var dε2 = -(1 / ES) * (MVector.CrossProduct(κb_h_l[i + 1], V_l[2 * i + 2]) * mframes[2 * i + 2].ZAxis + f3);
+
+                // 0-1
+                εmean = l0 / l_0[2 * i] - 1;
+                ε0 = εmean - l0 / 6 * (2 * dε0 + dε1);
+                ε1 = εmean + l0 / 6 * (dε0 + 2 * dε1);
+                εmid = εmean + l0 / 24 * (dε0 - dε1);
+
+                Nr[2 * i] = ES * ε0 * mframes[2 * i].ZAxis;
+                Nmid[2 * i] = ES * εmid * t_mid[2 * i];
+                Nl[2 * i + 1] = ES * ε1 * mframes[2 * i + 1].ZAxis;
+
+                // 1-2
+                εmean = l1 / l_0[2 * i + 1] - 1;
+                ε1 = εmean - l1 / 6 * (2 * dε1 + dε2);
+                ε2 = εmean + l1 / 6 * (dε1 + 2 * dε2);
+                εmid = εmean + l1 / 24 * (dε1 - dε2);
+
+                Nr[2 * i + 1] = ES * ε1 * mframes[2 * i + 1].ZAxis;
+                Nmid[2 * i + 1] = ES * εmid * t_mid[2 * i + 1];
+                Nl[2 * i + 2] = ES * ε2 * mframes[2 * i + 2].ZAxis;
+            }
+            Nr[nv - 1] = MVector.Zero;
+        }
+
 
         // doit être customizable
         public override void Update_lm_x(ref double[] lm_x)

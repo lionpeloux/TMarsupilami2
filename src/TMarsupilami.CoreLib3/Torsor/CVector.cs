@@ -21,6 +21,7 @@ namespace TMarsupilami.CoreLib3
         public CVector(MVector valueInGCS) :this(valueInGCS, MFrame.XY)
         {
         }
+        public CVector() : this(MVector.Zero) { }
 
         public void GetComponents(out MVector V1, out MVector V2, out MVector V3, bool inGCS)
         {
@@ -91,6 +92,7 @@ namespace TMarsupilami.CoreLib3
         public CForce(MVector valueInGCS) :base(valueInGCS)
         {
         }
+        public CForce() : base() { }
 
         CForce IDeepCopy<CForce>.DeepCopy()
         {
@@ -114,7 +116,7 @@ namespace TMarsupilami.CoreLib3
         public CMoment(MVector valueInGCS) : base(valueInGCS)
         {
         }
-
+        public CMoment() : base() { }
         CMoment IDeepCopy<CMoment>.DeepCopy()
         {
             return new CMoment(Value, LocalFrame);

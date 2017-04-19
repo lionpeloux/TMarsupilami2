@@ -73,25 +73,28 @@ namespace TMarsupilami.Gh.Component
 
 
             var beam = ghBeam.Value as Beam_4DOF_D;
+            CMoment[] Qr, Ql, Qmid;
 
-            var Qr = new CMoment[beam.Nv];
-            var Ql = new CMoment[beam.Nv];
+            //Qr = new CMoment[beam.Nv];
+            //Ql = new CMoment[beam.Nv];
+            //Qmid = new CMoment[beam.Ne];
 
-            for (int i = 0; i < beam.Nv; i++)
-            {
-                var Q = beam.Q_l[i] * beam.ActualConfiguration[i].ZAxis;
-                Ql[i] = new CMoment(Q, beam.ActualConfiguration[i]);
+            //for (int i = 0; i < beam.Nv; i++)
+            //{
+            //    var Q = beam.Q_l[i] * beam.ActualConfiguration[i].ZAxis;
+            //    Ql[i] = new CMoment(Q, beam.ActualConfiguration[i]);
 
-                Q = beam.Q_r[i] * beam.ActualConfiguration[i].ZAxis;
-                Qr[i] = new CMoment(Q, beam.ActualConfiguration[i]);
-            }
+            //    Q = beam.Q_r[i] * beam.ActualConfiguration[i].ZAxis;
+            //    Qr[i] = new CMoment(Q, beam.ActualConfiguration[i]);
+            //}
 
-            var Qmid = new CMoment[beam.Ne];
-            for (int i = 0; i < beam.Ne; i++)
-            {
-                var Q = beam.Q_mid[i] * beam.t_mid[i];
-                Qmid[i] = new CMoment(Q, beam.mframes_mid[i]);
-            }
+            //for (int i = 0; i < beam.Ne; i++)
+            //{
+            //    var Q = beam.Q_mid[i] * beam.t_mid[i];
+            //    Qmid[i] = new CMoment(Q, beam.mframes_mid[i]);
+            //}
+
+            beam.Get_Q(out Ql, out Qr, out Qmid);
 
             var pts = new List<Point3d>();
             var diagram = new List<NurbsCurve>();

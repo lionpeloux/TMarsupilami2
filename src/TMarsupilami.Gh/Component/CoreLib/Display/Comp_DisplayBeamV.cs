@@ -75,26 +75,30 @@ namespace TMarsupilami.Gh.Component
 
             var beam = ghBeam.Value as Beam_4DOF_D;
 
-            var Vr = new CForce[beam.V_r.Length];
-            for (int i = 0; i < Vr.Length; i++)
-            {
-                var V = beam.V_r[i];
-                Vr[i] = new CForce(V, beam.ActualConfiguration[i]);
-            }
+            CForce[] Vr, Vl, Vmid;
 
-            var Vl = new CForce[beam.V_l.Length];
-            for (int i = 0; i < Vl.Length; i++)
-            {
-                var V = beam.V_l[i];
-                Vl[i] = new CForce(V, beam.ActualConfiguration[i]);
-            }
+            //var Vr = new CForce[beam.V_r.Length];
+            //for (int i = 0; i < Vr.Length; i++)
+            //{
+            //    var V = beam.V_r[i];
+            //    Vr[i] = new CForce(V, beam.ActualConfiguration[i]);
+            //}
 
-            var Vmid = new CForce[beam.V_mid.Length];
-            for (int i = 0; i < Vmid.Length; i++)
-            {
-                var V = beam.V_mid[i];
-                Vmid[i] = new CForce(V, beam.ActualConfiguration[i]);
-            }
+            //var Vl = new CForce[beam.V_l.Length];
+            //for (int i = 0; i < Vl.Length; i++)
+            //{
+            //    var V = beam.V_l[i];
+            //    Vl[i] = new CForce(V, beam.ActualConfiguration[i]);
+            //}
+
+            //var Vmid = new CForce[beam.V_mid.Length];
+            //for (int i = 0; i < Vmid.Length; i++)
+            //{
+            //    var V = beam.V_mid[i];
+            //    Vmid[i] = new CForce(V, beam.ActualConfiguration[i]);
+            //}
+
+            beam.Get_V(out Vl, out Vr, out Vmid);
 
             var pts_1 = new List<Point3d>();
             var diagram_1 = new List<NurbsCurve>();
