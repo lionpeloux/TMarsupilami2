@@ -196,7 +196,7 @@ namespace TMarsupilami.Gh.Component
                     // force verticale
                     loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e5), Boundary.End, beam, true));
                     //loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, -1e5), beam.Nvg / 2, beam, true));
-                    //loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, -1e5,0), beam.Nvg/2, beam, false));
+                    loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, -1e5,0), beam.Nvg/2, beam, false));
                     loads.Add(BeamVectorLoad.Create_Mext(new MVector(0, 0,1e4), beam.Nvg/2, beam, false));
 
 
