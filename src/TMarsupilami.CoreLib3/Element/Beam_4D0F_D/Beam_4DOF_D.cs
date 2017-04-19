@@ -704,15 +704,15 @@ namespace TMarsupilami.CoreLib3
                 V_mid[2 * i + 1] = Vmid;
 
 
-                V_M[2 * i] = MVector.CrossProduct(t_mid[2 * i], dM01 + m);
-                V_Q[2 * i] = Q_mid[2 * i] * κb_mid[2 * i];
-                var V_MQ = -(τ[2 * i] / 2) * (M0 + M1); // manque le terme -τM
-                V_mid[2 * i] = V_M[2 * i] + V_Q[2 * i];
+                //V_M[2 * i] = MVector.CrossProduct(t_mid[2 * i], dM01 + m);
+                //V_Q[2 * i] = Q_mid[2 * i] * κb_mid[2 * i];
+                //var V_MQ = -(τ[2 * i] / 2) * (M0 + M1); // manque le terme -τM
+                //V_mid[2 * i] = V_M[2 * i] + V_Q[2 * i] + V_MQ;
 
-                V_M[2 * i + 1] = MVector.CrossProduct(t_mid[2 * i + 1], dM12 + m);
-                V_Q[2 * i + 1] = Q_mid[2 * i + 1] * κb_mid[2 * i + 1];
-                V_MQ = -(τ[2 * i + 1] / 2) * (M1 + M2); // manque le terme -τM
-                V_mid[2 * i + 1] = V_M[2 * i + 1] + V_Q[2 * i + 1];
+                //V_M[2 * i + 1] = MVector.CrossProduct(t_mid[2 * i + 1], dM12 + m);
+                //V_Q[2 * i + 1] = Q_mid[2 * i + 1] * κb_mid[2 * i + 1];
+                //V_MQ = -(τ[2 * i + 1] / 2) * (M1 + M2); // manque le terme -τM
+                //V_mid[2 * i + 1] = V_M[2 * i + 1] + V_Q[2 * i + 1] + V_MQ;
             }
         }
 
@@ -789,44 +789,51 @@ namespace TMarsupilami.CoreLib3
 
             // A revoir avec les nouvelles méthodes d'interpolation des efforts aux noeuds au début/fin de poutre
             // ne prend pas en compte les efforts linéiques
-            Rint_x_axial[0] = ((N_mid[0] * t_mid[0] + V_mid[0]) * t[0]) * t[0];
-            Rint_x_axial[0] = N_mid[0] * t_mid[0];
-            Rint_x_axial[0] = N_r[0];
+            //Rint_x_axial[0] = ((N_mid[0] * t_mid[0] + V_mid[0]) * t[0]) * t[0];
+            //Rint_x_axial[0] = N_mid[0] * t_mid[0];
+            //Rint_x_axial[0] = N_r[0];
 
-            Rint_x_axial[1] = -N_mid[0] * t_mid[0];
-            for (int i = 1; i < ne - 1; i++)
-            {
-                MVector force = N_mid[i] * t_mid[i];
-                Rint_x_axial[i] += force;
-                Rint_x_axial[i + 1] = -force;
-            }
-            Rint_x_axial[nv - 2] += N_mid[ne - 1] * t_mid[ne - 1];
-            Rint_x_axial[nv - 1] = -((N_mid[ne - 1] * t_mid[ne - 1] + V_M[ne - 1] + V_Q[ne - 1]) * t[nv - 1]) * t[nv - 1];
+            //Rint_x_axial[1] = -N_mid[0] * t_mid[0];
+            //for (int i = 1; i < ne - 1; i++)
+            //{
+            //    MVector force = N_mid[i] * t_mid[i];
+            //    Rint_x_axial[i] += force;
+            //    Rint_x_axial[i + 1] = -force;
+            //}
+            //Rint_x_axial[nv - 2] += N_mid[ne - 1] * t_mid[ne - 1];
+            //Rint_x_axial[nv - 1] = -((N_mid[ne - 1] * t_mid[ne - 1] + V_M[ne - 1] + V_Q[ne - 1]) * t[nv - 1]) * t[nv - 1];
 
-            // SHEAR FORCE | bending contribution
-            // A revoir avec les nouvelles méthodes d'interpolation des efforts aux noeuds au début/fin de poutre
-            // ne prend pas en compte les efforts linéiques
-            Rint_x_shear_M[0] = (N_mid[0] * t_mid[0]) - ((N_mid[0] * t_mid[0] + V_M[0]) * t[0]) * t[0];
-            for (int i = 0; i < ne; i++)
-            {
-                Rint_x_shear_M[i] += V_M[i];
-                Rint_x_shear_M[i + 1] = -V_M[i];
-            }
-            Rint_x_shear_M[nv - 1] += -N_mid[ne - 1] * t_mid[ne - 1] + ((N_mid[ne - 1] * t_mid[ne - 1] + V_M[ne - 1]) * t[nv - 1]) * t[nv - 1];
+            //// SHEAR FORCE | bending contribution
+            //// A revoir avec les nouvelles méthodes d'interpolation des efforts aux noeuds au début/fin de poutre
+            //// ne prend pas en compte les efforts linéiques
+            //Rint_x_shear_M[0] = (N_mid[0] * t_mid[0]) - ((N_mid[0] * t_mid[0] + V_M[0]) * t[0]) * t[0];
+            //for (int i = 0; i < ne; i++)
+            //{
+            //    Rint_x_shear_M[i] += V_M[i];
+            //    Rint_x_shear_M[i + 1] = -V_M[i];
+            //}
+            //Rint_x_shear_M[nv - 1] += -N_mid[ne - 1] * t_mid[ne - 1] + ((N_mid[ne - 1] * t_mid[ne - 1] + V_M[ne - 1]) * t[nv - 1]) * t[nv - 1];
 
-            // SHEAR FORCE | twisting contribution
-            Rint_x_shear_Q[0] = -(V_Q[0] * t[0]) * t[0];
-            for (int i = 0; i < ne; i++)
-            {
-                Rint_x_shear_Q[i] += V_Q[i];
-                Rint_x_shear_Q[i + 1] = -V_Q[i];
-            }
-            Rint_x_shear_Q[nv - 1] += (V_Q[nv_h - 1] * t[nv - 1]) * t[nv - 1];
+            //// SHEAR FORCE | twisting contribution
+            //Rint_x_shear_Q[0] = -(V_Q[0] * t[0]) * t[0];
+            //for (int i = 0; i < ne; i++)
+            //{
+            //    Rint_x_shear_Q[i] += V_Q[i];
+            //    Rint_x_shear_Q[i + 1] = -V_Q[i];
+            //}
+            //Rint_x_shear_Q[nv - 1] += (V_Q[nv_h - 1] * t[nv - 1]) * t[nv - 1];
+
+            //// RESULTANT FORCE
+            //for (int i = 0; i < nv; i++)
+            //{
+            //    Rint_x[i] = Rint_x_axial[i] + Rint_x_shear_M[i] + Rint_x_shear_Q[i];
+            //}
 
             // RESULTANT FORCE
-            for (int i = 0; i < nv; i++)
+            for (int i = 1; i < nv - 1; i++)
             {
-                Rint_x[i] = Rint_x_axial[i] + Rint_x_shear_M[i] + Rint_x_shear_Q[i];
+                var N = -N_mid[i - 1] * t_mid[i - 1] + N_mid[i] * t_mid[i];
+                Rint_x[i] = N - V_mid[i - 1] + V_mid[i];
             }
         }
 
