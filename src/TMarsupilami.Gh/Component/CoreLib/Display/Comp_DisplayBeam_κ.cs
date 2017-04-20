@@ -13,11 +13,11 @@ using TMarsupilami.CoreLib3;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_DisplayBeamV : GH_Component
+    public class Comp_DisplayBeam_κ : GH_Component
     {
 
-        public Comp_DisplayBeamV()
-          : base("Beam V", "V",
+        public Comp_DisplayBeam_κ()
+          : base("Beam κ", "κ",
               "Extract Beam Internals Informations",
               "TMarsupilami", "Display")
         {
@@ -27,12 +27,12 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.primary;
+                return GH_Exposure.tertiary;
             }
         }
         public override Guid ComponentGuid
         {
-            get { return new Guid("{253B90E5-C89E-43B0-9E80-3ECFFB465566}"); }
+            get { return new Guid("{96F95950-53F0-4BBA-8B56-0C466EE0A1A0}"); }
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -47,11 +47,11 @@ namespace TMarsupilami.Gh.Component
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddParameter(new Param_MCForce(), "Vr", "Vr", "", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MCForce(), "Vl", "Vl", "", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MCForce(), "Vmid", "Vmid", "", GH_ParamAccess.list);
-            pManager.AddCurveParameter("D1", "D1", "", GH_ParamAccess.list);
-            pManager.AddCurveParameter("D2", "D2", "", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "κbl", "κbl", "", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "κbr", "κbr", "", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MVector(), "κbmid", "κbmid", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("D1", "D2", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("D2", "D1", "", GH_ParamAccess.list);
         }
 
         protected override void BeforeSolveInstance()
@@ -71,34 +71,11 @@ namespace TMarsupilami.Gh.Component
             DA.GetData(1, ref scale);
             DA.GetData(2, ref isRest);
 
-
-
             var beam = ghBeam.Value as Beam_4DOF_D;
 
-            CForce[] Vr, Vl, Vmid;
+            MVector[] κbl, κbr, κbmid;
 
-            //var Vr = new CForce[beam.V_r.Length];
-            //for (int i = 0; i < Vr.Length; i++)
-            //{
-            //    var V = beam.V_r[i];
-            //    Vr[i] = new CForce(V, beam.ActualConfiguration[i]);
-            //}
-
-            //var Vl = new CForce[beam.V_l.Length];
-            //for (int i = 0; i < Vl.Length; i++)
-            //{
-            //    var V = beam.V_l[i];
-            //    Vl[i] = new CForce(V, beam.ActualConfiguration[i]);
-            //}
-
-            //var Vmid = new CForce[beam.V_mid.Length];
-            //for (int i = 0; i < Vmid.Length; i++)
-            //{
-            //    var V = beam.V_mid[i];
-            //    Vmid[i] = new CForce(V, beam.ActualConfiguration[i]);
-            //}
-
-            beam.Get_V(out Vl, out Vr, out Vmid);
+            beam.Get2_κ(out κbl, out κbr, out κbmid);
 
             var pts_1 = new List<Point3d>();
             var diagram_1 = new List<NurbsCurve>();
@@ -120,31 +97,40 @@ namespace TMarsupilami.Gh.Component
                 var d1 = frame.XAxis;
                 var d2 = frame.YAxis;
 
-                var pt_l = (frame.Origin + scale * (Vl[i].Value * d1) * d1).Cast();
+                var κbl1 = scale * κbl[i] * beam.ActualConfiguration[i].XAxis;
+                var pt_l = (frame.Origin + κbl1 * d1).Cast();
                 pts_1.Add(pt_l);
-                diagram_1.Add((new Line(frame.Origin.Cast(), pt_l)).ToNurbsCurve());
+                var line_l = new Line(frame.Origin.Cast(), pt_l);
+                diagram_1.Add(line_l.ToNurbsCurve());
 
-                var pt_r = (frame.Origin + scale * (Vr[i].Value * d1) * d1).Cast();
+                var κbr1 = scale * κbr[i] * beam.ActualConfiguration[i].XAxis;
+                var pt_r = (frame.Origin + κbr1 * d1).Cast();
                 pts_1.Add(pt_r);
-                diagram_1.Add((new Line(frame.Origin.Cast(), pt_r)).ToNurbsCurve());
+                var line_r = new Line(frame.Origin.Cast(), pt_r);
+                diagram_1.Add(line_r.ToNurbsCurve());
 
-                pt_l = (frame.Origin + scale * (Vl[i].Value * d2) * d2).Cast();
+                var κbl2 = scale * κbl[i] * beam.ActualConfiguration[i].YAxis;
+                pt_l = (frame.Origin + κbl2 * d2).Cast();
                 pts_2.Add(pt_l);
-                diagram_2.Add((new Line(frame.Origin.Cast(), pt_l)).ToNurbsCurve());
+                line_l = new Line(frame.Origin.Cast(), pt_l);
+                diagram_2.Add(line_l.ToNurbsCurve());
 
-                pt_r = (frame.Origin + scale * (Vr[i].Value * d2) * d2).Cast();
+                var κbr2 = scale * κbr[i] * beam.ActualConfiguration[i].YAxis;
+                pt_r = (frame.Origin + κbr2 * d2).Cast();
                 pts_2.Add(pt_r);
-                diagram_2.Add((new Line(frame.Origin.Cast(), pt_r)).ToNurbsCurve());
+                line_r = new Line(frame.Origin.Cast(), pt_r);
+                diagram_2.Add(line_r.ToNurbsCurve());
             }
 
             diagram_1.Add(new Polyline(pts_1).ToNurbsCurve());
             diagram_2.Add(new Polyline(pts_2).ToNurbsCurve());
 
-            DA.SetDataList(0, Vr);
-            DA.SetDataList(1, Vl);
-            DA.SetDataList(2, Vmid);
+            DA.SetDataList(0, κbr);
+            DA.SetDataList(1, κbl);
+            DA.SetDataList(2, κbmid);
             DA.SetDataList(3, diagram_1);
             DA.SetDataList(4, diagram_2);
+
         }
 
     }

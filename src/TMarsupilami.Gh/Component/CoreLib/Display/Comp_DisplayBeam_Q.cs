@@ -13,10 +13,10 @@ using TMarsupilami.CoreLib3;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_DisplayBeamQ : GH_Component
+    public class Comp_DisplayBeam_Q : GH_Component
     {
 
-        public Comp_DisplayBeamQ()
+        public Comp_DisplayBeam_Q()
           : base("Beam Q", "Q",
               "Extract Beam Internals Informations",
               "TMarsupilami", "Display")
@@ -27,7 +27,7 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return GH_Exposure.primary;
+                return GH_Exposure.tertiary;
             }
         }
         public override Guid ComponentGuid
@@ -75,32 +75,15 @@ namespace TMarsupilami.Gh.Component
             var beam = ghBeam.Value as Beam_4DOF_D;
             CMoment[] Qr, Ql, Qmid;
 
-            //Qr = new CMoment[beam.Nv];
-            //Ql = new CMoment[beam.Nv];
-            //Qmid = new CMoment[beam.Ne];
-
-            //for (int i = 0; i < beam.Nv; i++)
-            //{
-            //    var Q = beam.Q_l[i] * beam.ActualConfiguration[i].ZAxis;
-            //    Ql[i] = new CMoment(Q, beam.ActualConfiguration[i]);
-
-            //    Q = beam.Q_r[i] * beam.ActualConfiguration[i].ZAxis;
-            //    Qr[i] = new CMoment(Q, beam.ActualConfiguration[i]);
-            //}
-
-            //for (int i = 0; i < beam.Ne; i++)
-            //{
-            //    var Q = beam.Q_mid[i] * beam.t_mid[i];
-            //    Qmid[i] = new CMoment(Q, beam.mframes_mid[i]);
-            //}
-
-            beam.Get_Q(out Ql, out Qr, out Qmid);
+            beam.Get2_Q(out Ql, out Qr, out Qmid);
 
             var pts = new List<Point3d>();
             var diagram = new List<NurbsCurve>();
             for (int i = 0; i < beam.Nv; i++)
             {
                 MFrame frame;
+                MVector d, d3;
+
                 if (isRest)
                 {
                     frame = beam.RestConfiguration[i];
@@ -110,15 +93,20 @@ namespace TMarsupilami.Gh.Component
                     frame = beam.ActualConfiguration[i];
                 }
 
-                var d = frame.XAxis;
+                d = frame.XAxis;
+                d3 = beam.ActualConfiguration[i].ZAxis;
 
-                var pt_l = (frame.Origin + scale * Ql[i].Value.Length() * d).Cast();
+                var Ql3 = scale * (Ql[i].Value * d3);
+                var pt_l = (frame.Origin + Ql3 * d).Cast();
                 pts.Add(pt_l);
-                diagram.Add((new Line(frame.Origin.Cast(), pt_l)).ToNurbsCurve());
+                var line_l = new Line(frame.Origin.Cast(), pt_l);
+                diagram.Add(line_l.ToNurbsCurve());
 
-                var pt_r = (frame.Origin + scale * Qr[i].Value.Length() * d).Cast();
+                var Qr3 = scale * (Qr[i].Value * d3);
+                var pt_r = (frame.Origin + Qr3 * d).Cast();
                 pts.Add(pt_r);
-                diagram.Add((new Line(frame.Origin.Cast(), pt_r)).ToNurbsCurve());
+                var line_r = new Line(frame.Origin.Cast(), pt_r);
+                diagram.Add(line_r.ToNurbsCurve());
             }
 
             diagram.Add(new Polyline(pts).ToNurbsCurve());
