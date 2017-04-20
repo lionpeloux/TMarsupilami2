@@ -701,7 +701,7 @@ namespace TMarsupilami.CoreLib3
         private void UpdateShearForce()
         {
             MVector M0, M1, M2, Vmid, V;
-            MVector dM01, dM12;
+            MVector dM01, dM12, dM0, dM1, dM2, M01, M12;
             MFrame mframe;
             double l0, l1;
 
@@ -715,8 +715,16 @@ namespace TMarsupilami.CoreLib3
                 l0 = l[2 * i];
                 l1 = l[2 * i + 1];
 
-                dM01 = (M1 - M0) / l0; // dérivée en i+1/2 selon interpolation parabolique
-                dM12 = (M2 - M1) / l1; // dérivée en i+3/2 selon interpolation parabolique
+                Interpolation.Quadratic(l0, l1, M0, M1, M2, out dM0, out dM1, out dM2, out dM01, out dM12, out M01, out M12);
+
+                M01 = 0.5 * (M0 + M1);
+                M12 = 0.5 * (M1 + M2);
+
+                //parabolic interpolation of M
+                dM0 = -(2 * l0 + l1) / (l0 * (l0 + l1)) * M0 + (l0 + l1) / (l0 * l1) * M1 - l0 / (l1 * (l0 + l1)) * M2;
+                dM1 = -l1 / (l0 * (l1 + l0)) * M0 - (l0 - l1) / (l0 * l1) * M1 + l0 / (l1 * (l0 + l1)) * M2;
+                dM2 = l1 / (l0 * (l0 + l1)) * M0 - (l1 + l0) / (l0 * l1) * M1 + (2 * l1 + l0) / (l1 * (l1 + l0)) * M2;
+
 
                 var GJ = this.GJ[i];
                 var m = this.mext_m[i];
@@ -728,20 +736,16 @@ namespace TMarsupilami.CoreLib3
                 Vmid = MVector.CrossProduct(t_mid[2 * i], dM01);        // d3 x M'
                 Vmid += Vm;                                             // d3 x m
                 Vmid += Q_mid[2 * i] * κb_mid[2 * i];                   // Qκb
-                Vmid += -0.5 * τ_mid[2 * i] * (M0 + M1);                // -τM
+                Vmid += -τ_mid[2 * i] * M01;                            // -τM
                 V_mid[2 * i] = Vmid;
 
                 Vmid = MVector.CrossProduct(t_mid[2 * i + 1], dM12);    // d3 x M'
                 Vmid += Vm;                                             // d3 x m
                 Vmid += Q_mid[2 * i + 1] * κb_mid[2 * i + 1];           // Qκb
-                Vmid += -0.5 * τ_mid[2 * i + 1] * (M1 + M2);            // -τM
+                Vmid += - τ_mid[2 * i + 1] * M12;                       // -τM
                 V_mid[2 * i + 1] = Vmid;
 
-                // parabolic interpolation of M
-                var dM0 = -(2 * l0 + l1) / (l0 * (l0 + l1)) * M0 + (l0 + l1) / (l0 * l1) * M1 - l0 / (l1 * (l0 + l1)) * M2;
-                var dM1 = -l1 / (l0 * (l1 + l0)) * M0 - (l0 - l1) / (l0 * l1) * M1 + l0 / (l1 * (l0 + l1)) * M2;
-                var dM2 = l1 / (l0 * (l0 + l1)) * M0 - (l1 + l0) / (l0 * l1) * M1 + (2 * l1 + l0) / (l1 * (l1 + l0)) * M2;
-
+               
                 mframe = mframes[2 * i];
                 V = MVector.CrossProduct(mframe.ZAxis, dM0);       // d3 x M'
                 V += Vm;                                           // d3 x m

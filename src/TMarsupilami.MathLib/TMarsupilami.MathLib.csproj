@@ -62,6 +62,7 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IDeepCopy.cs" />
     <Compile Include="IShallowCopy.cs" />
+    <Compile Include="Math\Interpolation.cs" />
     <Compile Include="Math\BasisChange.cs" />
     <Compile Include="Math\OsculatingCircle.cs" />
     <Compile Include="Math\Projection.cs" />
