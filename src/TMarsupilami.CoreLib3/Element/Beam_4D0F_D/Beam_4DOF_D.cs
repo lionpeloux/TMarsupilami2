@@ -593,7 +593,7 @@ namespace TMarsupilami.CoreLib3
                 // 0-1
                 Q_mid[2 * i] = GJ * (τ[2 * i] - τ_0[2 * i]);
 
-                dQ = (l0 / 4) * (κM0 + κM1);
+                dQ = (l0 / 4) * (κM0 + κM1) + (l0 / 2) * m3;
                 Q_r[2 * i] = Q_mid[2 * i] + dQ;
                 Q_l[2 * i + 1] = Q_mid[2 * i] - dQ;
 
@@ -604,13 +604,13 @@ namespace TMarsupilami.CoreLib3
                 // 1-2
                 Q_mid[2 * i + 1] = GJ * (τ[2 * i + 1] - τ_0[2 * i + 1]);
 
-                dQ = (l1 / 4) * (κM1 + κM2);
+                dQ = (l1 / 4) * (κM1 + κM2) + (l1 / 2) * m3;
                 Q_r[2 * i + 1] = Q_mid[2 * i + 1] + dQ;
                 Q_l[2 * i + 2] = Q_mid[2 * i + 1] - dQ;
 
                 dτ = dQ / GJ;
-                τ_r[2 * i + 1] = τ[2 * i+1] + dτ;
-                τ_l[2 * i + 2] = τ[2 * i+1] - dτ;
+                τ_r[2 * i + 1] = τ[2 * i + 1] + dτ;
+                τ_l[2 * i + 2] = τ[2 * i + 1] - dτ;
 
                 // 0-1
                 //τmean = τ[2 * i];
@@ -726,33 +726,22 @@ namespace TMarsupilami.CoreLib3
             R_θ[0] = Rint_θ[0] + Mext_m[0] + (0.5 * l[0]) * mext_m[0];
             for (int i = 1; i < nv_h - 1; i++)
             {
-                R_θ[2 * i] = Rint_θ[2 * i] 
-                           + Mr_m[i] + Mext_m[i] 
-                           + 0.5 * (mext_m[i - 1] * l[2 * i - 1] + mext_m[i] * l[2 * i]);
+                R_θ[2 * i] = Rint_θ[2 * i]
+                           + Mr_m[i] + Mext_m[i];
+                           //+ 0.0 * (mext_m[i - 1] * l[2 * i - 1] + mext_m[i] * l[2 * i]);
             }
             R_θ[nv - 1] = Rint_θ[nv - 1] + Mext_m[nv_h - 1] + (0.5 * l[2 * nv_g - 1]) * mext_m[nv_g - 1];
 
             for (int i = 0; i < nv_g; i++)
             {
-                R_θ[2 * i + 1] = Rint_θ[2 * i + 1] + (0.5 * (l[2 * i] + l[2 * i + 1])) * mext_m[i];
+                R_θ[2 * i + 1] = Rint_θ[2 * i + 1];
+                    //+ (0.0 * (l[2 * i] + l[2 * i + 1])) * mext_m[i];
             }
 
             OnReactionMomentUpdating(Mr_m, R_θ);
-
-            // ADD REACTION MOMENTS TO INTERNAL RESULTANT
-            //for (int i = 0; i < nv_h; i++)
-            //{
-            //    R_θ[2 * i].Z += Mr_m[i].Z;
-            //}
         }
 
         // FORCES       
-        /// <summary>
-        /// V : shear force
-        /// V_M is the bending contribution
-        /// V_Q is the twisting contribution
-        /// V, V_M and V_Q are given for each mid edge i+1/2. Their size is ne.
-        /// </summary>
         private void UpdateShearForce()
         {
             MVector M0, M1, M2, Vmid, V;
@@ -780,7 +769,6 @@ namespace TMarsupilami.CoreLib3
                 dM1 = -l1 / (l0 * (l1 + l0)) * M0 - (l0 - l1) / (l0 * l1) * M1 + l0 / (l1 * (l0 + l1)) * M2;
                 dM2 = l1 / (l0 * (l0 + l1)) * M0 - (l1 + l0) / (l0 * l1) * M1 + (2 * l1 + l0) / (l1 * (l1 + l0)) * M2;
 
-
                 var GJ = this.GJ[i];
                 var m = this.mext_m[i];
 
@@ -799,65 +787,10 @@ namespace TMarsupilami.CoreLib3
                 Vmid += Q_mid[2 * i + 1] * κb_mid[2 * i + 1];           // Qκb
                 Vmid += - τ[2 * i + 1] * M12;                           // -τM
                 V_mid[2 * i + 1] = Vmid - (Vmid * t_mid[2 * i + 1]) * t_mid[2 * i + 1];
-
-                //mframe = mframes[2 * i];
-                //V = MVector.CrossProduct(mframe.ZAxis, dM0);       // d3 x M'
-                //V += Vm;                                           // d3 x m
-                //V += Q_r[2 * i] * κb_h_r[i];                       // Qκb
-                //V += -0.5 * τ_r[2 * i] * M_h_r[i];                 // -τM
-                //V_r[2 * i] = V;
-
-                //mframe = mframes[2 * i + 1];
-                //V = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
-                //V += Vm;                                           // d3 x m
-                //V += Q_l[2 * i + 1] * κb_g[i];                     // Qκb
-                //V += -0.5 * τ_l[2 * i + 1] * M_g[i];               // -τM
-                //V_l[2 * i + 1] = V;
-
-                //mframe = mframes[2 * i + 1];
-                //V = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
-                //V += Vm;                                           // d3 x m
-                //V += Q_r[2 * i + 1] * κb_g[i];                     // Qκb
-                //V += -0.5 * τ_r[2 * i + 1] * M_g[i];               // -τM
-                //V_r[2 * i + 1] = V;
-
-                //mframe = mframes[2 * i + 2];
-                //V = MVector.CrossProduct(mframe.ZAxis, dM2);       // d3 x M'
-                //V += Vm;                                           // d3 x m
-                //V += Q_l[2 * i + 2] * κb_h_l[i + 1];               // Qκb
-                //V += -0.5 * τ_l[2 * i + 2] * M_h_l[i + 1];         // -τM
-                //V_l[2 * i + 2] = V;
             }
         }
-
         private void UpdateAxialForce()
         {
-
-            // A EVACUER
-            //for (int i = 0; i < ne; i++)
-            //{
-            //    //double εε = l[i] * l[0] * (κ1[i] * κ1[i] + κ2[i] * κ2[i]) / 24; // second ordre avec la courbure
-            //    //ε[i] = l[i] / l_0[i] - 1 + εε;
-            //    var ε = l[i] / l_0[i] - 1;
-            //    N_mid[i] = this.ES[i / 2] * ε;
-            //}
-
-            //for (int i = 0; i < ne; i++)
-            //{
-            //    // dN est évalué à partir de N' + κ1T2 - κ2T1 + f3 = 0 (à l'équilibre statique)
-            //    // et donc N' = dN/ds = -m3 - (κ1T2 - κ2T1)
-            //    // on remarque que κb x T = (κ1T2 - κ2T1) * d3
-
-            //    var f = this.fext_g[i / 2];
-            //    var ES = this.ES[i / 2];
-
-            //    var κT = MVector.CrossProduct(κb_mid[i], V_mid[i]);
-            //    var dN = (-0.5 * l[i]) * ((κT + f) * t_mid[i]);
-            //    var d3 = mframes[i].ZAxis;
-            //    N_r[i] = N_mid[i] - dN;
-            //    N_l[i + 1] = N_mid[i] + dN;
-            //}
-
             double l0, l1;
             double dN, dε;
             MVector d1, d2, V;
@@ -869,12 +802,6 @@ namespace TMarsupilami.CoreLib3
 
                 var ES = this.ES[i];
                 var f3 = fext_g[i] * mframes[2 * i + 1].ZAxis;
-
-                // au repos, nécessairement τ_0(s) est uniforme sur [x_h_r, x_g, x_h_l]
-                // et donc on a bien Q' = GJτ' = -(κbxM + m).d3 sur cet intervalle (et non Q' = GJ(τ'-τ_0')
-                //var dε0 = -(1 / ES) * (MVector.CrossProduct(κb_h_r[i], V_r[2 * i]) * mframes[2 * i].ZAxis + f3);
-                //var dε1 = -(1 / ES) * (MVector.CrossProduct(κb_g[i], 0.5 * (V_l[2 * i + 1] + V_r[2 * i + 1])) * mframes[2 * i + 1].ZAxis + f3);
-                //var dε2 = -(1 / ES) * (MVector.CrossProduct(κb_h_l[i + 1], V_l[2 * i + 2]) * mframes[2 * i + 2].ZAxis + f3);
 
                 var κT01 = MVector.CrossProduct(κb_mid[2 * i], V_mid[2 * i]) * t_mid[2 * i];
                 var κT12 = MVector.CrossProduct(κb_mid[2 * i + 1], V_mid[2 * i + 1]) * t_mid[2 * i + 1];
@@ -940,64 +867,8 @@ namespace TMarsupilami.CoreLib3
                 V -= (l1 / 4) * (κN1 + κN2);
                 V -= (l1 / 2) * τT12;
                 V_l[2 * i + 2] = (V * d1) * mframes[2 * i + 2].XAxis + (V * d2) * mframes[2 * i + 2].YAxis;
-
-
-                // 0-1
-
-                //double V1_mid = V_mid[2 * i] * mframes_mid[2 * i].XAxis;
-                //double V2_mid = V_mid[2 * i] * mframes_mid[2 * i].YAxis;
-
-                //var dV = (l0 / 4) * (κN0 + κN1) + (l0 / 2) * τT01;
-                //var dV1 = dV * mframes_mid[2 * i].XAxis;
-                //var dV2 = dV * mframes_mid[2 * i].YAxis;
-
-                //V_r[2 * i] = V_mid[2 * i];
-                //V_r[2 * i] += (l0 / 4) * (κN0 + κN1);
-                //V_r[2 * i] += (l0 / 2) * τT01;
-
-                //V_l[2 * i + 1] = V_mid[2 * i];
-                //V_l[2 * i + 1] -= (l0 / 4) * (κN0 + κN1);
-                //V_l[2 * i + 1] -= (l0 / 2) * τT01;
-
-                //V_r[2 * i + 1] = V_mid[2 * i + 1];
-                //V_r[2 * i + 1] += (l1 / 4) * (κN1 + κN2);
-                //V_r[2 * i + 1] += (l1 / 2) * τT12;
-
-                //V_l[2 * i + 2] = V_mid[2 * i + 1];
-                //V_l[2 * i + 2] -= (l1 / 4) * (κN1 + κN2);
-                //V_l[2 * i + 2] -= (l1 / 2) * τT12;
-
-                //εmean = l0 / l_0[2 * i] - 1;
-                //ε0 = εmean - l0 / 6 * (2 * dε0 + dε1);
-                //ε1 = εmean + l0 / 6 * (dε0 + 2 * dε1);
-                //εmid = εmean + l0 / 24 * (dε0 - dε1);
-
-                //ε_r[2 * i] = ε0;
-                //N_r[2 * i] = ES * ε0;
-
-                //ε_mid[2 * i] = εmid;
-                //N_mid[2 * i] = ES * εmid;
-
-                //ε_l[2 * i + 1] = ε1;
-                //N_l[2 * i + 1] = ES * ε1;
-
-                // 1-2
-                //εmean = l1 / l_0[2 * i + 1] - 1;
-                //ε1 = εmean - l1 / 6 * (2 * dε1 + dε2);
-                //ε2 = εmean + l1 / 6 * (dε1 + 2 * dε2);
-                //εmid = εmean + l1 / 24 * (dε1 - dε2);
-
-                //ε_r[2 * i + 1] = ε1;
-                //N_r[2 * i + 1] = ES * ε1;
-
-                //ε_mid[2 * i + 1] = εmid;
-                //N_mid[2 * i + 1] = ES * εmid;
-
-                //ε_l[2 * i + 2] = ε2;
-                //N_l[2 * i + 2] = ES * ε2;
             }
         }
-
         private void UpdateInternalNodalForce()
         {
             // AXIAL FORCE : attention à ne pas répéter cette opération pour les variations sur θ
@@ -1074,7 +945,6 @@ namespace TMarsupilami.CoreLib3
             //}
 
         }
-
         private void UpdateResultantNodalForce()
         {
             // RESULTANT FORCE
@@ -1094,12 +964,6 @@ namespace TMarsupilami.CoreLib3
             }
 
             OnReactionForceUpdating(Fr_g, R_x);
-
-            // ADD REACTION FORCES TO INTERNAL RESULTANT
-            //for (int i = 0; i < nv_h; i++)
-            //{
-            //    R_x[2 * i] += Fr_g[i];
-            //}
         }
 
         // ENERGIES
