@@ -190,7 +190,7 @@ namespace TMarsupilami.Gh.Component
             switch (bc_end)
             {
                 
-
+                    
                 case (int)SupportCondition.Free:
 
                     // force verticale

@@ -71,6 +71,10 @@ namespace TMarsupilami.CoreLib3
         private MVector[] V_Q_g, V_Q_h_l, V_Q_h_r;          // shear (du au moment de torsion) aux ghost et à droite / gauche des handles
 
         public MVector[] M_g, M_h_l, M_h_r;
+        public double[] M1_g, M1_h_l, M1_h_r;
+        public double[] M2_g, M2_h_l, M2_h_r;
+
+
 
         public double[] Q_mid;                                 // torsional moment : Q = GJ.(τ-τ_0)
         public double[] Q_l, Q_r;                          // torsion moment at left/rigth of each node, ghost and handle
@@ -256,6 +260,12 @@ namespace TMarsupilami.CoreLib3
             M_g = new MVector[nv_g];   // moment à un ghost node
             M_h_l = new MVector[nv_h];   // moment à gauche d'un handle node
             M_h_r = new MVector[nv_h];   // moment à gauche d'un handle node
+            M1_g = new double[nv_g];  
+            M1_h_l = new double[nv_h];  
+            M1_h_r = new double[nv_h];
+            M2_g = new double[nv_g];
+            M2_h_l = new double[nv_h];
+            M2_h_r = new double[nv_h];
 
             Q_mid = new double[ne];
             Q_l = new double[nv];
@@ -471,6 +481,9 @@ namespace TMarsupilami.CoreLib3
             M_h_r[0] = M1 * d1 + M2 * d2;
             κb_h_r[0] = κb_r;
 
+            M1_h_l[0] = 0;
+            M2_h_l[0] = 0;
+
             // i = 1, ..., nv_h-1
             for (int i = 1; i < nv_h - 1; i++)
             {
@@ -497,6 +510,11 @@ namespace TMarsupilami.CoreLib3
                 M_h_l[i] = Mmean + dM;
                 M_h_r[i] = Mmean - dM;
 
+                M1_h_l[i] = M1 + dM1;
+                M2_h_l[i] = M2 + dM2;
+                M1_h_r[i] = M1 - dM1;
+                M2_h_r[i] = M2 - dM2;
+
                 // left curvatures from moment
                 var κ1_h_l = (M1 + dM1) / EI1[i - 1];
                 var κ2_h_l = (M2 + dM2) / EI2[i - 1];
@@ -518,6 +536,9 @@ namespace TMarsupilami.CoreLib3
             M_h_l[nv_h - 1] = M1 * d1 + M2 * d2;
             κb_h_l[nv_h - 1] = κb_l;
 
+            M1_h_r[nv_h - 1] = 0;
+            M2_h_r[nv_h - 1] = 0;
+
             // GHOST
             for (int i = 0; i < nv_g; i++)
             {
@@ -529,12 +550,15 @@ namespace TMarsupilami.CoreLib3
                 M1 = EI1[i] * (κb * d1 - κb_0.X);
                 M2 = EI2[i] * (κb * d2 - κb_0.Y);
                 M_g[i] = M1 * d1 + M2 * d2;
+                M1_g[i] = M1;
+                M2_g[i] = M2;
 
                 κb_mid[2 * i] = 0.5 * (κb_h_r[i] + κb_g[i]);
                 κb_mid[2 * i] = κb_mid[2 * i] - (κb_mid[2 * i] * t_mid[2 * i]) * t_mid[2 * i]; // make sure kb is perpendicular to d3
 
                 κb_mid[2 * i + 1] = 0.5 * (κb_g[i] + κb_h_l[i + 1]);
                 κb_mid[2 * i + 1] = κb_mid[2 * i + 1] - (κb_mid[2 * i + 1] * t_mid[2 * i + 1]) * t_mid[2 * i + 1]; // make sure kb is perpendicular to d3
+
             }
         }
 
@@ -545,7 +569,7 @@ namespace TMarsupilami.CoreLib3
         private void UpdateTwistingMoment()
         {
             double l0, l1;
-            double τmean, τ0, τ1, τ2, τmid;
+            double dQ, dτ;
             // interpolation de l'effort tranchant aux noeuds
             // non nécessaire pour la DR => à décplacer dans l'affichage
             for (int i = 0; i < nv_g; i++)
@@ -558,50 +582,76 @@ namespace TMarsupilami.CoreLib3
 
                 // au repos, nécessairement τ_0(s) est uniforme sur [x_h_r, x_g, x_h_l]
                 // et donc on a bien Q' = GJτ' = -(κbxM + m).d3 sur cet intervalle (et non Q' = GJ(τ'-τ_0')
-                var dτ0 = -(1 / GJ) * (MVector.CrossProduct(κb_h_r[i], M_h_r[i]) * mframes[2 * i].ZAxis + m3);
-                var dτ1 = -(1 / GJ) * (MVector.CrossProduct(κb_g[i], M_g[i]) * mframes[2 * i + 1].ZAxis + m3);
-                var dτ2 = -(1 / GJ) * (MVector.CrossProduct(κb_h_l[i + 1], M_h_l[i + 1]) * mframes[2 * i + 2].ZAxis + m3);
+                //var dτ0 = -(1 / GJ) * (MVector.CrossProduct(κb_h_r[i], M_h_r[i]) * mframes[2 * i].ZAxis + m3);
+                //var dτ1 = -(1 / GJ) * (MVector.CrossProduct(κb_g[i], M_g[i]) * mframes[2 * i + 1].ZAxis + m3);
+                //var dτ2 = -(1 / GJ) * (MVector.CrossProduct(κb_h_l[i + 1], M_h_l[i + 1]) * mframes[2 * i + 2].ZAxis + m3);
+
+                var κM0 = MVector.CrossProduct(κb_h_r[i], M_h_r[i]) * mframes[2 * i].ZAxis;
+                var κM1 = MVector.CrossProduct(κb_g[i], M_g[i]) * mframes[2 * i + 1].ZAxis;
+                var κM2 = MVector.CrossProduct(κb_h_l[i + 1], M_h_l[i + 1]) * mframes[2 * i + 2].ZAxis;
 
                 // 0-1
-                τmean = τ[2 * i];
-                τ0 = τmean - l0 / 6 * (2 * dτ0 + dτ1);
-                τ1 = τmean + l0 / 6 * (dτ0 + 2 * dτ1);
-                τmid = τmean + l0 / 24 * (dτ0 - dτ1);
+                Q_mid[2 * i] = GJ * (τ[2 * i] - τ_0[2 * i]);
 
-                τ_r[2 * i] = τ0;
-                Q_r[2 * i] = GJ * (τ0 - τ_0[2 * i]);
+                dQ = (l0 / 4) * (κM0 + κM1);
+                Q_r[2 * i] = Q_mid[2 * i] + dQ;
+                Q_l[2 * i + 1] = Q_mid[2 * i] - dQ;
 
-                τ_mid[2 * i] = τmid;
-                Q_mid[2 * i] = GJ * (τmid - τ_0[2 * i]);
-
-                τ_l[2 * i + 1] = τ1;
-                Q_l[2 * i + 1] = GJ * (τ1 - τ_0[2 * i]);
+                dτ = dQ / GJ;
+                τ_r[2 * i] = τ[2 * i] + dτ;
+                τ_l[2 * i + 1] = τ[2 * i] - dτ;
 
                 // 1-2
-                τmean = τ[2 * i + 1];
-                τ1 = τmean - l1 / 6 * (2 * dτ1 + dτ2);
-                τ2 = τmean + l1 / 6 * (dτ1 + 2 * dτ2);
-                τmid = τmean + l1 / 24 * (dτ1 - dτ2);
+                Q_mid[2 * i + 1] = GJ * (τ[2 * i + 1] - τ_0[2 * i + 1]);
 
-                τ_r[2 * i + 1] = τ1;
-                Q_r[2 * i + 1] = GJ * (τ1 - τ_0[2 * i + 1]);
+                dQ = (l1 / 4) * (κM1 + κM2);
+                Q_r[2 * i + 1] = Q_mid[2 * i + 1] + dQ;
+                Q_l[2 * i + 2] = Q_mid[2 * i + 1] - dQ;
 
-                τ_mid[2 * i + 1] = τmid;
-                Q_mid[2 * i + 1] = GJ * (τmid - τ_0[2 * i + 1]);
+                dτ = dQ / GJ;
+                τ_r[2 * i + 1] = τ[2 * i+1] + dτ;
+                τ_l[2 * i + 2] = τ[2 * i+1] - dτ;
 
-                τ_l[2 * i + 2] = τ2;
-                Q_l[2 * i + 2] = GJ * (τ2 - τ_0[2 * i + 1]);
+                // 0-1
+                //τmean = τ[2 * i];
+                //τ0 = τmean - l0 / 6 * (2 * dτ0 + dτ1);
+                //τ1 = τmean + l0 / 6 * (dτ0 + 2 * dτ1);
+                //τmid = τmean + l0 / 24 * (dτ0 - dτ1);
+
+                //τ_r[2 * i] = τ0;
+                //Q_r[2 * i] = GJ * (τ0 - τ_0[2 * i]);
+
+                //τ_mid[2 * i] = τmid;
+                //Q_mid[2 * i] = GJ * (τmid - τ_0[2 * i]);
+
+                //τ_l[2 * i + 1] = τ1;
+                //Q_l[2 * i + 1] = GJ * (τ1 - τ_0[2 * i]);
+
+                //1 - 2
+                //τmean = τ[2 * i + 1];
+                //τ1 = τmean - l1 / 6 * (2 * dτ1 + dτ2);
+                //τ2 = τmean + l1 / 6 * (dτ1 + 2 * dτ2);
+                //τmid = τmean + l1 / 24 * (dτ1 - dτ2);
+
+                //τ_r[2 * i + 1] = τ1;
+                //Q_r[2 * i + 1] = GJ * (τ1 - τ_0[2 * i + 1]);
+
+                //τ_mid[2 * i + 1] = τmid;
+                //Q_mid[2 * i + 1] = GJ * (τmid - τ_0[2 * i + 1]);
+
+                //τ_l[2 * i + 2] = τ2;
+                //Q_l[2 * i + 2] = GJ * (τ2 - τ_0[2 * i + 1]);
             }
 
             // Calcul les frames au milieu des edges
             // GJ * dθ_mid = li/8 *(3*Qr + Ql)
 
-            //for (int i = 0; i < ne; i++)
-            //{
-            //    var dθ_mid = l[i] / (8 * GJ[i/2]) * (3 * Q_r[i] + Q_l[i + 1]);
-            //    ParallelTransportation.ZPT_Rotation(mframes[i], mframes[i].ZAxis, 0.5 * (x[i] + x[i + 1]), t_mid[i], ref mframes_mid[i]); // la position ne tient pas compte de la courbure. Mais ce n'est pas nécessaire pour la suite
-            //    mframes_mid[i].ZRotate(dθ_mid);
-            //}
+            for (int i = 0; i < ne; i++)
+            {
+                var dθ_mid = l[i] * (0.5 * τ[i] + (Q_l[i + 1] - Q_r[i]) / (8 * GJ[i / 2]));
+                ParallelTransportation.ZPT_Rotation(mframes[i], mframes[i].ZAxis, 0.5 * (x[i] + x[i + 1]), t_mid[i], ref mframes_mid[i]); // la position ne tient pas compte de la courbure. Mais ce n'est pas nécessaire pour la suite
+                mframes_mid[i].ZRotate(dθ_mid);
+            }
 
         }
 
@@ -619,21 +669,26 @@ namespace TMarsupilami.CoreLib3
 
                 // au repos, nécessairement τ_0(s) est uniforme sur [x_h_r, x_g, x_h_l]
                 // et donc on a bien Q' = GJτ' = -(κbxM + m).d3 sur cet intervalle (et non Q' = GJ(τ'-τ_0')
-                var κM0 = MVector.CrossProduct(κb_h_r[i], M_h_r[i]) * mframes[2 * i].ZAxis;
-                var κM1 = MVector.CrossProduct(κb_g[i], M_g[i]) * mframes[2 * i + 1].ZAxis;
-                var κM2 = MVector.CrossProduct(κb_h_l[i + 1], M_h_l[i + 1]) * mframes[2 * i + 2].ZAxis;
+                //var κM0 = MVector.CrossProduct(κb_h_r[i], M_h_r[i]) * mframes[2 * i].ZAxis;
+                //var κM1 = MVector.CrossProduct(κb_g[i], M_g[i]) * mframes[2 * i + 1].ZAxis;
+                //var κM2 = MVector.CrossProduct(κb_h_l[i + 1], M_h_l[i + 1]) * mframes[2 * i + 2].ZAxis;
 
                 Rint_θ[2 * i].X += M_h_r[i].X;
                 Rint_θ[2 * i].Y += M_h_r[i].Y;
-                Rint_θ[2 * i].Z += Q_mid[2 * i] + l0 / 4 * (κM0 + κM1);
+                //Rint_θ[2 * i].Z += Q_mid[2 * i] + l0 / 4 * (κM0 + κM1);
+                Rint_θ[2 * i].Z += Q_r[2 * i];
+
 
                 Rint_θ[2 * i + 1].X = 0;
                 Rint_θ[2 * i + 1].Y = 0;
-                Rint_θ[2 * i + 1].Z = Q_mid[2 * i + 1] - Q_mid[2 * i] + l0 / 4 * (κM0 + κM1) + l1 / 4 * (κM1 + κM2);
+                //Rint_θ[2 * i + 1].Z = Q_mid[2 * i + 1] - Q_mid[2 * i] + l0 / 4 * (κM0 + κM1) + l1 / 4 * (κM1 + κM2);
+                Rint_θ[2 * i + 1].Z = -Q_l[2 * i + 1] + Q_r[2 * i + 1];
 
                 Rint_θ[2 * i + 2].X = -M_h_l[i + 1].X;
                 Rint_θ[2 * i + 2].Y = -M_h_l[i + 1].Y;
-                Rint_θ[2 * i + 2].Z = -Q_mid[2 * i + 1] + l1 / 4 * (κM1 + κM2);
+                //Rint_θ[2 * i + 2].Z = -Q_mid[2 * i + 1] + l1 / 4 * (κM1 + κM2);
+                Rint_θ[2 * i + 2].Z = -Q_l[2 * i + 2];
+
             }
 
             //Rint_θ[0] = MVector.Zero;
@@ -736,43 +791,42 @@ namespace TMarsupilami.CoreLib3
                 Vmid = MVector.CrossProduct(t_mid[2 * i], dM01);        // d3 x M'
                 Vmid += Vm;                                             // d3 x m
                 Vmid += Q_mid[2 * i] * κb_mid[2 * i];                   // Qκb
-                Vmid += -τ_mid[2 * i] * M01;                            // -τM
-                V_mid[2 * i] = Vmid;
+                Vmid += -τ[2 * i] * M01;                                // -τM
+                V_mid[2 * i] = Vmid - (Vmid * t_mid[2 * i]) * t_mid[2 * i];
 
                 Vmid = MVector.CrossProduct(t_mid[2 * i + 1], dM12);    // d3 x M'
                 Vmid += Vm;                                             // d3 x m
                 Vmid += Q_mid[2 * i + 1] * κb_mid[2 * i + 1];           // Qκb
-                Vmid += - τ_mid[2 * i + 1] * M12;                       // -τM
-                V_mid[2 * i + 1] = Vmid;
+                Vmid += - τ[2 * i + 1] * M12;                           // -τM
+                V_mid[2 * i + 1] = Vmid - (Vmid * t_mid[2 * i + 1]) * t_mid[2 * i + 1];
 
-               
-                mframe = mframes[2 * i];
-                V = MVector.CrossProduct(mframe.ZAxis, dM0);       // d3 x M'
-                V += Vm;                                           // d3 x m
-                V += Q_r[2 * i] * κb_h_r[i];                       // Qκb
-                V += -0.5 * τ_r[2 * i] * M_h_r[i];                 // -τM
-                V_r[2 * i] = V;
+                //mframe = mframes[2 * i];
+                //V = MVector.CrossProduct(mframe.ZAxis, dM0);       // d3 x M'
+                //V += Vm;                                           // d3 x m
+                //V += Q_r[2 * i] * κb_h_r[i];                       // Qκb
+                //V += -0.5 * τ_r[2 * i] * M_h_r[i];                 // -τM
+                //V_r[2 * i] = V;
 
-                mframe = mframes[2 * i + 1];
-                V = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
-                V += Vm;                                           // d3 x m
-                V += Q_l[2 * i + 1] * κb_g[i];                     // Qκb
-                V += -0.5 * τ_l[2 * i + 1] * M_g[i];               // -τM
-                V_l[2 * i + 1] = V;
+                //mframe = mframes[2 * i + 1];
+                //V = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
+                //V += Vm;                                           // d3 x m
+                //V += Q_l[2 * i + 1] * κb_g[i];                     // Qκb
+                //V += -0.5 * τ_l[2 * i + 1] * M_g[i];               // -τM
+                //V_l[2 * i + 1] = V;
 
-                mframe = mframes[2 * i + 1];
-                V = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
-                V += Vm;                                           // d3 x m
-                V += Q_r[2 * i + 1] * κb_g[i];                     // Qκb
-                V += -0.5 * τ_r[2 * i + 1] * M_g[i];               // -τM
-                V_r[2 * i + 1] = V;
+                //mframe = mframes[2 * i + 1];
+                //V = MVector.CrossProduct(mframe.ZAxis, dM1);       // d3 x M'
+                //V += Vm;                                           // d3 x m
+                //V += Q_r[2 * i + 1] * κb_g[i];                     // Qκb
+                //V += -0.5 * τ_r[2 * i + 1] * M_g[i];               // -τM
+                //V_r[2 * i + 1] = V;
 
-                mframe = mframes[2 * i + 2];
-                V = MVector.CrossProduct(mframe.ZAxis, dM2);       // d3 x M'
-                V += Vm;                                           // d3 x m
-                V += Q_l[2 * i + 2] * κb_h_l[i + 1];               // Qκb
-                V += -0.5 * τ_l[2 * i + 2] * M_h_l[i + 1];         // -τM
-                V_l[2 * i + 2] = V;
+                //mframe = mframes[2 * i + 2];
+                //V = MVector.CrossProduct(mframe.ZAxis, dM2);       // d3 x M'
+                //V += Vm;                                           // d3 x m
+                //V += Q_l[2 * i + 2] * κb_h_l[i + 1];               // Qκb
+                //V += -0.5 * τ_l[2 * i + 2] * M_h_l[i + 1];         // -τM
+                //V_l[2 * i + 2] = V;
             }
         }
 
@@ -805,7 +859,8 @@ namespace TMarsupilami.CoreLib3
             //}
 
             double l0, l1;
-            double εmean, ε0, ε1, ε2, εmid;
+            double dN, dε;
+            MVector d1, d2, V;
 
             for (int i = 0; i < nv_g; i++)
             {
@@ -817,39 +872,129 @@ namespace TMarsupilami.CoreLib3
 
                 // au repos, nécessairement τ_0(s) est uniforme sur [x_h_r, x_g, x_h_l]
                 // et donc on a bien Q' = GJτ' = -(κbxM + m).d3 sur cet intervalle (et non Q' = GJ(τ'-τ_0')
-                var dε0 = -(1 / ES) * (MVector.CrossProduct(κb_h_r[i], V_r[2 * i]) * mframes[2 * i].ZAxis + f3);
-                var dε1 = -(1 / ES) * (MVector.CrossProduct(κb_g[i], 0.5 * (V_l[2 * i + 1] + V_r[2 * i + 1])) * mframes[2 * i + 1].ZAxis + f3);
-                var dε2 = -(1 / ES) * (MVector.CrossProduct(κb_h_l[i + 1], V_l[2 * i + 2]) * mframes[2 * i + 2].ZAxis + f3);
+                //var dε0 = -(1 / ES) * (MVector.CrossProduct(κb_h_r[i], V_r[2 * i]) * mframes[2 * i].ZAxis + f3);
+                //var dε1 = -(1 / ES) * (MVector.CrossProduct(κb_g[i], 0.5 * (V_l[2 * i + 1] + V_r[2 * i + 1])) * mframes[2 * i + 1].ZAxis + f3);
+                //var dε2 = -(1 / ES) * (MVector.CrossProduct(κb_h_l[i + 1], V_l[2 * i + 2]) * mframes[2 * i + 2].ZAxis + f3);
+
+                var κT01 = MVector.CrossProduct(κb_mid[2 * i], V_mid[2 * i]) * t_mid[2 * i];
+                var κT12 = MVector.CrossProduct(κb_mid[2 * i + 1], V_mid[2 * i + 1]) * t_mid[2 * i + 1];
 
                 // 0-1
-                εmean = l0 / l_0[2 * i] - 1;
-                ε0 = εmean - l0 / 6 * (2 * dε0 + dε1);
-                ε1 = εmean + l0 / 6 * (dε0 + 2 * dε1);
-                εmid = εmean + l0 / 24 * (dε0 - dε1);
+                ε[2 * i] = l0 / l_0[2 * i] - 1;
+                N_mid[2 * i] = ES * ε[2 * i];
 
-                ε_r[2 * i] = ε0;
-                N_r[2 * i] = ES * ε0;
+                dN = (l0 / 2) * κT01;
+                N_r[2 * i] = N_mid[2 * i] + dN;
+                N_l[2 * i + 1] = N_mid[2 * i] - dN;
 
-                ε_mid[2 * i] = εmid;
-                N_mid[2 * i] = ES * εmid;
-
-                ε_l[2 * i + 1] = ε1;
-                N_l[2 * i + 1] = ES * ε1;
+                dε = dN / ES;
+                ε_r[2 * i] = ε[2 * i] + dε;
+                ε_l[2 * i + 1] = ε[2 * i] - dε;
 
                 // 1-2
-                εmean = l1 / l_0[2 * i + 1] - 1;
-                ε1 = εmean - l1 / 6 * (2 * dε1 + dε2);
-                ε2 = εmean + l1 / 6 * (dε1 + 2 * dε2);
-                εmid = εmean + l1 / 24 * (dε1 - dε2);
+                ε[2 * i + 1] = l1 / l_0[2 * i + 1] - 1;
+                N_mid[2 * i + 1] = ES * ε[2 * i + 1];
 
-                ε_r[2 * i + 1] = ε1;
-                N_r[2 * i + 1] = ES * ε1;
+                dN = (l1 / 2) * κT12;
+                N_r[2 * i + 1] = N_mid[2 * i + 1] + dN;
+                N_l[2 * i + 2] = N_mid[2 * i + 1] - dN;
 
-                ε_mid[2 * i + 1] = εmid;
-                N_mid[2 * i + 1] = ES * εmid;
+                dε = dN / ES;
+                ε_r[2 * i + 1] = ε[2 * i + 1] + dε;
+                ε_l[2 * i + 2] = ε[2 * i + 1] - dε;
 
-                ε_l[2 * i + 2] = ε2;
-                N_l[2 * i + 2] = ES * ε2;
+                var κN0 = N_r[2 * i] * MVector.CrossProduct(κb_h_r[i], mframes[2 * i].ZAxis);
+                var κN1 = 0.5 * (N_l[2 * i + 1] + N_r[2 * i + 1]) * MVector.CrossProduct(κb_g[i], mframes[2 * i + 1].ZAxis);
+                var κN2 = N_l[2 * i + 2] * MVector.CrossProduct(κb_h_l[i + 1], mframes[2 * i + 2].ZAxis);
+
+                var τT01 = τ[2 * i] * MVector.CrossProduct(t_mid[2 * i], V_mid[2 * i]);
+                var τT12 = τ[2 * i + 1] * MVector.CrossProduct(t_mid[2 * i + 1], V_mid[2 * i + 1]);
+
+                // 2i
+
+                d1 = mframes_mid[2 * i].XAxis;
+                d2 = mframes_mid[2 * i].YAxis;
+
+                V = V_mid[2 * i];
+                V += (l0 / 4) * (κN0 + κN1);
+                V += (l0 / 2) * τT01;
+                V_r[2 * i] = (V * d1) * mframes[2 * i].XAxis + (V * d2) * mframes[2 * i].YAxis;
+
+                // 2i+1
+
+                V = V_mid[2 * i];
+                V -= (l0 / 4) * (κN0 + κN1);
+                V -= (l0 / 2) * τT01;
+                V_l[2 * i + 1] = (V * d1) * mframes[2 * i + 1].XAxis + (V * d2) * mframes[2 * i + 1].YAxis;
+
+                d1 = mframes_mid[2 * i + 1].XAxis;
+                d2 = mframes_mid[2 * i + 1].YAxis;
+
+                V = V_mid[2 * i + 1];
+                V += (l1 / 4) * (κN1 + κN2);
+                V += (l1 / 2) * τT12;
+                V_r[2 * i + 1] = (V * d1) * mframes[2 * i + 1].XAxis + (V * d2) * mframes[2 * i + 1].YAxis;
+
+                // 2i+2
+                V = V_mid[2 * i + 1];
+                V -= (l1 / 4) * (κN1 + κN2);
+                V -= (l1 / 2) * τT12;
+                V_l[2 * i + 2] = (V * d1) * mframes[2 * i + 2].XAxis + (V * d2) * mframes[2 * i + 2].YAxis;
+
+
+                // 0-1
+
+                //double V1_mid = V_mid[2 * i] * mframes_mid[2 * i].XAxis;
+                //double V2_mid = V_mid[2 * i] * mframes_mid[2 * i].YAxis;
+
+                //var dV = (l0 / 4) * (κN0 + κN1) + (l0 / 2) * τT01;
+                //var dV1 = dV * mframes_mid[2 * i].XAxis;
+                //var dV2 = dV * mframes_mid[2 * i].YAxis;
+
+                //V_r[2 * i] = V_mid[2 * i];
+                //V_r[2 * i] += (l0 / 4) * (κN0 + κN1);
+                //V_r[2 * i] += (l0 / 2) * τT01;
+
+                //V_l[2 * i + 1] = V_mid[2 * i];
+                //V_l[2 * i + 1] -= (l0 / 4) * (κN0 + κN1);
+                //V_l[2 * i + 1] -= (l0 / 2) * τT01;
+
+                //V_r[2 * i + 1] = V_mid[2 * i + 1];
+                //V_r[2 * i + 1] += (l1 / 4) * (κN1 + κN2);
+                //V_r[2 * i + 1] += (l1 / 2) * τT12;
+
+                //V_l[2 * i + 2] = V_mid[2 * i + 1];
+                //V_l[2 * i + 2] -= (l1 / 4) * (κN1 + κN2);
+                //V_l[2 * i + 2] -= (l1 / 2) * τT12;
+
+                //εmean = l0 / l_0[2 * i] - 1;
+                //ε0 = εmean - l0 / 6 * (2 * dε0 + dε1);
+                //ε1 = εmean + l0 / 6 * (dε0 + 2 * dε1);
+                //εmid = εmean + l0 / 24 * (dε0 - dε1);
+
+                //ε_r[2 * i] = ε0;
+                //N_r[2 * i] = ES * ε0;
+
+                //ε_mid[2 * i] = εmid;
+                //N_mid[2 * i] = ES * εmid;
+
+                //ε_l[2 * i + 1] = ε1;
+                //N_l[2 * i + 1] = ES * ε1;
+
+                // 1-2
+                //εmean = l1 / l_0[2 * i + 1] - 1;
+                //ε1 = εmean - l1 / 6 * (2 * dε1 + dε2);
+                //ε2 = εmean + l1 / 6 * (dε1 + 2 * dε2);
+                //εmid = εmean + l1 / 24 * (dε1 - dε2);
+
+                //ε_r[2 * i + 1] = ε1;
+                //N_r[2 * i + 1] = ES * ε1;
+
+                //ε_mid[2 * i + 1] = εmid;
+                //N_mid[2 * i + 1] = ES * εmid;
+
+                //ε_l[2 * i + 2] = ε2;
+                //N_l[2 * i + 2] = ES * ε2;
             }
         }
 
