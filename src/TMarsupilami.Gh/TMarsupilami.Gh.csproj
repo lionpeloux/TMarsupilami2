@@ -91,10 +91,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeamQ.cs" />
-    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeamV.cs" />
-    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeamM.cs" />
-    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeamN.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_κ.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_ε.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_τ.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_Q.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_V.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_M.cs" />
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_N.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayDMoment.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayDForce.cs" />
