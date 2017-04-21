@@ -52,37 +52,26 @@ namespace TMarsupilami.CoreLib3
         public double[] ε_mid;                                 // torsional moment : Q = GJ.(τ-τ_0)
         public double[] ε_l, ε_r;                          // torsion moment at left/rigth of each node, ghost and handle
 
+        public double[] τ;           // twist angle and rate of twist : τ[i] = twist[i] / l[i]
+        public double[] τ_mid;                                 // torsional moment : Q = GJ.(τ-τ_0)
+        public double[] τ_l, τ_r;                          // torsion 
+
         private MVector[] κb_mid;           // curvature binormal at mid-edge
         private MVector[] κb_g;             // curvature at a ghost vertex
         private MVector[] κb_h_l, κb_h_r;   // curvature at a left/right of a handle vertex
-
-        public double[] τ;           // twist angle and rate of twist : τ[i] = twist[i] / l[i]
-        public double[] τ_mid;                                 // torsional moment : Q = GJ.(τ-τ_0)
-        public double[] τ_l, τ_r;                          // torsion moment at left/rigth of each node, ghost and handle
 
         // INTERNAL FORCES & MOMENTS
         public double[] N_mid;                                 // axial force : N = ES.ε
         public double[] N_l, N_r;                          // axial force at left/rigth of each node, ghost and handle
 
-        private MVector[] V_M;                              // shear force (bending contribution) : V_M = M'
-        private MVector[] V_Q;                              // shear force (torsion contribution) : V_Q = Qκb
         public MVector[] V_mid, V_l, V_r;                                // total shear force : V = V_M + V_Q
-        private MVector[] V_M_g, V_M_h_l, V_M_h_r;          // shear (du au moment de flexion) aux ghost et à droite / gauche des handles
-        private MVector[] V_Q_g, V_Q_h_l, V_Q_h_r;          // shear (du au moment de torsion) aux ghost et à droite / gauche des handles
 
         public MVector[] M_g, M_h_l, M_h_r;
-        public double[] M1_g, M1_h_l, M1_h_r;
-        public double[] M2_g, M2_h_l, M2_h_r;
-
-
 
         public double[] Q_mid;                                 // torsional moment : Q = GJ.(τ-τ_0)
         public double[] Q_l, Q_r;                          // torsion moment at left/rigth of each node, ghost and handle
 
         // RESULTANTE FORCES (DR SPECIFIC ?? => si oui, à déplacer)
-        private MVector[] Rint_x_axial, Rint_x_shear_M, Rint_x_shear_Q;
-        private double[] Rint_θ_torsion_Q, Rint_θ_torsion_M;
-        private MVector[] Rint_θ_bending;
 
         private MVector[] dθ;
 
@@ -225,7 +214,6 @@ namespace TMarsupilami.CoreLib3
             mframes_mid = new MFrame[ne];
 
             ε = new double[ne];
-            ε_mid = new double[ne];
             ε_l = new double[nv];
             ε_r = new double[nv];
 
@@ -246,26 +234,12 @@ namespace TMarsupilami.CoreLib3
 
             V_l = new MVector[nv];
             V_r = new MVector[nv];
-
             V_mid = new MVector[ne];
-            V_M = new MVector[ne];
-            V_M_g = new MVector[nv_g];
-            V_M_h_l = new MVector[nv_h];
-            V_M_h_r = new MVector[nv_h];
-            V_Q = new MVector[ne];
-            V_Q_g = new MVector[nv_g];
-            V_Q_h_l = new MVector[nv_h];
-            V_Q_h_r = new MVector[nv_h];
+
 
             M_g = new MVector[nv_g];   // moment à un ghost node
             M_h_l = new MVector[nv_h];   // moment à gauche d'un handle node
             M_h_r = new MVector[nv_h];   // moment à gauche d'un handle node
-            M1_g = new double[nv_g];  
-            M1_h_l = new double[nv_h];  
-            M1_h_r = new double[nv_h];
-            M2_g = new double[nv_g];
-            M2_h_l = new double[nv_h];
-            M2_h_r = new double[nv_h];
 
             Q_mid = new double[ne];
             Q_l = new double[nv];
@@ -274,15 +248,10 @@ namespace TMarsupilami.CoreLib3
             // DR RESULTANT
             R_x = new MVector[nv];
             Rint_x = new MVector[nv];
-            Rint_x_axial = new MVector[nv];
-            Rint_x_shear_M = new MVector[nv];
-            Rint_x_shear_Q = new MVector[nv];
+
 
             R_θ = new MVector[nv];
             Rint_θ = new MVector[nv];
-            Rint_θ_torsion_Q = new double[nv];
-            Rint_θ_torsion_M = new double[nv];
-            Rint_θ_bending = new MVector[nv];
 
             // internal rotation to realign frames with the centerline at each x step.
             dθ = new MVector[nv];
@@ -481,9 +450,6 @@ namespace TMarsupilami.CoreLib3
             M_h_r[0] = M1 * d1 + M2 * d2;
             κb_h_r[0] = κb_r;
 
-            M1_h_l[0] = 0;
-            M2_h_l[0] = 0;
-
             // i = 1, ..., nv_h-1
             for (int i = 1; i < nv_h - 1; i++)
             {
@@ -510,11 +476,6 @@ namespace TMarsupilami.CoreLib3
                 M_h_l[i] = Mmean + dM;
                 M_h_r[i] = Mmean - dM;
 
-                M1_h_l[i] = M1 + dM1;
-                M2_h_l[i] = M2 + dM2;
-                M1_h_r[i] = M1 - dM1;
-                M2_h_r[i] = M2 - dM2;
-
                 // left curvatures from moment
                 var κ1_h_l = (M1 + dM1) / EI1[i - 1];
                 var κ2_h_l = (M2 + dM2) / EI2[i - 1];
@@ -536,9 +497,6 @@ namespace TMarsupilami.CoreLib3
             M_h_l[nv_h - 1] = M1 * d1 + M2 * d2;
             κb_h_l[nv_h - 1] = κb_l;
 
-            M1_h_r[nv_h - 1] = 0;
-            M2_h_r[nv_h - 1] = 0;
-
             // GHOST
             for (int i = 0; i < nv_g; i++)
             {
@@ -550,8 +508,6 @@ namespace TMarsupilami.CoreLib3
                 M1 = EI1[i] * (κb * d1 - κb_0.X);
                 M2 = EI2[i] * (κb * d2 - κb_0.Y);
                 M_g[i] = M1 * d1 + M2 * d2;
-                M1_g[i] = M1;
-                M2_g[i] = M2;
 
                 κb_mid[2 * i] = 0.5 * (κb_h_r[i] + κb_g[i]);
                 κb_mid[2 * i] = κb_mid[2 * i] - (κb_mid[2 * i] * t_mid[2 * i]) * t_mid[2 * i]; // make sure kb is perpendicular to d3
