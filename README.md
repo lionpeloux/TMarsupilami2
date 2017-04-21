@@ -9,32 +9,50 @@ Lionel du Peloux
 
 ## WIP
 
-modèle de poutre simple semble fonctionnel :
+### Prise en compte de l'état repos :
+- à partir des frames ou des courbures généralisées au repos ??
+- traitement de epsilon et tau : moyenné sur un edge ou définis au bords pour coder une variation linéaire
 
-- les boundary conditions sont désormais basées sur des conditions en force et non plus en vitesse, ce qui les rend indépendantes du solveur
+### Resultantes Rx / Ro
+- reprendre le calcul final dans l'élément
+- vérifier le fonctionnement des charges linéaires (m1, m2, f1, f2, f3)
 
-- la condition `FREE` n'a plus lieu d'être et doit être retirée (comportement par défaut d'un noeud)
+### Automatic refine (IRefinable)
+- mise en place de principe effectuée (ça marche)
+- doit marcher avec les charges
 
-- la condition `CLAMPED` fait apparaître un problème de définition de l'effort normal au niveau des noeuds, et donc de l'encastrement. Cf le cas de la poutre circulaire encastrée d'un côté libre de l'autre => la courbure transforme l'effort normal en effort tranchant et l'effort tranchant en effort normal. Et ce phénomène conduit à une approximation qui donne des résultantes sur appuis faussées (légèrement, selon le niveau de discrétisation)
-- Intégrer un appuis élastique (sur la rotule puis l'encastrement)
+### Lumped Mass
+- passer la méthode en déléguée avec une méthode par défaut
+- Laisser la possibilité de changer le mode de calcul des masses ficitves par élément.
+- préciser le calcul des masses fictives
+- mettre en place le système de transfert des masses fictives
 
-- poutre courbe
+### Section & Material (IBreakable)
+- préciser les classes
+- doivent implementer le refine
+- comment surcharger les classes pour un affichage dans Gh (section)
+- gestion d'événements pour la plasticité / rupture
 
-- section variable
+### Préciser hierarchy des éléménts (IDRElement ??)
+- un élément a des vertex en propre
+- soit 3DOF soit 6DOF
+- possède position, vitesses, accélérations
+- quelle interface / classe abstraint avec le solver ??
 
-- reprendre au propre les champs & propriétés C#
+### Support
+- reprendre le calcul du moment induit comme pour la force (après le calcul de la resistance)
+- introduire les supports groupés (pin / clamped) avec torseur résultant au point d'attache
+- introduire les supports élastiques
 
-## informations sur la branche :
+### Links
+- base implémentée avec des ressorts de rappel
+- essayer la méthode de projection
 
-branch_id = 1beam_master
+### attractors / springs
+- introduire une classe générique d'attractor
+- les rendres compatibles via des callbacks avec les types grasshoppers (courbes / surfaces).
+- trouver un système d'interaction par évènement poru du recalcul auto.
 
-Dans cette branche, on essai de donner l'implémentation la plus complète possible d'une poutre seule avec des conditions aux limites variées et des chargements extérieurs. Cette branche devrait servir de base à l'implémentation du modèle à N poutres interconnectées. Il s'agit également d'aborder les compatibilités et incompatibilités entre les différents conditions aux limites.
-
-TYPE      | DESCRIPTION    | X | Y | Z | XX | YY | ZZ | Mext
-----------|----------------|---|---|---|----|----|----|-----
-`Free`    | appui libre    | 0 | 0 | 0 | 0  | 0  | 0  | M0
-`Pinned`  | appui rotulé   | 1 | 1 | 1 | 0  | 0  | 0  | 0
-`Clamped` | appui encastré | 1 | 1 | 1 | 1  | 1  | 1  |
-
-- `PIN`: appui rotulé (x,y,z) bloqués et (xx, yy, zz) libres
-- `ENC`: appuis encastré (x,y,z) bloqués (xx, yy, zz) libres
+## Diagrams
+- créer des diagrams normalisés pour un affichage plus simple.
+- penser un affichage par code couleur / gradient.
