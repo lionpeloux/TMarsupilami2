@@ -7,15 +7,7 @@ using TMarsupilami.MathLib;
 
 namespace TMarsupilami.CoreLib3
 {
-    /// <summary>
-    ///  Types of coordinate systems. 
-    ///  Can be either the material coordinate system of the element (t, d1, d2) or the world coordinate system (x, y, z).
-    /// </summary>
-    public enum CoordinateSystem
-    {
-        Material,
-        Global,
-    }
+
 
     public enum LoadType : int
     {

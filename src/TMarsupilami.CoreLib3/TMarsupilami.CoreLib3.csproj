@@ -46,6 +46,7 @@
     <Compile Include="Element\Beam_4D0F_D\BeamLoadManager.cs" />
     <Compile Include="Element\Beam_4D0F_D\Beam_4DOF_D.cs" />
     <Compile Include="Element\Element.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Torsor\DVector.cs" />
     <Compile Include="Torsor\CVector.cs" />
     <Compile Include="Torsor\Torsor.cs" />
