@@ -1017,61 +1017,71 @@ namespace TMarsupilami.CoreLib3
 
         }
 
-        public void Get2_M(out CMoment[] Ml, out CMoment[] Mr)
+        public void Get_M(out CMoment[] Ml, out CMoment[] Mr)
         {
-            if (IsClosed)
-                throw new NotImplementedException();
-
             Ml = new CMoment[nv];
             Mr = new CMoment[nv];
 
-            Ml[0] = new CMoment(M_l[0], mframes[0]);
             for (int i = 0; i < nv_g; i++)
             {
-                Mr[2 * i] = new CMoment(M_r[i], mframes[2 * i]);
                 Ml[2 * i + 1] = new CMoment(M_g[i], mframes[2 * i + 1]);
                 Mr[2 * i + 1] = new CMoment(M_g[i], mframes[2 * i + 1]);
-                Ml[2 * i + 2] = new CMoment(M_l[i + 1], mframes[2 * i + 2]);
             }
-            Mr[nv - 1] = new CMoment(M_r[nv_h - 1], mframes[nv - 1]);
-        }
-        public void Get_M(out CMoment[] Ml, out CMoment[] Mr)
-        {
-            MVector[] Ml_base, Mr_base;
-            this.Get_M(out Ml_base, out Mr_base);
-
-            Ml = new CMoment[Nv];
-            Mr = new CMoment[Nv];
-
-            for (int i = 0; i < nv; i++)
+            for (int i = 0; i < nv_h; i++)
             {
-                var frame = mframes[i];
-                Ml[i] = new CMoment(Ml_base[i], frame);
-                Mr[i] = new CMoment(Mr_base[i], frame);
+                Ml[2 * i] = new CMoment(M_l[i], mframes[2 * i]);
+                Mr[2 * i] = new CMoment(M_r[i], mframes[2 * i]);
             }
-
         }
         public void Get_M(out MVector[] Ml, out MVector[] Mr)
+        {
+            Ml = new MVector[nv];
+            Mr = new MVector[nv];
+
+            for (int i = 0; i < nv_g; i++)
+            {
+                Ml[2 * i + 1] = M_g[i];
+                Mr[2 * i + 1] = M_g[i];
+            }
+            for (int i = 0; i < nv_h; i++)
+            {
+                Ml[2 * i] = M_l[i];
+                Mr[2 * i] = M_r[i];
+            }
+        }
+        public void Diagram_M(out MPoint[] startPoints, out MPoint[] endPoints_1, out MPoint[] endPoints_2, double scale, Configuration config)
         {
             if (IsClosed)
                 throw new NotImplementedException();
 
-            Ml = new MVector[Nv];
-            Mr = new MVector[Nv];
-
-            Ml[0] = MVector.Zero;
-            for (int i = 0; i < nv_g; i++)
-            {
-                Mr[2 * i] = M_r[i];
-                Ml[2 * i + 1] = M_g[i];
-                Mr[2 * i + 1] = M_g[i];
-                Ml[2 * i + 2] = M_l[i + 1];
-            }
-            Mr[nv - 1] = MVector.Zero;
-
+            if (config == Configuration.Rest)
+                Diagram_vector_12(M_l, M_g, M_r, mframes, mframes_0, scale, out startPoints, out endPoints_1, out endPoints_2);
+            else if (config == Configuration.Initial)
+                Diagram_vector_12(M_l, M_g, M_r, mframes, mframes_i, scale, out startPoints, out endPoints_1, out endPoints_2);
+            else
+                Diagram_vector_12(M_l, M_g, M_r, mframes, mframes, scale, out startPoints, out endPoints_1, out endPoints_2);
         }
 
+        public void Get_V(out CForce[] Vl, out CForce[] Vr, out CForce[] Vmid)
+        {
+            Vl = new CForce[nv];
+            Vr = new CForce[nv];
+            Vmid = new CForce[ne];
 
+            for (int i = 0; i < nv_g; i++)
+            {
+                Vl[2 * i + 1] = new CForce(V_g[i], mframes[2 * i + 1]);
+                Vr[2 * i + 1] = new CForce(V_g[i], mframes[2 * i + 1]);
+
+                Vmid[2 * i] = new CForce(V_mid[2 * i], mframes_mid[2 * i]);
+                Vmid[2 * i + 1] = new CForce(V_mid[2 * i + 1], mframes_mid[2 * i + 1]);
+            }
+            for (int i = 0; i < nv_h; i++)
+            {
+                Vl[2 * i] = new CForce(V_l[i], mframes[2 * i]);
+                Vr[2 * i] = new CForce(V_r[i], mframes[2 * i]);
+            }
+        }
         public void Get_V(out MVector[] Vl, out MVector[] Vr, out MVector[] Vmid)
         {
             Vl = new MVector[nv];
@@ -1088,31 +1098,8 @@ namespace TMarsupilami.CoreLib3
             }
             for (int i = 0; i < nv_h; i++)
             {
-                var d3 = mframes[2 * i].ZAxis;
                 Vl[2 * i] = V_l[i];
                 Vr[2 * i] = V_r[i];
-            }
-        }
-        public void Get_V(out CForce[] Vl, out CForce[] Vr, out CForce[] Vmid)
-        {
-            Vl = new CForce[nv];
-            Vr = new CForce[nv];
-            Vmid = new CForce[ne];
-
-            for (int i = 0; i < nv_g; i++)
-            {
-                var d3 = mframes[2 * i + 1].ZAxis;
-                Vl[2 * i + 1] = new CForce(V_g[i], mframes[2 * i + 1]);
-                Vr[2 * i + 1] = new CForce(V_g[i], mframes[2 * i + 1]);
-
-                Vmid[2 * i] = new CForce(V_mid[2 * i], mframes_mid[2 * i]);
-                Vmid[2 * i + 1] = new CForce(V_mid[2 * i + 1], mframes_mid[2 * i + 1]);
-            }
-            for (int i = 0; i < nv_h; i++)
-            {
-                var d3 = mframes[2 * i].ZAxis;
-                Vl[2 * i] = new CForce(V_l[i], mframes[2 * i]);
-                Vr[2 * i] = new CForce(V_r[i], mframes[2 * i]);
             }
         }
         public void Diagram_V(out MPoint[] startPoints, out MPoint[] endPoints_1, out MPoint[] endPoints_2, double scale, Configuration config)

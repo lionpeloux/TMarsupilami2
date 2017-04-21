@@ -39,92 +39,80 @@ namespace TMarsupilami.Gh.Component
         {
             pManager.AddParameter(new Param_MBeam(), "Beam", "B", "The beam to preview.", GH_ParamAccess.item);
             pManager.AddNumberParameter("Scale", "S", "Scale", GH_ParamAccess.item, 1);
-            pManager.AddBooleanParameter("Rest/Actual", "B", "Choose config", GH_ParamAccess.item, false);
+            pManager.AddIntegerParameter("Configuration", "C", "Rest (0), Initial (1), Actual (2).", GH_ParamAccess.item, 2);
 
             pManager[1].Optional = true;
             pManager[2].Optional = true;
         }
-
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddParameter(new Param_MCMoment(), "Mr", "Mr", "", GH_ParamAccess.list);
             pManager.AddParameter(new Param_MCMoment(), "Ml", "Ml", "", GH_ParamAccess.list);
-            pManager.AddCurveParameter("D1", "D1", "", GH_ParamAccess.list);
-            pManager.AddCurveParameter("D2", "D2", "", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCMoment(), "Mr", "Mr", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Diagram (M1)", "D1", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Diagram (M2)", "D2", "", GH_ParamAccess.list);
         }
-
-        protected override void BeforeSolveInstance()
-        {
-            base.BeforeSolveInstance();
-        }
-
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             var frames = new List<MFrame>();
             var ghBeam = new GH_MBeam();
             var scale = 1.0;
-            var isRest = false;
+            var configIndex = 2;
 
-            if (!DA.GetData(0, ref ghBeam)){ return; }
+            if (!DA.GetData(0, ref ghBeam)) { return; }
 
             DA.GetData(1, ref scale);
-            DA.GetData(2, ref isRest);
+            DA.GetData(2, ref configIndex);
 
             var beam = ghBeam.Value as Beam_4DOF_D;
-            CMoment[] Mr, Ml;
 
-            beam.Get2_M(out Ml, out Mr);
+            CMoment[] Ml, Mr, Mmid;
+            Configuration config;
+            MPoint[] startPoints, endPoints_1, endPoints_2;
 
-            var pts_1 = new List<Point3d>();
-            var diagram_1 = new List<NurbsCurve>();
-            var pts_2 = new List<Point3d>();
-            var diagram_2 = new List<NurbsCurve>();
-
-            for (int i = 0; i < beam.Nv; i++)
+            switch (configIndex)
             {
-                MFrame frame;
-                if (isRest)
-                {
-                    frame = beam.RestConfiguration[i];
-                }
-                else
-                {
-                    frame = beam.ActualConfiguration[i];
-                }
-
-                var d1 = frame.XAxis;
-                var d2 = frame.YAxis;
-
-                var Ml1 = scale * Ml[i].Value * beam.ActualConfiguration[i].XAxis;
-                var pt_l = (frame.Origin + Ml1 * d1).Cast();
-                pts_1.Add(pt_l);
-                var line_l = new Line(frame.Origin.Cast(), pt_l);
-                diagram_1.Add(line_l.ToNurbsCurve());
-
-                var Mr1 = scale * Mr[i].Value * beam.ActualConfiguration[i].XAxis;
-                var pt_r = (frame.Origin + Mr1 * d1).Cast();
-                pts_1.Add(pt_r);
-                var line_r = new Line(frame.Origin.Cast(), pt_r);
-                diagram_1.Add(line_r.ToNurbsCurve());
-
-                var Ml2 = scale * Ml[i].Value * beam.ActualConfiguration[i].YAxis;
-                pt_l = (frame.Origin + Ml2 * d2).Cast();
-                pts_2.Add(pt_l);
-                line_l = new Line(frame.Origin.Cast(), pt_l);
-                diagram_2.Add(line_l.ToNurbsCurve());
-
-                var Mr2 = scale * Mr[i].Value * beam.ActualConfiguration[i].YAxis;
-                pt_r = (frame.Origin + Mr2 * d2).Cast();
-                pts_2.Add(pt_r);
-                line_r = new Line(frame.Origin.Cast(), pt_r);
-                diagram_2.Add(line_r.ToNurbsCurve());
+                case 0:
+                    config = Configuration.Rest;
+                    break;
+                case 1:
+                    config = Configuration.Initial;
+                    break;
+                default:
+                    config = Configuration.Actual;
+                    break;
             }
 
-            diagram_1.Add(new Polyline(pts_1).ToNurbsCurve());
-            diagram_2.Add(new Polyline(pts_2).ToNurbsCurve());
+            beam.Get_M(out Ml, out Mr);
+            beam.Diagram_M(out startPoints, out endPoints_1, out endPoints_2, scale, config);
 
-            DA.SetDataList(0, Mr);
-            DA.SetDataList(1, Ml);
+            int n = startPoints.Length;
+            var pts_1 = new Point3d[n];
+            var pts_2 = new Point3d[n];
+            var diagram_1 = new NurbsCurve[n + 1];
+            var diagram_2 = new NurbsCurve[n + 1];
+
+            for (int i = 0; i < startPoints.Length; i++)
+            {
+                var ps = startPoints[i].Cast();
+                var pe1 = endPoints_1[i].Cast();
+                var pe2 = endPoints_2[i].Cast();
+
+                var l1 = new Line(ps, pe1);
+                var l2 = new Line(ps, pe2);
+
+                diagram_1[i] = l1.ToNurbsCurve();
+                diagram_2[i] = l2.ToNurbsCurve();
+
+                pts_1[i] = pe1;
+                pts_2[i] = pe2;
+            }
+
+            diagram_1[n] = new Polyline(pts_1).ToNurbsCurve();
+            diagram_2[n] = new Polyline(pts_2).ToNurbsCurve();
+
+
+            DA.SetDataList(0, Ml);
+            DA.SetDataList(1, Mr);
             DA.SetDataList(2, diagram_1);
             DA.SetDataList(3, diagram_2);
         }

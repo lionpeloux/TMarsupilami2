@@ -46,9 +46,9 @@ namespace TMarsupilami.Gh.Component
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddParameter(new Param_MVector(), "Vl", "Vl", "", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MVector(), "Vr", "Vr", "", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MVector(), "Vmid", "Vmid", "", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCForce(), "Vl", "Vl", "", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCForce(), "Vr", "Vr", "", GH_ParamAccess.list);
+            pManager.AddParameter(new Param_MCForce(), "Vmid", "Vmid", "", GH_ParamAccess.list);
             pManager.AddCurveParameter("Diagram (V1)", "D1", "", GH_ParamAccess.list);
             pManager.AddCurveParameter("Diagram (V2)", "D2", "", GH_ParamAccess.list);
         }
