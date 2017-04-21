@@ -30,6 +30,13 @@ namespace TMarsupilami.Gh.Component
                 return GH_Exposure.tertiary;
             }
         }
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                return Resources.DisplayBeam_ε;
+            }
+        }
         public override Guid ComponentGuid
         {
             get { return new Guid("{B05BDE82-B7AB-4277-970B-7D0D29893906}"); }
@@ -84,26 +91,12 @@ namespace TMarsupilami.Gh.Component
 
             beam.Get_ε(out εl, out εr, out εmid);
             beam.Diagram_ε(out startPoints, out endPoints, scale, config, Axis.d1);
-
-            int n = startPoints.Length;
-            var pts = new Point3d[n];
-            var diagram = new NurbsCurve[n+1];
-
-            for (int i = 0; i < startPoints.Length; i++)
-            {
-                var ps = startPoints[i].Cast();
-                var pe = endPoints[i].Cast();
-                var line = new Line(ps, pe);
-                diagram[i] = line.ToNurbsCurve();
-                pts[i] = pe;
-            }
-
-            diagram[n] = (new Polyline(pts)).ToNurbsCurve();
+            var D = Diagram.GetOutlines(startPoints, endPoints);
 
             DA.SetDataList(0, εl);
             DA.SetDataList(1, εr);
             DA.SetDataList(2, εmid);
-            DA.SetDataList(3, diagram);
+            DA.SetDataList(3, D);
         }
 
     }

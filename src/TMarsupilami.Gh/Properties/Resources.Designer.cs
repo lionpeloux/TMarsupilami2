@@ -133,6 +133,86 @@ namespace TMarsupilami.Gh.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DisplayBeam_E {
+            get {
+                object obj = ResourceManager.GetObject("DisplayBeam_E", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DisplayBeam_M {
+            get {
+                object obj = ResourceManager.GetObject("DisplayBeam_M", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DisplayBeam_N {
+            get {
+                object obj = ResourceManager.GetObject("DisplayBeam_N", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DisplayBeam_Q {
+            get {
+                object obj = ResourceManager.GetObject("DisplayBeam_Q", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DisplayBeam_V {
+            get {
+                object obj = ResourceManager.GetObject("DisplayBeam_V", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DisplayBeam_ε {
+            get {
+                object obj = ResourceManager.GetObject("DisplayBeam_ε", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DisplayBeam_κ {
+            get {
+                object obj = ResourceManager.GetObject("DisplayBeam_κ", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DisplayBeam_τ {
+            get {
+                object obj = ResourceManager.GetObject("DisplayBeam_τ", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap DisplayCForce {
             get {
                 object obj = ResourceManager.GetObject("DisplayCForce", resourceCulture);

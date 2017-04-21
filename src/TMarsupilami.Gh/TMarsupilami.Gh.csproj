@@ -91,6 +91,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_Energy.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_κ.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_ε.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_τ.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Component\_Model\Test\_Comp_CoreLib3_Beam4D_SKDR_Link.cs" />
     <Compile Include="Component\_Model\Test\_Comp_CoreLib3_Beam4D_SKDR.cs" />
     <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D_SKDR1.cs" />
+    <Compile Include="Diagram.cs" />
     <Compile Include="Draw.cs" />
     <Compile Include="Parameter\Param_MBeam.cs" />
     <Compile Include="Parameter\Param_MDMoment.cs" />
@@ -278,6 +280,30 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\DisplayDMoment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayBeam_M.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayBeam_N.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayBeam_Q.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayBeam_V.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayBeam_ε.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayBeam_κ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayBeam_τ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplayBeam_E.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

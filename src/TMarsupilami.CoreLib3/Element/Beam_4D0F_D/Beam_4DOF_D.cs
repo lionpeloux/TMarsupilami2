@@ -837,42 +837,57 @@ namespace TMarsupilami.CoreLib3
         }
 
         // ENERGIES
-        public double GetAxialElasticEnergy()
+        public double Get_Ea(out double[] Ea)
         {
-            double E_axial = 0;
+            double sum = 0;
+            Ea = new double[ne];
             for (int i = 0; i < ne; i++)
             {
-                E_axial += ES[i/2] * (ε[i] * ε[i]) * l[i];
+                var dE = 0.5 * ES[i / 2] * (ε[i] * ε[i]) * l[i];
+                sum += dE;
+                Ea[i] = dE;
             }
-            E_axial = 0.5 * E_axial;
-            return E_axial;
+            return sum;
         }
-        public double GetBendingElasticEnergy()
+        public double Get_Eb(out double[] Eb)
         {
             double κ1, κ2;
-
-            double E_bending = 0;
+            double sum = 0;
+            Eb = new double[ne];
             for (int i = 0; i < ne; i++)
             {
                 κ1 = κb_mid[i] * mframes_mid[i].XAxis - κb_mid_0[i].X;
                 κ2 = κb_mid[i] * mframes_mid[i].YAxis - κb_mid_0[i].Y;
-
-                var index = i / 2;
-                E_bending += (EI1[index] * κ1 * κ1 + EI2[index] * κ2 * κ2) * l[i];
+                var dE = 0.5 * (EI1[i/2] * κ1 * κ1 + EI2[i/2] * κ2 * κ2) * l[i];
+                sum += dE;
+                Eb[i] = dE;
             }
-            E_bending = 0.5 * E_bending;
-            return E_bending;
+            return sum;
         }
-        public double GetTwistingElasticEnergy()
+        public double Get_Et(out double[] Et)
         {
-            double E_twisting = 0;
+            double sum = 0;
+            Et = new double[ne];
             for (int i = 0; i < ne; i++)
             {
                 double τ = (this.τ[i] - τ_0[i]);
-                E_twisting += GJ[i / 2] * (τ * τ) * l[i];
+                var dE = 0.5 * GJ[i / 2] * (τ * τ) * l[i];
+                sum += dE;
+                Et[i] = dE;
             }
-            E_twisting = 0.5 * E_twisting;
-            return E_twisting;
+            return sum;
+        }
+        public void Diagram_Energy(double[] E, out MPoint[] startPoints, out MPoint[] endPoints, double scale, Configuration config, Axis axis)
+        {
+            if (IsClosed)
+                throw new NotImplementedException();
+
+            if (config == Configuration.Rest)
+                Diagram_scalar(E, mframes_0, scale, axis, out startPoints, out endPoints);
+            else if (config == Configuration.Initial)
+                Diagram_scalar(E, mframes_i, scale, axis, out startPoints, out endPoints);
+            else
+                Diagram_scalar(E, mframes, scale, axis, out startPoints, out endPoints);
         }
 
         // DISPLAY
@@ -1133,6 +1148,29 @@ namespace TMarsupilami.CoreLib3
         }
 
         // Diagram Helper
+        private void Diagram_scalar(double[] vmid,  MFrame[] displayFrames, double scale, Axis axis, out MPoint[] startPoints, out MPoint[] endPoints)
+        {
+            if (IsClosed)
+                throw new NotImplementedException();
+
+            int ne = vmid.Length;
+
+            startPoints = new MPoint[2 * ne];
+            endPoints = new MPoint[2 * ne];
+
+            var dir = displayFrames.GetAxis(axis);
+
+            for (int i = 0; i < ne; i++)
+            {
+                var P = displayFrames[i].Origin;
+
+                startPoints[2 * i] = P;
+                endPoints[2 * i] = P + scale * vmid[i] * dir[i];
+
+                startPoints[2 * i + 1] = P;
+                endPoints[2 * i + 1] = P + scale * vmid[i] * dir[i + 1];
+            }
+        }
         private void Diagram_scalar(double[] vl, double[] vr, MFrame[] displayFrames, double scale, Axis axis, out MPoint[] startPoints, out MPoint[] endPoints)
         {
             if (IsClosed)

@@ -13,14 +13,14 @@ using TMarsupilami.CoreLib3;
 
 namespace TMarsupilami.Gh.Component
 {
-    public class Comp_DisplayBeam_M : GH_Component
+    public class Comp_DisplayBeam_Energy : GH_Component
     {
 
-        public Comp_DisplayBeam_M()
-          : base("Beam M", "M",
-              "Extract Beam Internals Informations",
-              "TMarsupilami", "Display")
-        {
+        public Comp_DisplayBeam_Energy()
+              : base("Beam Energy", "Energy",
+                  "Extract Beam Internals Informations",
+                  "TMarsupilami", "Display")
+            {
         }
 
         public override GH_Exposure Exposure
@@ -34,12 +34,12 @@ namespace TMarsupilami.Gh.Component
         {
             get
             {
-                return Resources.DisplayBeam_M;
+                return Resources.DisplayBeam_E;
             }
         }
         public override Guid ComponentGuid
         {
-            get { return new Guid("{08D301B5-9E54-4645-9F9C-345F1AA77726}"); }
+            get { return new Guid("{4B20D058-B9E2-49AF-AE84-C7FAEC52CA6A}"); }
         }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -53,10 +53,12 @@ namespace TMarsupilami.Gh.Component
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddParameter(new Param_MCMoment(), "Ml", "Ml", "", GH_ParamAccess.list);
-            pManager.AddParameter(new Param_MCMoment(), "Mr", "Mr", "", GH_ParamAccess.list);
-            pManager.AddCurveParameter("Diagram (M1)", "D1", "", GH_ParamAccess.list);
-            pManager.AddCurveParameter("Diagram (M2)", "D2", "", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Axial Energy", "Ea", "", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Bending Energy", "Eb", "", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Twisting Energy", "Et", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Diagram (Ea)", "Da", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Diagram (Eb)", "Db", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Diagram (Et)", "Dt", "", GH_ParamAccess.list);
         }
         protected override void SolveInstance(IGH_DataAccess DA)
         {
@@ -72,9 +74,9 @@ namespace TMarsupilami.Gh.Component
 
             var beam = ghBeam.Value as Beam_4DOF_D;
 
-            CMoment[] Ml, Mr, Mmid;
+            double[] Ea, Eb, Et;
             Configuration config;
-            MPoint[] startPoints, endPoints_1, endPoints_2;
+            MPoint[] startPoints, endPoints;
 
             switch (configIndex)
             {
@@ -89,15 +91,25 @@ namespace TMarsupilami.Gh.Component
                     break;
             }
 
-            beam.Get_M(out Ml, out Mr);
-            beam.Diagram_M(out startPoints, out endPoints_1, out endPoints_2, scale, config);
-            var D1 = Diagram.GetOutlines(startPoints, endPoints_1);
-            var D2 = Diagram.GetOutlines(startPoints, endPoints_2);
+            beam.Get_Ea(out Ea);
+            beam.Diagram_Energy(Ea, out startPoints, out endPoints, scale, config, Axis.d1);
+            var Da = Diagram.GetOutlines(startPoints, endPoints);
 
-            DA.SetDataList(0, Ml);
-            DA.SetDataList(1, Mr);
-            DA.SetDataList(2, D1);
-            DA.SetDataList(3, D2);
+            beam.Get_Eb(out Eb);
+            beam.Diagram_Energy(Eb, out startPoints, out endPoints, scale, config, Axis.d1);
+            var Db = Diagram.GetOutlines(startPoints, endPoints);
+
+            beam.Get_Et(out Et);
+            beam.Diagram_Energy(Et, out startPoints, out endPoints, scale, config, Axis.d1);
+            var Dt = Diagram.GetOutlines(startPoints, endPoints);
+
+            DA.SetDataList(0, Ea);
+            DA.SetDataList(1, Eb);
+            DA.SetDataList(2, Et);
+            DA.SetDataList(3, Da);
+            DA.SetDataList(4, Db);
+            DA.SetDataList(5, Dt);
+
         }
 
     }

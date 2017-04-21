@@ -30,6 +30,13 @@ namespace TMarsupilami.Gh.Component
                 return GH_Exposure.tertiary;
             }
         }
+        protected override System.Drawing.Bitmap Icon
+        {
+            get
+            {
+                return Resources.DisplayBeam_V;
+            }
+        }
         public override Guid ComponentGuid
         {
             get { return new Guid("{253B90E5-C89E-43B0-9E80-3ECFFB465566}"); }
@@ -85,38 +92,14 @@ namespace TMarsupilami.Gh.Component
 
             beam.Get_V(out Vl, out Vr, out Vmid);
             beam.Diagram_V(out startPoints, out endPoints_1, out endPoints_2, scale, config);
-
-            int n = startPoints.Length;
-            var pts_1 = new Point3d[n];
-            var pts_2 = new Point3d[n];
-            var diagram_1 = new NurbsCurve[n + 1];
-            var diagram_2 = new NurbsCurve[n + 1];
-
-            for (int i = 0; i < startPoints.Length; i++)
-            {
-                var ps = startPoints[i].Cast();
-                var pe1 = endPoints_1[i].Cast();
-                var pe2 = endPoints_2[i].Cast();
-
-                var l1 = new Line(ps, pe1);
-                var l2 = new Line(ps, pe2);
-
-                diagram_1[i] = l1.ToNurbsCurve();
-                diagram_2[i] = l2.ToNurbsCurve();
-
-                pts_1[i] = pe1;
-                pts_2[i] = pe2;
-            }
-
-            diagram_1[n] = new Polyline(pts_1).ToNurbsCurve();
-            diagram_2[n] = new Polyline(pts_2).ToNurbsCurve();
-
+            var D1 = Diagram.GetOutlines(startPoints, endPoints_1);
+            var D2 = Diagram.GetOutlines(startPoints, endPoints_2);
 
             DA.SetDataList(0, Vl);
             DA.SetDataList(1, Vr);
             DA.SetDataList(2, Vmid);
-            DA.SetDataList(3, diagram_1);
-            DA.SetDataList(4, diagram_2);
+            DA.SetDataList(3, D1);
+            DA.SetDataList(4, D2);
         }
 
     }
