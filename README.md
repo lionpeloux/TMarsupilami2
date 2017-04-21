@@ -16,6 +16,7 @@ Lionel du Peloux
 ### Resultantes Rx / Ro
 - reprendre le calcul final dans l'élément
 - vérifier le fonctionnement des charges linéaires (m1, m2, f1, f2, f3)
+- passer Ro en global et plus local. Idem pour Vo et Ao ?
 
 ### Automatic refine (IRefinable)
 - mise en place de principe effectuée (ça marche)
@@ -53,6 +54,11 @@ Lionel du Peloux
 - les rendres compatibles via des callbacks avec les types grasshoppers (courbes / surfaces).
 - trouver un système d'interaction par évènement poru du recalcul auto.
 
-## Diagrams
+### Diagrams
 - créer des diagrams normalisés pour un affichage plus simple.
 - penser un affichage par code couleur / gradient.
+
+
+### Mix elements
+- implementer un cable
+- tester la mixité des éléments 3DOF/6DOF
