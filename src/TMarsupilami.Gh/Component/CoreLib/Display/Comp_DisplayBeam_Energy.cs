@@ -17,7 +17,7 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_DisplayBeam_Energy()
-              : base("Beam Energy", "Energy",
+              : base("Elastic Energy (E)", "Energy",
                   "Extract Beam Internals Informations",
                   "TMarsupilami", "Display")
             {

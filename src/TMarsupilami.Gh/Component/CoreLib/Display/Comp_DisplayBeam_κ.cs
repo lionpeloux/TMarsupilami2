@@ -17,7 +17,7 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_DisplayBeam_κ()
-          : base("Beam κ", "κ",
+          : base("Curvature Strain (κ)", "κ",
               "Extract Beam Internals Informations",
               "TMarsupilami", "Display")
         {

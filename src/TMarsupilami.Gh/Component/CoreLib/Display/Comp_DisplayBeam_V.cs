@@ -17,7 +17,7 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_DisplayBeam_V()
-          : base("Beam V", "V",
+          : base("Shear Force", "V",
               "Extract Beam Internals Informations",
               "TMarsupilami", "Display")
         {

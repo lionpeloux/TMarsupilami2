@@ -17,7 +17,7 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_DisplayBeam_τ()
-          : base("Beam τ", "τ",
+          : base("Twisting Strain (τ)", "τ",
               "Extract Beam Internals Informations",
               "TMarsupilami", "Display")
         {

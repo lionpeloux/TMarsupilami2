@@ -17,7 +17,7 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_DisplayBeam_Geometry()
-              : base("Beam Geometry", "Geometry",
+              : base("Material Frames", "Geometry",
                   "Extract Beam Internals Informations",
                   "TMarsupilami", "Display")
             {

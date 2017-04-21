@@ -17,7 +17,7 @@ namespace TMarsupilami.Gh.Component
     {
 
         public Comp_DisplayBeam_Q()
-          : base("Beam Q", "Q",
+          : base("Twisting Moment (Q)", "Q",
               "Extract Beam Internals Informations",
               "TMarsupilami", "Display")
         {
