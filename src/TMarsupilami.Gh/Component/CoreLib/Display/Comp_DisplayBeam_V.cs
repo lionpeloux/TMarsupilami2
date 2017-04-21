@@ -66,7 +66,7 @@ namespace TMarsupilami.Gh.Component
 
             var beam = ghBeam.Value as Beam_4DOF_D;
 
-            MVector[] Vl, Vr, Vmid;
+            CForce[] Vl, Vr, Vmid;
             Configuration config;
             MPoint[] startPoints, endPoints_1, endPoints_2;
 

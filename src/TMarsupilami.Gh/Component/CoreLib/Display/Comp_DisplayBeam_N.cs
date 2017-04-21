@@ -44,7 +44,6 @@ namespace TMarsupilami.Gh.Component
             pManager[1].Optional = true;
             pManager[2].Optional = true;
         }
-
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddParameter(new Param_MCForce(), "Nl", "Nl", "", GH_ParamAccess.list);
@@ -52,7 +51,6 @@ namespace TMarsupilami.Gh.Component
             pManager.AddParameter(new Param_MCForce(), "Nmid", "Nmid", "", GH_ParamAccess.list);
             pManager.AddCurveParameter("Diagram (N)", "D", "", GH_ParamAccess.list);
         }
-
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             var frames = new List<MFrame>();

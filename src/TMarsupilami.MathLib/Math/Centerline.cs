@@ -501,7 +501,7 @@ namespace TMarsupilami.MathLib
             twistAngle = -Rotation.ZAngle_Rotation(frames[nv - 1], frames[nv - 1].ZAxis, frames[0], frames[0].ZAxis);
             τ[ne - 1] = twistAngle / l[ne - 1];
         }
-   
+
         // Centerline Interpolation & Refine   
         /// <summary>
         /// Interpolates a frame at mid span between two frames.
@@ -517,7 +517,7 @@ namespace TMarsupilami.MathLib
         /// <param name="κb2">The curvature at first frame.</param>
         /// <param name="τ">The constant rate of twist between the frames.</param>
         /// <returns>The interpolated frame, equidistant from f1 and f2.</returns>
-        public static MFrame Interpolate(MFrame f1, MFrame f2, MVector κb1, MVector κb2, double τ)
+        public static MFrame Interpolate(MFrame f1, MFrame f2, MVector κb1, MVector κb2, double τ1, double τ2)
         {
             MPoint x;
             MFrame f = new MFrame();
@@ -527,6 +527,9 @@ namespace TMarsupilami.MathLib
             var e = new MVector(f1.Origin, f2.Origin);
             var l = e.Length();
             var u = (1 / l) * e;
+
+            var τ = 0.5 * (τ1 + τ2);                // assumes that τ(s) = τ1 + s/l(τ2 - τ1)
+            var dθ = (l / 8) * (3 * τ1 + τ2);       // dθ = int(τ(s)ds, [0,l/2])
 
             if (κ == 0)
             {
@@ -542,9 +545,13 @@ namespace TMarsupilami.MathLib
             }
 
             ParallelTransportation.ZPT_Rotation(f1, f1.ZAxis, x, u, ref f);
-            Rotation.ZRotate(f, 0.5 * τ * l, ref f);
+            Rotation.ZRotate(f, dθ, ref f);
 
             return f;
+        }
+        public static MFrame Interpolate(MFrame f1, MFrame f2, MVector κb1, MVector κb2, double τ)
+        {
+            return Interpolate(f1, f2, κb1, κb2, τ, τ);
         }
         public static MPoint Interpolate(MPoint p1, MPoint p2, MVector κb1, MVector κb2)
         {
