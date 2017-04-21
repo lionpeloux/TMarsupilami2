@@ -737,7 +737,6 @@ namespace TMarsupilami.MathLib
                 return refinedArray;
             }  
         }
-
         public static double[] RefineVertexBasedQuantity(double[] vertexBasedQuantity, bool isClosed, int recursionCount = 1)
         {
             var tmp = RefineVertexBasedQuantity(vertexBasedQuantity, isClosed);
@@ -809,7 +808,6 @@ namespace TMarsupilami.MathLib
             }
             return refinedArray;     
         }
-
         public static double[] RefineEdgeBasedQuantity(double[] edgeBasedQuantity, bool isClosed, int recursionCount = 1)
         {
             var tmp = RefineEdgeBasedQuantity(edgeBasedQuantity, isClosed);

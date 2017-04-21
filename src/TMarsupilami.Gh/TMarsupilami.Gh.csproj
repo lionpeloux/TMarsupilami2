@@ -91,6 +91,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_Geometry.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_Energy.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_κ.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_ε.cs" />

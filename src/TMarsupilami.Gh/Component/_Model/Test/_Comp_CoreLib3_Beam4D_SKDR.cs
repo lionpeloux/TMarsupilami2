@@ -26,8 +26,14 @@ namespace TMarsupilami.Gh.Component
         private List<Section> sections;
         private List<Material> materials;
         private Beam[] elements;
+        private List<Support> bc_list;
+        private Beam_4DOF_D beam;
         private KDRSolver solver;
         private Stopwatch watch;
+
+        double Ec_x_lim;
+        double Ec_θ_lim;
+
 
         // CONSTRUCTOR
         public _Comp_CoreLib3_Beam4D_SKDR()
@@ -61,11 +67,13 @@ namespace TMarsupilami.Gh.Component
             pManager.AddIntegerParameter("iteration_max", "N_max", "Total number of iterations to run", GH_ParamAccess.item, 10);
             pManager.AddBooleanParameter("reset", "reset", "Reset the engine", GH_ParamAccess.item, false);
 
-            pManager.AddBooleanParameter("isBase", "isBase", "True pour revenir à la version sans discontinuités du model", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("refine", "refine", "Press button to restart the solver with a refined element.", GH_ParamAccess.item, false);
 
             pManager[4].Optional = false;
             pManager[5].Optional = false;
             pManager[6].Optional = false;
+            pManager[8].Optional = true;
+
 
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -84,6 +92,8 @@ namespace TMarsupilami.Gh.Component
             b1 = new List<double>();
             b2 = new List<double>();
 
+            bool isRefine = false;
+
             if (!DA.GetDataList(0, frames_0)) { return; }
             if (!DA.GetDataList(1, frames_i)) { return; }
 
@@ -96,51 +106,68 @@ namespace TMarsupilami.Gh.Component
             if (!DA.GetData(6, ref iteration_max)) { return; }
             if (!DA.GetData(7, ref loop_reset)) { return; }
 
-            if (!DA.GetData(8, ref is_base)) { return; }
+            DA.GetData(8, ref isRefine);
 
+            Ec_x_lim = 1e-10;
+            Ec_θ_lim = 1e-6;
 
-            if (loop_reset == true) // Premier Calcul
+            if (isRefine)
             {
-                loop_reset_cache = loop_reset;
+                beam.Refine();
 
-                int n = frames_i.Count;
-                sections = new List<Section>();
+                solver = new KDRSolver(elements, bc_list, new List<Link>(), iteration_max, Ec_x_lim, Ec_θ_lim);
+                solver.OnEnergyPeak_x += OnKineticEnergyPeak_x;
+                solver.OnConvergence += OnConvergence;
+                solver.OnNotConvergence += OnNotConvergence;
 
-                // n-1 section definitions
-                if (n == 1)
-                {
-                    var sprop = Section.RectangularSection(b1[0], b2[0]);
-                    for (int i = 0; i < n - 1; i++)
-                    {
-                        sections.Add(sprop);
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < b1.Count; i++)
-                    {
-                        sections.Add(Section.RectangularSection(b1[i], b2[i]));
-                    }
-                }
-
-                materials = new List<Material>() { new Material(StandardMaterials.GFRP) };
-                DR_Relax(iteration_max);
+                watch = new Stopwatch();
+                watch.Start();
+                solver.Run(iteration_max);
+                watch.Stop();
             }
+            else
+            {
+                if (loop_reset == true) // Premier Calcul
+                {
+                    loop_reset_cache = loop_reset;
 
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed = " + watch.Elapsed.TotalMilliseconds + " ms");
-            this.Message = "Elapsed = " + watch.Elapsed.TotalMilliseconds + " ms";
+                    int n = frames_i.Count;
+                    sections = new List<Section>();
 
-            DA.SetDataList(0, solver.elements_x);
+                    // n-1 section definitions
+                    if (n == 1)
+                    {
+                        var sprop = Section.RectangularSection(b1[0], b2[0]);
+                        for (int i = 0; i < n - 1; i++)
+                        {
+                            sections.Add(sprop);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < b1.Count; i++)
+                        {
+                            sections.Add(Section.RectangularSection(b1[i], b2[i]));
+                        }
+                    }
+
+                    materials = new List<Material>() { new Material(StandardMaterials.GFRP) };
+                    DR_Relax(iteration_max);
+                }
+
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Elapsed = " + watch.Elapsed.TotalMilliseconds + " ms");
+                this.Message = "Elapsed = " + watch.Elapsed.TotalMilliseconds + " ms";
+
+                DA.SetDataList(0, solver.elements_x);
+            }           
         }
 
         private void DR_Relax(int iteration_max)
         {
-            var Ec_x_lim = 1e-10;
-            var Ec_θ_lim = 1e-6;
-
+           
             // INIT
             Rhino.RhinoApp.WriteLine("PB SETUP");
-            Beam_4DOF_D beam = new Beam_4DOF_D(frames_0, frames_i, sections, materials);
+            beam = new Beam_4DOF_D(frames_0, frames_i, sections, materials);
             elements = new Beam[1] { beam };
 
             double M1 = 1 * 50 * 1e4;
@@ -154,7 +181,7 @@ namespace TMarsupilami.Gh.Component
 
             bool old = false;
 
-            var bc_list = new List<Support>();
+            bc_list = new List<Support>();
             switch (bc_start)
             {
                 case (int)SupportCondition.Free:
@@ -262,8 +289,6 @@ namespace TMarsupilami.Gh.Component
             watch.Start();
             solver.Run(iteration_max);
             watch.Stop();
-
-
         }
        
         private static void OnKineticEnergyPeak_x(KDRSolver solver)

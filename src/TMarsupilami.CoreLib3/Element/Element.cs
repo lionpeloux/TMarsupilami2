@@ -280,6 +280,11 @@ namespace TMarsupilami.CoreLib3
         {
             return 2 * handleVertexIndex;
         }
+        public int GlobalToHandleVertexIndex(int globalVertexIndex)
+        {
+            return globalVertexIndex / 2; // should decide if its a ghost or a handle
+        }
+
 
         public bool IsEdgeIndexValid(int edgeIndex, bool throwError = false)
         {

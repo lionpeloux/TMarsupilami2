@@ -109,8 +109,8 @@ namespace TMarsupilami.Gh.Component
             }
 
 
-            DA.SetDataList(0, beam.ActualConfiguration);
-            DA.SetDataList(1, beam.mframes_mid);
+            DA.SetDataList(0, beam.Get_MaterialFrames(Configuration.Actual));
+            DA.SetDataList(1, beam.Get_MaterialFramesAtMid());
             DA.SetDataList(2, Fext);
             DA.SetDataList(3, Mext);
             DA.SetDataList(4, fext);

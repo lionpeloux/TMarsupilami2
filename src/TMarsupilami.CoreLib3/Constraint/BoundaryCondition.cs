@@ -222,34 +222,35 @@ namespace TMarsupilami.CoreLib3
         #endregion
 
         #region CONSTRUCTORS
-        protected Support(Beam beam, int vertexIndex, SupportCondition type)
+        private Support(Beam beam, SupportCondition type)
         {
             Beam = beam;
             Type = type;
+
+            beam.TopologyChanged += OnTopologyChanged;
+        }
+
+        protected Support(Beam beam, int vertexIndex, SupportCondition type):this(beam, type)
+        {
             nv_h = vertexIndex;
             nv = Beam.HandleToGlobalVertexIndex(VertexIndex);
             frame = beam.ActualConfiguration[GlobalVertexIndex];
         }
-        protected Support(Beam beam, int vertexIndex, SupportCondition type, MFrame supportFrame):this(beam, vertexIndex, type)
+        protected Support(Beam beam, int vertexIndex, SupportCondition type, MFrame supportFrame):this(beam, type)
         {
-            Beam = beam;
-            Type = type;
             nv_h = vertexIndex;
             nv = Beam.HandleToGlobalVertexIndex(VertexIndex);
             frame = supportFrame;
         }
-        protected Support(Beam beam, Boundary boundary, SupportCondition type)
+
+        protected Support(Beam beam, Boundary boundary, SupportCondition type):this(beam, type)
         {
-            Beam = beam;
-            Type = type;
             nv_h = beam.BoundaryToVertexIndex(boundary);
             nv = Beam.HandleToGlobalVertexIndex(VertexIndex);
             frame = beam.ActualConfiguration[GlobalVertexIndex];
         }
-        protected Support(Beam beam, Boundary boundary, SupportCondition type, MFrame supportFrame) : this(beam, boundary, type)
+        protected Support(Beam beam, Boundary boundary, SupportCondition type, MFrame supportFrame) : this(beam, type)
         {
-            Beam = beam;
-            Type = type;
             nv_h = beam.BoundaryToVertexIndex(boundary);
             nv = Beam.HandleToGlobalVertexIndex(VertexIndex);
             frame = supportFrame;
@@ -295,6 +296,11 @@ namespace TMarsupilami.CoreLib3
         {
             var torsor = new Torsor(F, M, Beam.ActualConfiguration[nv].Origin);
             return torsor.Move(Frame);
+        }
+        private void OnTopologyChanged(int[] indexMap)
+        {
+            nv = indexMap[nv];
+            nv_h = Beam.GlobalToHandleVertexIndex(nv);
         }
 
         public virtual void Init() { }

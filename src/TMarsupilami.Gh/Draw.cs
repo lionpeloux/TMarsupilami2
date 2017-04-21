@@ -52,6 +52,7 @@ namespace TMarsupilami.Gh
         public static void DrawAxialDistributedMoment(MPoint edgeStartPoint, MPoint edgeEndPoint, MVector vector, MVector perpDirection, DisplayPipeline display, Color color, double scale, bool pointsToApplicationPoint, int refineCount)
         {
             double arrowSize = CentralSettings.PreviewPlaneRadius * Settings.Default.DVectorArrowHeadSize;
+            double arrowSpacing = Settings.Default.DoubleArrowSpacingRatio * arrowSize;
             int thickness = Settings.Default.DVectorLineThickness;
 
             double value;
@@ -77,7 +78,7 @@ namespace TMarsupilami.Gh
                 valueLine.Flip();
 
             Point3d midPoint = 0.5 * (valueLine.From + valueLine.To);
-            DrawConcentratedArrowWithDoubleHead(new Line(valueLine.From, midPoint), display, color, arrowSize, thickness);
+            DrawConcentratedArrowWithDoubleHead(new Line(valueLine.From, midPoint), display, color, arrowSpacing, arrowSize, thickness);
             display.DrawLine(new Line(midPoint, valueLine.To), color, thickness);
 
             // DRAW LABEL

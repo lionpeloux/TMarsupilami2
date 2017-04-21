@@ -40,7 +40,7 @@ namespace TMarsupilami.CoreLib3
 
         // ACTUAL CONFIG
         private MVector[] t_mid;
-        public MFrame[] mframes_mid;
+        private MFrame[] mframes_mid;
        
         private MVector[] κb_mid;
         private MVector[] κb_l;       
@@ -116,13 +116,57 @@ namespace TMarsupilami.CoreLib3
             CreateInternalArrays(nv, nv_h, nv_g, ne);
 
             // DEEP COPY
-            this.sections = sections.ToArray();
-            this.materials = materials.ToArray();
+            this.sections = new Section[nv_g];
+            if (sections.Count() == 1)
+            {
+                var s = sections.First();
+                for (int i = 0; i < nv_g; i++)
+                {
+                    this.sections[i] = s; // DeepCopy
+                }
+            }
+            else if (sections.Count() != nv_g)
+            {
+                throw new ArgumentException("sections must have either one item of ne items.");
+            }
+            else
+            {
+                int count = 0;
+                foreach (var s in sections)
+                {
+                    this.sections[count] = s;
+                    count++;
+                }
+            }
+
+            this.materials = new Material[nv_g];
+            if (materials.Count() == 1)
+            {
+                var m = materials.First();
+                for (int i = 0; i < nv_g; i++)
+                {
+                    this.materials[i] = m; // DeepCopy
+                }
+            }
+            else if (materials.Count() != nv_g)
+            {
+                throw new ArgumentException("materials must have either one item of ne items.");
+            }
+            else
+            {
+                int count = 0;
+                foreach (var m in materials)
+                {
+                    this.materials[count] = m;
+                    count++;
+                }
+            }
+
 
             for (int i = 0; i < nv_g; i++)
             {
-                var section = this.sections[0];
-                var material = this.materials[0];
+                var section = this.sections[i];
+                var material = this.materials[i];
 
                 ES[i] = material.E * section.S;
                 EI1[i] = material.E * section.I1;
@@ -252,6 +296,62 @@ namespace TMarsupilami.CoreLib3
 
             dθ = new MVector[nv];
     }
+
+        public int[] Refine()
+        {
+            var indexMap = new int[nv];
+            for (int i = 0; i < nv; i++)
+            {
+                indexMap[i] = 2 * i;
+            }
+
+            CreateGhostVertices(mframes_0, mframes, IsClosed);
+
+            // Refine actual & rest frames
+            nv = nv + ne;
+            nv_h = nv_h + nv_g;
+            nv_g = 2 * nv_g;
+            ne = 2 * ne;
+
+            // backu
+
+            CreateInternalArrays(nv, nv_h, nv_g, ne);
+
+            // Refine Sections & Material
+            var sections_r = new Section[nv_g];
+            var materials_r = new Material[nv_g];
+
+            for (int i = 0; i < nv_g / 2; i++)
+            {
+                sections_r[2 * i] = sections[i];
+                sections_r[2 * i + 1] = sections[i];
+                materials_r[2 * i] = materials[i];
+                materials_r[2 * i + 1] = materials[i];
+            }
+
+            this.sections = sections_r;
+            this.materials = materials_r;
+
+            for (int i = 0; i < nv_g; i++)
+            {
+                var material = materials[i];
+                var section = sections[i];
+                ES[i] = material.E * section.S;
+                EI1[i] = material.E * section.I1;
+                EI2[i] = material.E * section.I2;
+                GJ[i] = material.G * section.J;
+            }
+
+            // SET CONFIGURATIONS
+            SetRestConfig(mframes_0);
+            SetInitialConfig(mframes);
+
+            // Refine loads
+            // move supports
+            OnTopologyChanged(indexMap);
+
+            return indexMap;
+        }
 
         public override string ToString()
         {
@@ -631,14 +731,6 @@ namespace TMarsupilami.CoreLib3
 
                 Interpolation.Quadratic(l0, l1, M0, M1, M2, out dM0, out dM1, out dM2, out dM01, out dM12, out M01, out M12);
 
-                M01 = 0.5 * (M0 + M1);
-                M12 = 0.5 * (M1 + M2);
-
-                //parabolic interpolation of M
-                dM0 = -(2 * l0 + l1) / (l0 * (l0 + l1)) * M0 + (l0 + l1) / (l0 * l1) * M1 - l0 / (l1 * (l0 + l1)) * M2;
-                dM1 = -l1 / (l0 * (l1 + l0)) * M0 - (l0 - l1) / (l0 * l1) * M1 + l0 / (l1 * (l0 + l1)) * M2;
-                dM2 = l1 / (l0 * (l0 + l1)) * M0 - (l1 + l0) / (l0 * l1) * M1 + (2 * l1 + l0) / (l1 * (l1 + l0)) * M2;
-
                 var GJ = this.GJ[i];
                 var m = this.mext_m[i];
 
@@ -834,6 +926,41 @@ namespace TMarsupilami.CoreLib3
             }
 
             OnReactionForceUpdating(Fr_g, R_x);
+        }
+
+
+        // GEOMETRY
+        public MFrame[] Get_MaterialFrames(Configuration config)
+        {
+            switch (config)
+            {
+                case Configuration.Rest:
+                    return mframes_0.ToArray();
+                case Configuration.Initial:
+                    return mframes_i.ToArray();
+                default:
+                    return mframes.ToArray();
+            }
+        }
+        public MFrame[] Get_MaterialFramesAtMid()
+        {
+            return mframes_mid.ToArray();
+        }
+        public double Get_Length()
+        {
+            return l.Sum();
+        }
+        public double[] Get_l()
+        {
+            return l.ToArray();
+        }
+        public MVector[] Get_e()
+        {
+            return e.ToArray();
+        }
+        public MPoint[] Get_x()
+        {
+            return x.ToArray();
         }
 
         // ENERGIES
