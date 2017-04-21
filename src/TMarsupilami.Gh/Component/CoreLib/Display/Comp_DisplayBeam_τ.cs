@@ -39,75 +39,68 @@ namespace TMarsupilami.Gh.Component
         {
             pManager.AddParameter(new Param_MBeam(), "Beam", "B", "The beam to preview.", GH_ParamAccess.item);
             pManager.AddNumberParameter("Scale", "S", "Scale", GH_ParamAccess.item, 1);
-            pManager.AddBooleanParameter("Rest/Actual", "B", "Choose config", GH_ParamAccess.item, false);
+            pManager.AddIntegerParameter("Configuration", "C", "Rest (0), Initial (1), Actual (2).", GH_ParamAccess.item, 2);
 
             pManager[1].Optional = true;
             pManager[2].Optional = true;
         }
-
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddNumberParameter("τr", "τr", "", GH_ParamAccess.list);
             pManager.AddNumberParameter("τl", "τl", "", GH_ParamAccess.list);
-            pManager.AddNumberParameter("τmid", "τmid", "", GH_ParamAccess.list);
             pManager.AddCurveParameter("D", "D", "", GH_ParamAccess.list);
         }
-
-        protected override void BeforeSolveInstance()
-        {
-            base.BeforeSolveInstance();
-        }
-
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             var frames = new List<MFrame>();
             var ghBeam = new GH_MBeam();
             var scale = 1.0;
-            var isRest = false;
+            var configIndex = 2;
 
-            if (!DA.GetData(0, ref ghBeam)){ return; }
+            if (!DA.GetData(0, ref ghBeam)) { return; }
 
             DA.GetData(1, ref scale);
-            DA.GetData(2, ref isRest);
+            DA.GetData(2, ref configIndex);
 
             var beam = ghBeam.Value as Beam_4DOF_D;
 
-            double[] τl, τr, τmid;
+            double[] τl, τr;
+            Configuration config;
+            MPoint[] startPoints, endPoints;
 
-            beam.Get2_τ(out τl, out τr, out τmid);
+            switch (configIndex)
+            {
+                case 0:
+                    config = Configuration.Rest;
+                    break;
+                case 1:
+                    config = Configuration.Initial;
+                    break;
+                default:
+                    config = Configuration.Actual;
+                    break;
+            }
+
+            beam.Get_τ(out τl, out τr);
+            beam.Diagram_τ(out startPoints, out endPoints, scale, config, Axis.d1);
 
             var pts = new List<Point3d>();
             var diagram = new List<NurbsCurve>();
-            for (int i = 0; i < beam.Nv; i++)
+
+            for (int i = 0; i < startPoints.Length; i++)
             {
-                MFrame frame;
-                if (isRest)
-                {
-                    frame = beam.RestConfiguration[i];
-                }
-                else
-                {
-                    frame = beam.ActualConfiguration[i];
-                }
-
-                var d = frame.XAxis;
-
-                var pt_l = (frame.Origin + scale * τl[i] * d).Cast();
-                pts.Add(pt_l);
-                diagram.Add((new Line(frame.Origin.Cast(), pt_l)).ToNurbsCurve());
-
-                var pt_r = (frame.Origin + scale * τr[i] * d).Cast();
-                pts.Add(pt_r);
-                diagram.Add((new Line(frame.Origin.Cast(), pt_r)).ToNurbsCurve());
+                var ps = startPoints[i].Cast();
+                var pe = endPoints[i].Cast();
+                var line = new Line(ps, pe);
+                diagram.Add(line.ToNurbsCurve());
+                pts.Add(pe);
             }
 
             diagram.Add(new Polyline(pts).ToNurbsCurve());
 
             DA.SetDataList(0, τr);
             DA.SetDataList(1, τl);
-            DA.SetDataList(2, τmid);
-            DA.SetDataList(3, diagram);
-
+            DA.SetDataList(2, diagram);
         }
 
     }

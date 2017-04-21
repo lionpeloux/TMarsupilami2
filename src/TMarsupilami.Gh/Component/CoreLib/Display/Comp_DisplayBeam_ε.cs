@@ -44,19 +44,12 @@ namespace TMarsupilami.Gh.Component
             pManager[1].Optional = true;
             pManager[2].Optional = true;
         }
-
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddNumberParameter("εr", "εr", "", GH_ParamAccess.list);
             pManager.AddNumberParameter("εl", "εl", "", GH_ParamAccess.list);
             pManager.AddCurveParameter("D", "D", "", GH_ParamAccess.list);
         }
-
-        protected override void BeforeSolveInstance()
-        {
-            base.BeforeSolveInstance();
-        }
-
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             var frames = new List<MFrame>();
