@@ -218,9 +218,9 @@ namespace TMarsupilami.CoreLib3
             ε_r = new double[nv_h];
 
             κb_mid = new MVector[ne];
-            κb_l = new MVector[nv_h];   // courbure à gauche d'un handle node (non défini en 0)
-            κb_g = new MVector[nv_g];     // courbure 3pts aux ghost nodes
-            κb_r = new MVector[nv_h];   // courbure à gauche d'un handle node (non défini en 0)
+            κb_l = new MVector[nv_h];       
+            κb_g = new MVector[nv_g];       
+            κb_r = new MVector[nv_h];       
 
             τ = new double[ne];
             τ_mid = new double[ne];
@@ -1300,42 +1300,54 @@ namespace TMarsupilami.CoreLib3
             Nr[nv - 1] = MVector.Zero;
         }
 
-        public void Get2_τ(out double[] τl, out double[] τr, out double[] τmid)
-        {
-            if (IsClosed)
-                throw new NotImplementedException();
 
-            τl = τ_l.ToArray();
-            τr = τ_r.ToArray();
-            τmid = τ_r.ToArray();
-        }
-        public void Get2_κ(out MVector[] κbl, out MVector[] κbr, out MVector[] κbmid)
-        {
-            if (IsClosed)
-                throw new NotImplementedException();
 
+        public void Get_κ(out MVector[] κbl, out MVector[] κbr, out MVector[] κbmid)
+        {
             κbl = new MVector[nv];
             κbr = new MVector[nv];
-            κbmid = new MVector[nv];
+            κbmid = κb_mid.DeepCopy();
 
-            κbl[0] = κb_l[0];
             for (int i = 0; i < nv_g; i++)
             {
-                κbr[2 * i] = κb_r[i];
                 κbl[2 * i + 1] = κb_g[i];
                 κbr[2 * i + 1] = κb_g[i];
-                κbl[2 * i + 2] = κb_l[i + 1];
             }
-            κbr[nv - 1] = κb_r[nv_h - 1];
+            for (int i = 0; i < nv_h; i++)
+            {
+                κbl[2 * i] = κb_l[i];
+                κbr[2 * i] = κb_r[i];
+            }
         }
-
-        public void Get_τ(out double[] τl, out double[] τr)
+        public void Diagram_κ(out MPoint[] startPoints, out MPoint[] endPoints_1, out MPoint[] endPoints_2, double scale, Configuration config)
         {
             if (IsClosed)
                 throw new NotImplementedException();
 
-            τl = τ_l.ToArray();
-            τr = τ_r.ToArray();
+            if (config == Configuration.Rest)
+                Diagram_vector_12(κb_l, κb_g, κb_r, mframes, mframes_0, scale, out startPoints, out endPoints_1, out endPoints_2);
+            else if (config == Configuration.Initial)
+                Diagram_vector_12(κb_l, κb_g, κb_r, mframes, mframes_i, scale, out startPoints, out endPoints_1, out endPoints_2);
+            else
+                Diagram_vector_12(κb_l, κb_g, κb_r, mframes, mframes, scale, out startPoints, out endPoints_1, out endPoints_2);
+        }
+
+        public void Get_τ(out double[] τl, out double[] τr, out double[] τmid)
+        {
+            τl = new double[nv];
+            τr = new double[nv];
+            τmid = τ.ToArray();
+
+            for (int i = 0; i < nv_g; i++)
+            {
+                τl[2 * i + 1] = τ_g[i];
+                τr[2 * i + 1] = τ_g[i];
+            }
+            for (int i = 0; i < nv_h; i++)
+            {
+                τl[2 * i] = τ_l[i];
+                τr[2 * i] = τ_r[i];
+            }
         }
         public void Diagram_τ(out MPoint[] startPoints, out MPoint[] endPoints, double scale, Configuration config, Axis axis)
         {
@@ -1350,14 +1362,22 @@ namespace TMarsupilami.CoreLib3
                 Diagram_scalar(τ_l, τ_g, τ_r, mframes, scale, axis, out startPoints, out endPoints);
         }
 
-
-        public void Get_ε(out double[] εl, out double[] εr)
+        public void Get_ε(out double[] εl, out double[] εr, out double[] εmid)
         {
-            if (IsClosed)
-                throw new NotImplementedException();
+            εl = new double[nv];
+            εr = new double[nv];
+            εmid = ε.ToArray();
 
-            εl = ε_l.ToArray();
-            εr = ε_r.ToArray();
+            for (int i = 0; i < nv_g; i++)
+            {
+                εl[2 * i + 1] = ε_g[i];
+                εr[2 * i + 1] = ε_g[i];
+            }
+            for (int i = 0; i < nv_h; i++)
+            {
+                εl[2 * i] = ε_l[i];
+                εr[2 * i] = ε_r[i];
+            }
         }
         public void Diagram_ε(out MPoint[] startPoints, out MPoint[] endPoints, double scale, Configuration config, Axis axis)
         {
@@ -1407,8 +1427,47 @@ namespace TMarsupilami.CoreLib3
                 endPoints[ir] = P + scale * vr[i] * dir[2 * i];
             }
         }
+        private void Diagram_vector_12(MVector[] vl, MVector[] vg, MVector[] vr, MFrame[] valueFrames, MFrame[] displayFrames, double scale, out MPoint[] startPoints, out MPoint[] endPoints_1, out MPoint[] endPoints_2)
+        {
+            if (IsClosed)
+                throw new NotImplementedException();
 
-      
+            int nh = vl.Length;
+            int ng = vg.Length;
+
+            startPoints = new MPoint[2 * nv_h + nv_g];
+            endPoints_1 = new MPoint[2 * nv_h + nv_g];
+            endPoints_2 = new MPoint[2 * nv_h + nv_g];
+
+
+            var d1 = displayFrames.GetAxis(Axis.d1);
+            var d2 = displayFrames.GetAxis(Axis.d2);
+
+            MPoint P;
+
+            for (int i = 0; i < nv_g; i++)
+            {
+                var ig = 3 * i + 2; // ghost index in startPoints & endPoints
+                P = displayFrames[2 * i + 1].Origin;
+                startPoints[ig] = P;
+                endPoints_1[ig] = P + scale * (vg[i] * valueFrames[i].XAxis) * d1[2 * i + 1];
+                endPoints_2[ig] = P + scale * (vg[i] * valueFrames[i].YAxis) * d2[2 * i + 1];
+            }
+            for (int i = 0; i < nv_h; i++)
+            {
+                P = displayFrames[2 * i].Origin;
+
+                var il = 3 * i;     // handle left index in startPoints & endPoints
+                startPoints[il] = P;
+                endPoints_1[il] = P + scale * (vl[i] * valueFrames[2*i].XAxis) * d1[2 * i];
+                endPoints_2[il] = P + scale * (vl[i] * valueFrames[2*i].YAxis) * d2[2 * i];
+
+                var ir = il + 1;    // handle right index in startPoints & endPoints
+                startPoints[ir] = P;
+                endPoints_1[ir] = P + scale * (vr[i] * valueFrames[2 * i].XAxis) * d1[2 * i];
+                endPoints_2[ir] = P + scale * (vr[i] * valueFrames[2 * i].YAxis) * d2[2 * i];
+            }
+        }
 
         // doit être customizable
         public override void Update_lm_x(ref double[] lm_x)

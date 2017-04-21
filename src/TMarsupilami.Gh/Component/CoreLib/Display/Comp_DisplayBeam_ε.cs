@@ -46,9 +46,10 @@ namespace TMarsupilami.Gh.Component
         }
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddNumberParameter("εr", "εr", "", GH_ParamAccess.list);
             pManager.AddNumberParameter("εl", "εl", "", GH_ParamAccess.list);
-            pManager.AddCurveParameter("D", "D", "", GH_ParamAccess.list);
+            pManager.AddNumberParameter("εr", "εr", "", GH_ParamAccess.list);
+            pManager.AddNumberParameter("εmid", "εmid", "", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Diagram (ε)", "D", "", GH_ParamAccess.list);
         }
         protected override void SolveInstance(IGH_DataAccess DA)
         {
@@ -64,7 +65,7 @@ namespace TMarsupilami.Gh.Component
 
             var beam = ghBeam.Value as Beam_4DOF_D;
 
-            double[] εl, εr;
+            double[] εl, εr, εmid;
             Configuration config;
             MPoint[] startPoints, endPoints;
 
@@ -81,7 +82,7 @@ namespace TMarsupilami.Gh.Component
                     break;
             }
 
-            beam.Get_ε(out εl, out εr);
+            beam.Get_ε(out εl, out εr, out εmid);
             beam.Diagram_ε(out startPoints, out endPoints, scale, config, Axis.d1);
 
             var pts = new List<Point3d>();
@@ -98,9 +99,10 @@ namespace TMarsupilami.Gh.Component
 
             diagram.Add(new Polyline(pts).ToNurbsCurve());
 
-            DA.SetDataList(0, εr);
-            DA.SetDataList(1, εl);
-            DA.SetDataList(2, diagram);
+            DA.SetDataList(0, εl);
+            DA.SetDataList(1, εr);
+            DA.SetDataList(2, εmid);
+            DA.SetDataList(3, diagram);
         }
 
     }
