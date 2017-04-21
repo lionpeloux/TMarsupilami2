@@ -85,19 +85,20 @@ namespace TMarsupilami.Gh.Component
             beam.Get_ε(out εl, out εr, out εmid);
             beam.Diagram_ε(out startPoints, out endPoints, scale, config, Axis.d1);
 
-            var pts = new List<Point3d>();
-            var diagram = new List<NurbsCurve>();
+            int n = startPoints.Length;
+            var pts = new Point3d[n];
+            var diagram = new NurbsCurve[n+1];
 
             for (int i = 0; i < startPoints.Length; i++)
             {
                 var ps = startPoints[i].Cast();
                 var pe = endPoints[i].Cast();
                 var line = new Line(ps, pe);
-                diagram.Add(line.ToNurbsCurve());
-                pts.Add(pe);
+                diagram[i] = line.ToNurbsCurve();
+                pts[i] = pe;
             }
 
-            diagram.Add(new Polyline(pts).ToNurbsCurve());
+            diagram[n] = (new Polyline(pts)).ToNurbsCurve();
 
             DA.SetDataList(0, εl);
             DA.SetDataList(1, εr);
