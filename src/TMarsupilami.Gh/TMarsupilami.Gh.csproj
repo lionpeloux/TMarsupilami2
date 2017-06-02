@@ -105,6 +105,7 @@
     <Compile Include="Component\CoreLib\Display\Comp_DisplayDForce.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayCMoment.cs" />
     <Compile Include="Component\CoreLib\Display\Comp_DisplayCForce.cs" />
+    <Compile Include="Component\CoreLib\Section\Comp_SectionProperties.cs" />
     <Compile Include="Component\MathLib\Arithmetic\Comp_ReNormalizeVector.cs" />
     <Compile Include="Component\MathLib\Arithmetic\Comp_NormalizeVector.cs" />
     <Compile Include="Component\MathLib\Centerline\Comp_InterpolateFrames.cs" />
