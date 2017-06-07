@@ -293,6 +293,7 @@ namespace TMarsupilami.MathLib
         }
 
         // CURVATURE FOR DICONTINUOUS CENTERLINE (V2)
+        // same as V1 but with different input & output parameters
 
         /// <summary>
         /// Gets the curvature and geometric invariants of a centerline with ghost vertices (V2).

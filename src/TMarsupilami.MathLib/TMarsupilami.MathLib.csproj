@@ -64,6 +64,7 @@
     <Compile Include="IShallowCopy.cs" />
     <Compile Include="Math\Interpolation.cs" />
     <Compile Include="Math\BasisChange.cs" />
+    <Compile Include="Math\Motion.cs" />
     <Compile Include="Math\OsculatingCircle.cs" />
     <Compile Include="Math\Projection.cs" />
     <Compile Include="Math\Centerline.cs" />

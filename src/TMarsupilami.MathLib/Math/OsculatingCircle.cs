@@ -449,7 +449,6 @@ namespace TMarsupilami.MathLib
             fe = Math.Acos(c);
         }
 
-
         #endregion
 
 

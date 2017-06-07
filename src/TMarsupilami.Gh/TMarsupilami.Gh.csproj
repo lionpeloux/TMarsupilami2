@@ -111,6 +111,7 @@
     <Compile Include="Component\MathLib\Centerline\Comp_InterpolateFrames.cs" />
     <Compile Include="Component\MathLib\Centerline\Comp_CenterlineProperties.cs" />
     <Compile Include="Component\MathLib\Display\Comp_DisplayVector.cs" />
+    <Compile Include="Component\MathLib\Motion\Comp_MoveFrame.cs" />
     <Compile Include="Component\MathLib\OsculatingCircle\Comp_InscribedCirclePolyline.cs" />
     <Compile Include="Component\MathLib\OsculatingCircle\Comp_CircumscribedCirclePolyline.cs" />
     <Compile Include="Component\MathLib\OsculatingCircle\Comp_InscribedCircleEnd.cs" />
