@@ -47,7 +47,8 @@ namespace TMarsupilami.MathLib
                 var r = 1 / κ;
                 var b = κb / κ; // in LCS
                 var n = MVector.CrossProduct(b, t); // in LCS
-                var dα = dl / r;
+                var dα = dl / r; // sur le cercle
+                dα = 2 * Math.Asin(0.5 * dl / r); // à la chorde
                 dx = r * Math.Sin(dα) * t + r * (1 - Math.Cos(dα)) * n;
             }
 

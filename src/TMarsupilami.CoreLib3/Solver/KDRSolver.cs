@@ -166,6 +166,7 @@ namespace TMarsupilami.CoreLib3
 
                 elements_x.Add(beam);
                 CalculateElements_x += beam.Calculate_x;
+                InitElements += beam.Init;
 
                 if (beam.IsTorsionCapable)
                 {

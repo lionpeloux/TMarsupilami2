@@ -34,6 +34,19 @@ namespace TMarsupilami.MathLib
             V12 = -(0.25 * q1 * (l1 / l0))  * V0 + (0.25 * (2 * l0 + l1) / l0)  * V1 + (0.25 * (2 * q0 + q1))    * V2;  // s = +l1/2
         }
 
+        public static void Quadratic(double l0, double l1, double V0, double V1, double V2,
+                                        out double V01, out double V12
+                                    )
+        {
+            var s = (l0 + l1);
+            var q0 = l0 / s;
+            var q1 = l1 / s;
+
+            // value at mid points
+            V01 = (0.25 * (q0 + 2 * q1)) * V0 + (0.25 * (l0 + 2 * l1) / l1) * V1 - (0.25 * q0 * (l0 / l1)) * V2;  // s = -l0/2
+            V12 = -(0.25 * q1 * (l1 / l0)) * V0 + (0.25 * (2 * l0 + l1) / l0) * V1 + (0.25 * (2 * q0 + q1)) * V2;  // s = +l1/2
+        }
+
         public static void Quadratic(   double l0, double l1, 
                                         MVector V0, MVector V1, MVector V2,
                                         out MVector dV0, out MVector dV1, out MVector dV2,
