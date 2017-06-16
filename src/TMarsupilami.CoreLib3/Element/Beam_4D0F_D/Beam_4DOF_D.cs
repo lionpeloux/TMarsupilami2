@@ -29,14 +29,17 @@ namespace TMarsupilami.CoreLib3
 
         #region FIELDS
 
-        // REST CONFIGURATION      
-        private double[] l_0;                 
+        // applied 
 
-        // in LCS (X <=> d1 | Y <=> d2 | Z = 0)
+        // REST CONFIGURATION      
+
+        // in GCS
         private MVector[] κb_mid_0;
         private MVector[] κb_l_0;
         private MVector[] κb_g_0;
         private MVector[] κb_r_0;
+
+        private double[] l_0;
 
         private double[] κ1_mid_0, κ1_l_0, κ1_g_0, κ1_r_0;
         private double[] κ2_mid_0, κ2_l_0, κ2_g_0, κ2_r_0;
@@ -227,6 +230,8 @@ namespace TMarsupilami.CoreLib3
             fext_g = new MVector[nv_g];
             mext_m = new MVector[nv_g];
 
+
+
             // REACTION MOMENT AND FORCES
             Fr_g = new MVector[nv_h];
             Mr_m = new MVector[nv_h];
@@ -330,7 +335,6 @@ namespace TMarsupilami.CoreLib3
             // DR RESULTANT
             R_x = new MVector[nv];
             Rint_x = new MVector[nv];
-
 
             R_θ = new MVector[nv];
             Rint_θ = new MVector[nv];
@@ -477,12 +481,6 @@ namespace TMarsupilami.CoreLib3
                 //d1 = mframes_mid[2 * i + 1].XAxis;
                 //d2 = mframes_mid[2 * i + 1].YAxis;
                 //κb_mid_0[2 * i + 1] = κ1_mid_0[2 * i + 1] * d1 + κ2_mid_0[2 * i + 1] * d2;
-
-                //κb_mid_0[2 * i] = 0.5 * (κb_r_0[i] + κb_g_0[i]);
-                //κb_mid_0[2 * i] = κb_mid_0[2 * i] - (κb_mid_0[2 * i] * t_mid[2 * i]) * t_mid[2 * i]; // make sure kb is perpendicular to d3
-
-                //κb_mid_0[2 * i + 1] = 0.5 * (κb_g_0[i] + κb_l_0[i + 1]);
-                //κb_mid_0[2 * i + 1] = κb_mid_0[2 * i + 1] - (κb_mid_0[2 * i + 1] * t_mid[2 * i + 1]) * t_mid[2 * i + 1]; // make sure kb is perpendicular to d3
             }
         }
         private void SetInitialConfig(MFrame[] initialFrames)
@@ -629,9 +627,8 @@ namespace TMarsupilami.CoreLib3
         private void UpdateBendingMoment()
         {
             MVector d1, d2;
-            MVector κbl, κbl_0, κbr, κbr_0;
+            MVector κbl, κbr;
             double dM1, dM2, M1, M2;
-            MVector dM, Mmean;
 
             // HANDLE
 
@@ -949,14 +946,20 @@ namespace TMarsupilami.CoreLib3
         }
         private void UpdateInternalNodalForce()
         {
-            //RESULTANT FORCE
-            Rint_x[0] = N_mid[0] * t[0] + V_mid[0];
-            for (int i = 1; i < nv - 1; i++)
+            //RESULTANT FORCE : par les milieux des segments (manque les forces linéiques)
+            //Rint_x[0] = N_mid[0] * t[0] + V_mid[0];
+            //for (int i = 1; i < nv - 1; i++)
+            //{
+            //    var N = -N_mid[i - 1] * t_mid[i - 1] + N_mid[i] * t_mid[i];
+            //    Rint_x[i] = N - V_mid[i - 1] + V_mid[i];
+            //}
+            //Rint_x[nv - 1] = -N_mid[ne - 1] * t[nv - 1] - V_mid[ne - 1];
+
+            //(alternative) RESULTANT FORCE : par les noeuds
+            for (int i = 0; i < nv; i++)
             {
-                var N = -N_mid[i - 1] * t_mid[i - 1] + N_mid[i] * t_mid[i];
-                Rint_x[i] = N - V_mid[i - 1] + V_mid[i];
+                Rint_x[i] = (-N_l[i] + N_r[i]) * mframes[i].ZAxis + (-V_l[i] + V_r[i]);
             }
-            Rint_x[nv - 1] = -N_mid[ne - 1] * t[nv - 1] - V_mid[ne - 1];
         }
         private void UpdateResultantNodalForce()
         {
@@ -1077,8 +1080,8 @@ namespace TMarsupilami.CoreLib3
             Eb = new double[ne];
             for (int i = 0; i < ne; i++)
             {
-                κ1 = κ1_mid[i] - κb_mid_0[i].X;
-                κ2 = κ2_mid[i] - κb_mid_0[i].Y;
+                κ1 = κ1_mid[i] - κ1_mid_0[i];
+                κ2 = κ2_mid[i] - κ2_mid_0[i];
                 var dE = 0.5 * (EI1[i/2] * κ1 * κ1 + EI2[i/2] * κ2 * κ2) * l[i];
                 sum += dE;
                 Eb[i] = dE;

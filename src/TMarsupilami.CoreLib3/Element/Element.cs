@@ -237,9 +237,20 @@ namespace TMarsupilami.CoreLib3
         public MVector[] fext_g;
         public MVector[] mext_m;
 
+        // plus clair, à remplacer ? => via le loadmanager / nécessite une réécriture importante
+        //public double[] Fx_ext, Fy_ext, Fz_ext;
+        //public double[] fx_ext, fy_ext, fz_ext;
+        //public double[] M1_ext, M2_ext, M3_ext;
+        //public double[] m1_ext, m2_ext, m3_ext;
+
         // REACTION MOMENT AND FORCES
         public MVector[] Fr_g;
         public MVector[] Mr_m;
+
+        // plus clair, à remplacer ? => via le loadmanager / nécéssite une réécriture importante
+        //public double[] Fx_sup, Fy_sup, Fz_sup;
+        //public double[] M1_sup, M2_sup, M3_sup;
+
 
         //LOAD MANAGER
         protected BeamLoadManager loadManager;
