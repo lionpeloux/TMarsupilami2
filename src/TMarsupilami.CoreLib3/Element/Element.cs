@@ -226,9 +226,9 @@ namespace TMarsupilami.CoreLib3
         public double[] l;            // edge length : l[i] = |e[i]|
         public MVector[] e;                // edge : e[i] = x[i+1] - x[i]
 
-        // NODAL RESULTANT
-        protected MVector[] R_x, Rint_x;
-        protected MVector[] R_θ, Rint_θ;
+        // NODAL RESULTANT 
+        protected MVector[] R_x, Rint_x;    // in GCS
+        protected MVector[] R_θ, Rint_θ;    // in LCS
 
         // EXTERNAL FORCES & MOMENTS
         // applied by supports and constraints to the element
@@ -250,7 +250,6 @@ namespace TMarsupilami.CoreLib3
         // plus clair, à remplacer ? => via le loadmanager / nécéssite une réécriture importante
         //public double[] Fx_sup, Fy_sup, Fz_sup;
         //public double[] M1_sup, M2_sup, M3_sup;
-
 
         //LOAD MANAGER
         protected BeamLoadManager loadManager;

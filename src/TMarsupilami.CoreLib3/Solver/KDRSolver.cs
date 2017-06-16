@@ -442,10 +442,10 @@ namespace TMarsupilami.CoreLib3
             {
                 for (int nj = 0; nj < elements_θ[ei].Nv; nj++)
                 {
-                    var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj].Z;
-                    a_θ[ei][nj].Z = a;
-                    v_θ[ei][nj].Z = (0.5 * dt) * a;
-                    //v_θ[ei][nj].Z = 0.5 * (dt / lm_θ[ei][nj]) * R_θ[ei][nj];
+                    // in LCS
+                    var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj];
+                    a_θ[ei][nj] = a;
+                    v_θ[ei][nj] = (0.5 * dt) * a;
                 }
             }
 
@@ -468,9 +468,10 @@ namespace TMarsupilami.CoreLib3
             {
                 for (int nj = 0; nj < elements_θ[ei].Nv; nj++)
                 {
-                    var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj].Z;
-                    a_θ[ei][nj].Z = a;
-                    v_θ[ei][nj].Z += dt * a;
+                    // in LCS
+                    var a = (1 / lm_θ[ei][nj]) * R_θ[ei][nj];
+                    a_θ[ei][nj] = a;
+                    v_θ[ei][nj] += dt * a;
                 }
             }
 
@@ -507,12 +508,13 @@ namespace TMarsupilami.CoreLib3
         }
         private void ComputeEc_θ()
         {
+            // devrait etre demandé à l'élément de calculer son énergie cinétique.
             Ec_θ = 0.0;
             for (int ei = 0; ei < nθ; ei++)
             {
                 for (int vj = 0; vj < elements_θ[ei].Nv; vj++)
                 {
-                    Ec_θ += lm_θ[ei][vj] * (v_θ[ei][vj] * v_θ[ei][vj]);
+                    Ec_θ += lm_θ[ei][vj] * (v_θ[ei][vj].Z * v_θ[ei][vj].Z); // => enlever la projection sur d3 pour la relaxation 6DOF
                 }
             }
             Ec_θ = 0.5 * Ec_θ;

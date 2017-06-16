@@ -76,9 +76,7 @@ namespace TMarsupilami.CoreLib3
 
         private MVector[] V_mid;
         private MVector[] V_l;
-        private MVector[] V_r;
-
-        
+        private MVector[] V_r;      
 
         // LCS ou GCS ??
         private MVector[] dθ;
@@ -564,6 +562,10 @@ namespace TMarsupilami.CoreLib3
             // θ = θ + dθ
             for (int i = 0; i < nv; i++)
             {
+                // At the moment, dθ is given in LCS
+                // Here, we just take the d3 component
+                // probablement, il faut revoir la façon dont est calculée l'énergie cinétique de rotation
+                // en effet, dθ peut avoir des composantes non nulles sur d1 et d2 et  donc l'énergie cinétique en tient compte.
                 mframes[i].ZRotate(dθ[i].Z);
             }
             //OnFramesRotated(dθ);
@@ -599,16 +601,6 @@ namespace TMarsupilami.CoreLib3
             UpdateResultantNodalForce();
         }
 
-        private void InterpolateMidFrames(MFrame[] midFrames, MVector[] κb_r, MVector[] κb_g, MVector[] κb_l, double[] τ_r, double[] τ_l )
-        {
-            int nv_g = κb_g.Length;
-            for (int i = 0; i < nv_g; i++)
-            {
-                mframes_mid[2 * i] = Centerline.Interpolate(mframes[2 * i], mframes[2 * i + 1], κb_r[i], κb_g[i], τ_r[2 * i], τ_l[2 * i + 1]);
-                mframes_mid[2 * i + 1] = Centerline.Interpolate(mframes[2 * i + 1], mframes[2 * i + 2], κb_g[i], κb_l[i + 1], τ_r[2 * i + 1], τ_l[2 * i + 2]);
-            }
-        }
-
         public void ClearAppliedReactions()
         {
             for (int i = 0; i < nv_h; i++)
@@ -620,6 +612,16 @@ namespace TMarsupilami.CoreLib3
             {
                 fext_g[i] = MVector.Zero;
                 mext_m[i] = MVector.Zero;
+            }
+        }
+
+        private void InterpolateMidFrames(MFrame[] midFrames, MVector[] κb_r, MVector[] κb_g, MVector[] κb_l, double[] τ_r, double[] τ_l)
+        {
+            int nv_g = κb_g.Length;
+            for (int i = 0; i < nv_g; i++)
+            {
+                mframes_mid[2 * i] = Centerline.Interpolate(mframes[2 * i], mframes[2 * i + 1], κb_r[i], κb_g[i], τ_r[2 * i], τ_l[2 * i + 1]);
+                mframes_mid[2 * i + 1] = Centerline.Interpolate(mframes[2 * i + 1], mframes[2 * i + 2], κb_g[i], κb_l[i + 1], τ_r[2 * i + 1], τ_l[2 * i + 2]);
             }
         }
 
@@ -791,11 +793,6 @@ namespace TMarsupilami.CoreLib3
             }
 
             InterpolateMidFrames(mframes_mid, κb_r, κb_g, κb_l, τ_r, τ_l);
-            //for (int i = 0; i < nv_g; i++)
-            //{
-            //    mframes_mid[2 * i] = Centerline.Interpolate(mframes[2 * i], mframes[2 * i + 1], κb_r[i], κb_g[i], τ_r[2 * i], τ_l[2 * i + 1]);
-            //    mframes_mid[2 * i + 1] = Centerline.Interpolate(mframes[2 * i + 1], mframes[2 * i + 2], κb_g[i], κb_l[i + 1], τ_r[2 * i + 1], τ_l[2 * i + 2]);
-            //}
         }
         private void UpdateInternalNodalMoment()
         {
@@ -805,16 +802,16 @@ namespace TMarsupilami.CoreLib3
                 // ATTENTION : confusion entre GCS pour XY et LCS pour Z ...
                 // Pour l'instant ca marche mais uniquement car seulement Rint_θ.Z est pris en compte dans une relaxation dynamique sur θ = θ3 et non θZ.
                 // => tout passer en GCS
-                Rint_θ[2 * i].X += M_r[i].X;
-                Rint_θ[2 * i].Y += M_r[i].Y;
+                Rint_θ[2 * i].X += M1_r[i];
+                Rint_θ[2 * i].Y += M2_r[i];
                 Rint_θ[2 * i].Z += Q_r[2 * i];
 
                 Rint_θ[2 * i + 1].X = 0;
                 Rint_θ[2 * i + 1].Y = 0;
                 Rint_θ[2 * i + 1].Z = -Q_l[2 * i + 1] + Q_r[2 * i + 1];
 
-                Rint_θ[2 * i + 2].X = -M_l[i + 1].X;
-                Rint_θ[2 * i + 2].Y = -M_l[i + 1].Y;
+                Rint_θ[2 * i + 2].X = -M1_l[i + 1];
+                Rint_θ[2 * i + 2].Y = -M2_l[i + 1];
                 Rint_θ[2 * i + 2].Z = -Q_l[2 * i + 2];
             }
         }
