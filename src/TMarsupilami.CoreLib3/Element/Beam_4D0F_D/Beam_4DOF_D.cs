@@ -31,7 +31,6 @@ namespace TMarsupilami.CoreLib3
 
         // REST CONFIGURATION      
         private double[] l_0;                 
-        private double[] τ_0;
 
         // in LCS (X <=> d1 | Y <=> d2 | Z = 0)
         private MVector[] κb_mid_0;
@@ -39,52 +38,44 @@ namespace TMarsupilami.CoreLib3
         private MVector[] κb_g_0;
         private MVector[] κb_r_0;
 
+        private double[] κ1_mid_0, κ1_l_0, κ1_g_0, κ1_r_0;
+        private double[] κ2_mid_0, κ2_l_0, κ2_g_0, κ2_r_0;
+        private double[] τ_0, τ_l_0, τ_r_0;
+
         // ACTUAL CONFIG (in GCS)
         private MVector[] t_mid;
         private MFrame[] mframes_mid;
-       
-        // in GCS
-        private MVector[] κb_mid;
-        private MVector[] κb_l;       
-        private MVector[] κb_g;
-        private MVector[] κb_r;
+
+        // in LCS
+        private double[] ε, ε_l, ε_r;
 
         private double[] κ1_mid, κ1_l, κ1_g, κ1_r;
         private double[] κ2_mid, κ2_l, κ2_g, κ2_r;
+        private double[] τ, τ_l, τ_r;
 
-        private double[] τ;       
-        private double[] τ_l;
-        private double[] τ_r;
+        private double[] M1_l, M1_g, M1_r;
+        private double[] M2_l, M2_g, M2_r;
+        private double[] Q_mid, Q_l, Q_r;
 
-        private double[] ε;
-        private double[] ε_l;
-        private double[] ε_r;
+        private double[] F1_mid, F1_l, F1_r;
+        private double[] F2_mid, F2_l, F2_r;
+        private double[] N_mid, N_l, N_r;
 
         // in GCS
+        private MVector[] κb_mid;
+        private MVector[] κb_l;
+        private MVector[] κb_g;
+        private MVector[] κb_r;
+
         private MVector[] M_l;
         private MVector[] M_g;
         private MVector[] M_r;
 
-        private double[] M1_l, M1_g, M1_r;
-        private double[] M2_l, M2_g, M2_r;
-
-        private double[] Q_mid;
-        private double[] Q_l;
-        private double[] Q_r;
-
-
-        // in GCS
         private MVector[] V_mid;
         private MVector[] V_l;
         private MVector[] V_r;
 
-
-        private double[] F1_mid, F1_l, F1_r;
-        private double[] F2_mid, F2_l, F2_r;
-
-        private double[] N_mid;                                 
-        private double[] N_l;
-        private double[] N_r;
+        
 
         // LCS ou GCS ??
         private MVector[] dθ;
@@ -261,6 +252,16 @@ namespace TMarsupilami.CoreLib3
             κb_g_0 = new MVector[nv_g];
             κb_r_0 = new MVector[nv_h];
 
+            κ1_mid_0 = new double[ne];
+            κ1_l_0 = new double[nv_h];
+            κ1_g_0 = new double[nv_g];
+            κ1_r_0 = new double[nv_h];
+
+            κ2_mid_0 = new double[ne];
+            κ2_l_0 = new double[nv_h];
+            κ2_g_0 = new double[nv_g];
+            κ2_r_0 = new double[nv_h];
+
             τ_0 = new double[ne];
 
             // DEFORMED CONFIGURATION
@@ -408,59 +409,80 @@ namespace TMarsupilami.CoreLib3
             Centerline.GetTwist(restFrames, l_0, τ_0, IsClosed);
 
             int index;
-            MVector κb, κb_l, κb_r, d1, d2;
+            MVector κbg, κbl, κbr, d1, d2;
 
             // HANDLE
 
             // i = 0
-            κb_r = (2 / l_0[0]) * MVector.CrossProduct(t[0], t_mid[0]);
             d1 = restFrames[0].XAxis;
             d2 = restFrames[0].YAxis;
-            κb_r_0[0].X = κb_r * d1;
-            κb_r_0[0].Y = κb_r * d2;
+
+            κbr = (2 / l_0[0]) * MVector.CrossProduct(t[0], t_mid[0]);
+            κ1_r_0[0] = κbr * d1;
+            κ2_r_0[0] = κbr * d2;
+            κb_r_0[0] = κbr;
 
             for (int i = 1; i < nv_h-1; i++)
             {
                 index = 2 * i;
-                κb_l = (2 / l_0[index - 1]) * MVector.CrossProduct(t_mid[index - 1], t[index]);
-                κb_r = (2 / l_0[index]) * MVector.CrossProduct(t[index], t_mid[index]);
-
                 d1 = restFrames[index].XAxis;
                 d2 = restFrames[index].YAxis;
 
-                // WARNING : given in the material frame coordinate system
-                κb_l_0[i].X = κb_l * d1;
-                κb_l_0[i].Y = κb_l * d2;
-                κb_r_0[i].X = κb_r * d1;
-                κb_r_0[i].Y = κb_r * d2;
+                // left curvature
+                κbl = (2 / l_0[index - 1]) * MVector.CrossProduct(t_mid[index - 1], t[index]);
+                κ1_l_0[i] = κbl * d1;
+                κ2_l_0[i] = κbl * d2;
+                κb_l_0[i] = κbl;
+
+                // right curvature
+                κbr = (2 / l_0[index]) * MVector.CrossProduct(t[index], t_mid[index]);
+                κ1_r_0[i] = κbr * d1;
+                κ2_r_0[i] = κbr * d2;
+                κb_r_0[i] = κbr;
             }
 
             // i = nv_h-1
-            κb_l = 2 / (l_0[ne - 1]) * MVector.CrossProduct(t_mid[ne - 1], t[nv - 1]);
             d1 = mframes[nv - 1].XAxis;
             d2 = mframes[nv - 1].YAxis;
-            κb_l_0[nv_h - 1].X = κb_l * d1;
-            κb_l_0[nv_h - 1].Y = κb_l * d2;
+
+            κbl = 2 / (l_0[ne - 1]) * MVector.CrossProduct(t_mid[ne - 1], t[nv - 1]);
+            κ1_l_0[nv_h - 1] = κbl * d1;
+            κ2_l_0[nv_h - 1] = κbl * d2;
+            κb_l_0[nv_h - 1] = κbl;
 
             // GHOST
             for (int i = 0; i < nv_g; i++)
             {
                 index = 2 * i + 1;
-                κb = κb_g_0[i];
-
                 d1 = restFrames[index].XAxis;
                 d2 = restFrames[index].YAxis;
 
-                // WARNING : given in the material frame coordinate system
-                κb_g_0[i].X = κb * d1;
-                κb_g_0[i].Y = κb * d2;
-                κb_g_0[i].Z = 0;
+                // ghost curvature
+                κbg = κb_g_0[i];
+                κ1_g_0[i] = κbg * d1;
+                κ2_g_0[i] = κbg * d2;
 
-                κb_mid_0[2 * i] = 0.5 * (κb_r_0[i] + κb_g_0[i]);
-                κb_mid_0[2 * i] = κb_mid_0[2 * i] - (κb_mid_0[2 * i] * t_mid[2 * i]) * t_mid[2 * i]; // make sure kb is perpendicular to d3
+                // Parabolic interpolation of the components in the material frame basis
+                var l0 = l_0[2 * i];
+                var l1 = l_0[2 * i + 1];
+                Interpolation.Quadratic(l0, l1, κ1_r_0[i], κ1_g_0[i], κ1_l_0[i + 1], out κ1_mid_0[2 * i], out κ1_mid_0[2 * i + 1]);
+                Interpolation.Quadratic(l0, l1, κ2_r_0[i], κ2_g_0[i], κ2_l_0[i + 1], out κ2_mid_0[2 * i], out κ2_mid_0[2 * i + 1]);
 
-                κb_mid_0[2 * i + 1] = 0.5 * (κb_g_0[i] + κb_l_0[i + 1]);
-                κb_mid_0[2 * i + 1] = κb_mid_0[2 * i + 1] - (κb_mid_0[2 * i + 1] * t_mid[2 * i + 1]) * t_mid[2 * i + 1]; // make sure kb is perpendicular to d3
+                //// 2i
+                //d1 = mframes_mid[2 * i].XAxis;
+                //d2 = mframes_mid[2 * i].YAxis;
+                //κb_mid_0[2 * i] = κ1_mid_0[2 * i] * d1 + κ2_mid_0[2 * i] * d2;
+
+                //// 2i + 1
+                //d1 = mframes_mid[2 * i + 1].XAxis;
+                //d2 = mframes_mid[2 * i + 1].YAxis;
+                //κb_mid_0[2 * i + 1] = κ1_mid_0[2 * i + 1] * d1 + κ2_mid_0[2 * i + 1] * d2;
+
+                //κb_mid_0[2 * i] = 0.5 * (κb_r_0[i] + κb_g_0[i]);
+                //κb_mid_0[2 * i] = κb_mid_0[2 * i] - (κb_mid_0[2 * i] * t_mid[2 * i]) * t_mid[2 * i]; // make sure kb is perpendicular to d3
+
+                //κb_mid_0[2 * i + 1] = 0.5 * (κb_g_0[i] + κb_l_0[i + 1]);
+                //κb_mid_0[2 * i + 1] = κb_mid_0[2 * i + 1] - (κb_mid_0[2 * i + 1] * t_mid[2 * i + 1]) * t_mid[2 * i + 1]; // make sure kb is perpendicular to d3
             }
         }
         private void SetInitialConfig(MFrame[] initialFrames)
@@ -475,17 +497,37 @@ namespace TMarsupilami.CoreLib3
                 mframes[i] = initialFrames[i];
             }
             Centerline.GetCurvature(x, e, t_mid, l, t, κb_g, IsClosed);
-            Centerline.GetTwist(mframes, l, τ, IsClosed);
 
-            // befor any moves
+            // Before any moves, ensure that boundary conditions are not violated
+            // Recall that Centerline.GetCurvature(x, e, t_mid, l, t, κb_g, IsClosed)
+            // adapt t and that t is used to compute bondary moments and curvatures.
+            if (!IsClosed)
+            {
+                t[0] = mframes[0].ZAxis;
+                t[nv - 1] = mframes[nv - 1].ZAxis;
+            }
+
+            // realign material frames to stick to the centerline (this is a rotation by dθ[i] = MVector.CrossProduct(mframes[i].ZAxis, t[i]);
+            // if the tangent vector has not changed, the frame remains unchanged.
             for (int i = 0; i < nv; i++)
             {
-                t[i] = mframes[i].ZAxis;
+                dθ[i] = MVector.CrossProduct(mframes[i].ZAxis, t[i]);
+                ParallelTransportation.ZPT_Rotation(mframes[i], mframes[i].ZAxis, x[i], t[i], ref mframes[i]);
             }
+
+            Centerline.GetTwist(mframes, l, τ, IsClosed);      
         }
 
         public override void Init()
         {
+            //// befor any moves
+            //for (int i = 0; i < nv; i++)
+            //{
+            //    t[i] = mframes[i].ZAxis;
+            //}
+
+            //// call for tangent constraint
+            //OnTangentsUpdated(t);
         }
 
         public override void Move_x(MVector[] dx)
@@ -559,6 +601,16 @@ namespace TMarsupilami.CoreLib3
             UpdateResultantNodalForce();
         }
 
+        private void InterpolateMidFrames(MFrame[] midFrames, MVector[] κb_r, MVector[] κb_g, MVector[] κb_l, double[] τ_r, double[] τ_l )
+        {
+            int nv_g = κb_g.Length;
+            for (int i = 0; i < nv_g; i++)
+            {
+                mframes_mid[2 * i] = Centerline.Interpolate(mframes[2 * i], mframes[2 * i + 1], κb_r[i], κb_g[i], τ_r[2 * i], τ_l[2 * i + 1]);
+                mframes_mid[2 * i + 1] = Centerline.Interpolate(mframes[2 * i + 1], mframes[2 * i + 2], κb_g[i], κb_l[i + 1], τ_r[2 * i + 1], τ_l[2 * i + 2]);
+            }
+        }
+
         public void ClearAppliedReactions()
         {
             for (int i = 0; i < nv_h; i++)
@@ -588,13 +640,15 @@ namespace TMarsupilami.CoreLib3
             d2 = mframes[0].YAxis;
 
             // right curvature
-            κb_r[0] = (2 / l[0]) * MVector.CrossProduct(t[0], t_mid[0]);
-            κ1_r[0] = κb_r[0] * d1;
-            κ2_r[0] = κb_r[0] * d2;
+            κbr = (2 / l[0]) * MVector.CrossProduct(t[0], t_mid[0]);
+            var k = κb_r[0].Length();
+            κ1_r[0] = κbr * d1;
+            κ2_r[0] = κbr * d2;
+            κb_r[0] = κbr;
 
             // right bending moment
-            M1 = EI1[0] * (κ1_r[0] - κb_r_0[0].X);
-            M2 = EI2[0] * (κ2_r[0] - κb_r_0[0].Y);
+            M1 = EI1[0] * (κ1_r[0] - κ1_r_0[0]);
+            M2 = EI2[0] * (κ2_r[0] - κ2_r_0[0]);
             M1_r[0] = M1;
             M2_r[0] = M2;
             M_r[0] = M1 * d1 + M2 * d2;
@@ -607,28 +661,27 @@ namespace TMarsupilami.CoreLib3
 
                 // left curvature
                 κbl = (2 / l[2 * i - 1]) * MVector.CrossProduct(t_mid[2 * i - 1], t[2 * i]);
-                κbl_0 = κb_l_0[i];
 
                 // right curvature
                 κbr = (2 / l[2 * i]) * MVector.CrossProduct(t[2 * i], t_mid[2 * i]);
-                κbr_0 = κb_r_0[i];
 
-                // mean moment 
-                M1 = 0.5 * (EI1[i - 1] * (κbl * d1 - κbl_0.X) + EI1[i] * (κbr * d1 - κbr_0.X));
-                M2 = 0.5 * (EI2[i - 1] * (κbl * d2 - κbl_0.Y) + EI2[i] * (κbr * d2 - κbr_0.Y));
-                Mmean = M1 * d1 + M2 * d2;
+                // mean moment (Mmean = M1d1 + M2d2)
+                M1 = 0.5 * (EI1[i - 1] * (κbl * d1 - κ1_l_0[i]) + EI1[i] * (κbr * d1 - κ1_r_0[i]));
+                M2 = 0.5 * (EI2[i - 1] * (κbl * d2 - κ2_l_0[i]) + EI2[i] * (κbr * d2 - κ2_r_0[i]));
 
                 // left & right moments that satisfy the static condition -Ml + Mr + Mext_m + Mr_m = 0
                 dM1 = 0.5 * (Mext_m[i].X + Mr_m[i].X);
                 dM2 = 0.5 * (Mext_m[i].Y + Mr_m[i].Y);
+
+                // Ml = Mmean + dM
                 M1_l[i] = M1 + dM1;
                 M2_l[i] = M2 + dM2;
-                M1_r[i] = M1 - dM1;
-                M2_r[i] = M2 - dM2;
+                M_l[i] = M1_l[i] * d1 + M2_l[i] * d2;
 
-                dM = dM1 * d1 + dM2 * d2;
-                M_l[i] = Mmean + dM;
-                M_r[i] = Mmean - dM;
+                // Mr = Mmean - dM
+                M1_r[i] = M1 - dM1;
+                M2_r[i] = M2 - dM2;       
+                M_r[i] = M1_r[i] * d1 + M2_r[i] * d2;
 
                 // left curvatures from moment
                 κ1_l[i] = (M1 + dM1) / EI1[i - 1];
@@ -646,13 +699,14 @@ namespace TMarsupilami.CoreLib3
             d2 = mframes[nv - 1].YAxis;
 
             // left curvature
-            κb_l[nv_h - 1] = (2 / l[ne - 1]) * MVector.CrossProduct(t_mid[ne - 1], t[nv - 1]);
-            κ1_l[nv_h - 1] = κb_l[nv_h - 1] * d1;
-            κ2_l[nv_h - 1] = κb_l[nv_h - 1] * d2;
+            κbl = (2 / l[ne - 1]) * MVector.CrossProduct(t_mid[ne - 1], t[nv - 1]);
+            κ1_l[nv_h - 1] = κbl * d1;
+            κ2_l[nv_h - 1] = κbl * d2;
+            κb_l[nv_h - 1] = κbl;
 
             // left bending moment
-            M1 = EI1[nv_g - 1] * (κ1_l[nv_h - 1] - κb_l_0[nv_h - 1].X);
-            M2 = EI2[nv_g - 1] * (κ2_l[nv_h - 1] - κb_l_0[nv_h - 1].Y);
+            M1 = EI1[nv_g - 1] * (κ1_l[nv_h - 1] - κ1_l_0[nv_h - 1]);
+            M2 = EI2[nv_g - 1] * (κ2_l[nv_h - 1] - κ2_l_0[nv_h - 1]);
             M1_l[nv_h - 1] = M1;
             M2_l[nv_h - 1] = M2;
             M_l[nv_h - 1] = M1 * d1 + M2 * d2;
@@ -674,25 +728,28 @@ namespace TMarsupilami.CoreLib3
                 M2_g[i] = M2;
                 M_g[i] = M1_g[i] * d1 + M2_g[i] * d2;
 
-                // parabolic interpolation
                 // Parabolic interpolation of the components in the material frame basis
                 var l0 = l[2 * i];
                 var l1 = l[2 * i + 1];
                 Interpolation.Quadratic(l0, l1, κ1_r[i], κ1_g[i], κ1_l[i + 1], out κ1_mid[2 * i], out κ1_mid[2 * i + 1]);
                 Interpolation.Quadratic(l0, l1, κ2_r[i], κ2_g[i], κ2_l[i + 1], out κ2_mid[2 * i], out κ2_mid[2 * i + 1]);
 
-                //κ1_mid[2 * i] = 0.5 * (κ1_r[i] + κ1_g[i]);
-                //κ2_mid[2 * i] = 0.5 * (κ2_r[i] + κ2_g[i]);
+                // 2i
+                d1 = mframes_mid[2 * i].XAxis;
+                d2 = mframes_mid[2 * i].YAxis;
+                κb_mid[2 * i] = κ1_mid[2 * i] * d1 + κ2_mid[2 * i] * d2;
 
-                //κ1_mid[2 * i + 1] = 0.5 * (κ1_g[i] + κ1_l[i + 1]);
-                //κ2_mid[2 * i + 1] = 0.5 * (κ2_g[i] + κ2_l[i + 1]);
+                // 2i + 1
+                d1 = mframes_mid[2 * i + 1].XAxis;
+                d2 = mframes_mid[2 * i + 1].YAxis;
+                κb_mid[2 * i + 1] = κ1_mid[2 * i + 1] * d1 + κ2_mid[2 * i + 1] * d2;
 
                 // passer en interpolation parabolique ??
-                κb_mid[2 * i] = 0.5 * (κb_r[i] + κb_g[i]);
-                κb_mid[2 * i] = κb_mid[2 * i] - (κb_mid[2 * i] * t_mid[2 * i]) * t_mid[2 * i]; // make sure kb is perpendicular to d3
+                //κb_mid[2 * i] = 0.5 * (κb_r[i] + κb_g[i]);
+                //κb_mid[2 * i] = κb_mid[2 * i] - (κb_mid[2 * i] * t_mid[2 * i]) * t_mid[2 * i]; // make sure kb is perpendicular to d3
 
-                κb_mid[2 * i + 1] = 0.5 * (κb_g[i] + κb_l[i + 1]);
-                κb_mid[2 * i + 1] = κb_mid[2 * i + 1] - (κb_mid[2 * i + 1] * t_mid[2 * i + 1]) * t_mid[2 * i + 1]; // make sure kb is perpendicular to d3
+                //κb_mid[2 * i + 1] = 0.5 * (κb_g[i] + κb_l[i + 1]);
+                //κb_mid[2 * i + 1] = κb_mid[2 * i + 1] - (κb_mid[2 * i + 1] * t_mid[2 * i + 1]) * t_mid[2 * i + 1]; // make sure kb is perpendicular to d3
             }
         }
         private void UpdateTwistingMoment()
@@ -736,11 +793,12 @@ namespace TMarsupilami.CoreLib3
                 τ_l[2 * i + 2] = τ12 - dτ12;
             }
 
-            for (int i = 0; i < nv_g; i++)
-            {
-                mframes_mid[2 * i] = Centerline.Interpolate(mframes[2 * i], mframes[2 * i + 1], κb_r[i], κb_g[i], τ_r[2 * i], τ_l[2 * i + 1]);
-                mframes_mid[2 * i + 1] = Centerline.Interpolate(mframes[2 * i + 1], mframes[2 * i + 2], κb_g[i], κb_l[i + 1], τ_r[2 * i + 1], τ_l[2 * i + 2]);
-            }
+            InterpolateMidFrames(mframes_mid, κb_r, κb_g, κb_l, τ_r, τ_l);
+            //for (int i = 0; i < nv_g; i++)
+            //{
+            //    mframes_mid[2 * i] = Centerline.Interpolate(mframes[2 * i], mframes[2 * i + 1], κb_r[i], κb_g[i], τ_r[2 * i], τ_l[2 * i + 1]);
+            //    mframes_mid[2 * i + 1] = Centerline.Interpolate(mframes[2 * i + 1], mframes[2 * i + 2], κb_g[i], κb_l[i + 1], τ_r[2 * i + 1], τ_l[2 * i + 2]);
+            //}
         }
         private void UpdateInternalNodalMoment()
         {
@@ -788,8 +846,6 @@ namespace TMarsupilami.CoreLib3
         private void UpdateShearForce()
         {
             MVector dM01, dM12, dM0, dM1, dM2, M01, M12;
-            var M1_mid = new double[ne];
-            var M2_mid = new double[ne];
 
             for (int i = 0; i < nv_g; i++)
             {
@@ -802,18 +858,6 @@ namespace TMarsupilami.CoreLib3
                 var M1 = new MVector(M1_g[i], M2_g[i], 0);
                 var M2 = new MVector(M1_l[i + 1], M2_l[i + 1], 0);
                 Interpolation.Quadratic(l0, l1, M0, M1, M2, out dM0, out dM1, out dM2, out dM01, out dM12, out M01, out M12);
-
-                dM01 = new MVector((M1_g[i] - M1_r[i]) / l0, (M2_g[i] - M2_r[i]) / l0, 0);
-                dM12 = new MVector((M1_l[i + 1] - M1_g[i]) / l1, (M2_l[i + 1] - M2_g[i]) / l1, 0);
-
-                M01 = new MVector((M1_g[i] + M1_r[i]) / 2, (M2_g[i] + M2_r[i]) / 2, 0);
-                M12 = new MVector((M1_l[i + 1] + M1_g[i]) / 2, (M2_l[i + 1] + M2_g[i]) / 2, 0);
-
-                M1_mid[2*i] = M01.X;
-                M2_mid[2*i] = M01.Y;
-
-                M1_mid[2 * i+1] = M12.X;
-                M2_mid[2 * i+1] = M12.Y;
 
                 F1_mid[2 * i] = -dM01.Y + κ1_mid[2 * i] * Q_mid[2 * i] - τ[2 * i] * M01.X - m.Y;
                 F2_mid[2 * i] = dM01.X + κ2_mid[2 * i] * Q_mid[2 * i] - τ[2 * i] * M01.Y + m.X;
@@ -887,12 +931,10 @@ namespace TMarsupilami.CoreLib3
                 F2_r[2 * i] = F2_mid[2 * i] + dF2_01;
                 V_r[2 * i] = F1_r[2 * i] * mframes[2 * i].XAxis + F2_r[2 * i] * mframes[2 * i].YAxis;
 
-
                 // 2i + 1
                 F1_l[2 * i + 1] = F1_mid[2 * i] - dF1_01;
                 F2_l[2 * i + 1] = F2_mid[2 * i] - dF2_01;
                 V_l[2 * i + 1] = F1_l[2 * i + 1] * mframes[2 * i + 1].XAxis + F2_l[2 * i + 1] * mframes[2 * i + 1].YAxis;
-
 
                 F1_r[2 * i + 1] = F1_mid[2 * i + 1] + dF1_12;
                 F2_r[2 * i + 1] = F2_mid[2 * i + 1] + dF2_12;
@@ -907,50 +949,6 @@ namespace TMarsupilami.CoreLib3
         }
         private void UpdateInternalNodalForce()
         {
-            // AXIAL FORCE : attention à ne pas répéter cette opération pour les variations sur θ
-
-            // A revoir avec les nouvelles méthodes d'interpolation des efforts aux noeuds au début/fin de poutre
-            // ne prend pas en compte les efforts linéiques
-            //Rint_x_axial[0] = ((N_mid[0] * t_mid[0] + V_mid[0]) * t[0]) * t[0];
-            //Rint_x_axial[0] = N_mid[0] * t_mid[0];
-            //Rint_x_axial[0] = N_r[0];
-
-            //Rint_x_axial[1] = -N_mid[0] * t_mid[0];
-            //for (int i = 1; i < ne - 1; i++)
-            //{
-            //    MVector force = N_mid[i] * t_mid[i];
-            //    Rint_x_axial[i] += force;
-            //    Rint_x_axial[i + 1] = -force;
-            //}
-            //Rint_x_axial[nv - 2] += N_mid[ne - 1] * t_mid[ne - 1];
-            //Rint_x_axial[nv - 1] = -((N_mid[ne - 1] * t_mid[ne - 1] + V_M[ne - 1] + V_Q[ne - 1]) * t[nv - 1]) * t[nv - 1];
-
-            //// SHEAR FORCE | bending contribution
-            //// A revoir avec les nouvelles méthodes d'interpolation des efforts aux noeuds au début/fin de poutre
-            //// ne prend pas en compte les efforts linéiques
-            //Rint_x_shear_M[0] = (N_mid[0] * t_mid[0]) - ((N_mid[0] * t_mid[0] + V_M[0]) * t[0]) * t[0];
-            //for (int i = 0; i < ne; i++)
-            //{
-            //    Rint_x_shear_M[i] += V_M[i];
-            //    Rint_x_shear_M[i + 1] = -V_M[i];
-            //}
-            //Rint_x_shear_M[nv - 1] += -N_mid[ne - 1] * t_mid[ne - 1] + ((N_mid[ne - 1] * t_mid[ne - 1] + V_M[ne - 1]) * t[nv - 1]) * t[nv - 1];
-
-            //// SHEAR FORCE | twisting contribution
-            //Rint_x_shear_Q[0] = -(V_Q[0] * t[0]) * t[0];
-            //for (int i = 0; i < ne; i++)
-            //{
-            //    Rint_x_shear_Q[i] += V_Q[i];
-            //    Rint_x_shear_Q[i + 1] = -V_Q[i];
-            //}
-            //Rint_x_shear_Q[nv - 1] += (V_Q[nv_h - 1] * t[nv - 1]) * t[nv - 1];
-
-            //// RESULTANT FORCE
-            //for (int i = 0; i < nv; i++)
-            //{
-            //    Rint_x[i] = Rint_x_axial[i] + Rint_x_shear_M[i] + Rint_x_shear_Q[i];
-            //}
-
             //RESULTANT FORCE
             Rint_x[0] = N_mid[0] * t[0] + V_mid[0];
             for (int i = 1; i < nv - 1; i++)
@@ -959,27 +957,6 @@ namespace TMarsupilami.CoreLib3
                 Rint_x[i] = N - V_mid[i - 1] + V_mid[i];
             }
             Rint_x[nv - 1] = -N_mid[ne - 1] * t[nv - 1] - V_mid[ne - 1];
-
-            //Rint_x[0] = MVector.Zero;
-            //for (int i = 0; i < nv_g; i++)
-            //{
-            //    var l0 = l[2 * i];
-            //    var l1 = l[2 * i + 1];
-
-            //    var κV0 = MVector.CrossProduct(κb_h_r[i], V_r[2 * i]) * mframes[2 * i].ZAxis;
-            //    var κV1 = MVector.CrossProduct(κb_g[i], 0.5 * (V_l[2 * i + 1] + V_r[2 * i + 1])) * mframes[2 * i + 1].ZAxis;
-            //    var κV2 = MVector.CrossProduct(κb_h_l[i + 1], V_l[2 * i + 2]) * mframes[2 * i + 2].ZAxis;
-
-            //    Rint_x[2 * i] += (N_mid[2 * i] + l0 / 4 * (κV0 + κV1)) * mframes[2 * i].ZAxis;
-            //    Rint_x[2 * i] += V_mid[2 * i];
-
-            //    Rint_x[2 * i + 1] = (-N_mid[2 * i] + N_mid[2 * i + 1] + l0 / 4 * (κV0 + κV1) + l1 / 4 * (κV1 + κV2)) * mframes[2 * i + 1].ZAxis;
-            //    Rint_x[2 * i + 1] += -V_mid[2 * i] + V_mid[2 * i + 1];
-
-            //    Rint_x[2 * i + 2] = (-N_mid[2 * i + 1] + l1 / 4 * (κV1 + κV2)) * mframes[2 * i].ZAxis;
-            //    Rint_x[2 * i + 2] += -V_mid[2 * i + 1];
-            //}
-
         }
         private void UpdateResultantNodalForce()
         {
@@ -1002,6 +979,49 @@ namespace TMarsupilami.CoreLib3
             OnReactionForceUpdating(Fr_g, R_x);
         }
 
+        private void VectorResultants()
+        {
+            // reconstruction des efforts dans le repère global
+            MVector d1, d2, d3;
+            for (int i = 0; i < nv_g; i++)
+            {
+                // VERTEX
+
+                // 2i
+                d1 = mframes[2 * i].XAxis;
+                d2 = mframes[2 * i].YAxis;
+                κb_r[i] = κ1_r[i] * d1 + κ2_r[i] * d2;
+                M_r[i] = M1_r[i] * d1 + M2_r[i] * d2;
+
+                // 2i + 1
+                d1 = mframes[2 * i + 1].XAxis;
+                d2 = mframes[2 * i + 1].YAxis;
+                M_g[i] = M1_g[i] * d1 + M2_g[i] * d2;
+
+                // 2i + 2
+                d1 = mframes[2 * i + 2].XAxis;
+                d2 = mframes[2 * i + 2].YAxis;
+                κb_l[i + 1] = κ1_l[i + 1] * d1 + κ2_l[i + 1] * d2;
+                M_l[i + 1] = M1_l[i + 1] * d1 + M2_l[i + 1] * d2;
+
+                // EDGES
+
+                // 2i
+                d1 = mframes_mid[2 * i].XAxis;
+                d2 = mframes_mid[2 * i].YAxis;
+                κb_mid[2 * i] = κ1_mid[2 * i] * d1 + κ2_mid[2 * i] * d2;
+
+                // 2i + 1
+                d1 = mframes_mid[2 * i + 1].XAxis;
+                d2 = mframes_mid[2 * i + 1].YAxis;
+                κb_mid[2 * i + 1] = κ1_mid[2 * i + 1] * d1 + κ2_mid[2 * i + 1] * d2;
+
+            }
+        }
+        private void Interpolate()
+        {
+            // mettre ici les interpolations non nécessaires au déroulement de la DR pour alléger les calculs
+        }
 
         // GEOMETRY
         public MFrame[] Get_MaterialFrames(Configuration config)
@@ -1057,8 +1077,8 @@ namespace TMarsupilami.CoreLib3
             Eb = new double[ne];
             for (int i = 0; i < ne; i++)
             {
-                κ1 = κb_mid[i] * mframes_mid[i].XAxis - κb_mid_0[i].X;
-                κ2 = κb_mid[i] * mframes_mid[i].YAxis - κb_mid_0[i].Y;
+                κ1 = κ1_mid[i] - κb_mid_0[i].X;
+                κ2 = κ2_mid[i] - κb_mid_0[i].Y;
                 var dE = 0.5 * (EI1[i/2] * κ1 * κ1 + EI2[i/2] * κ2 * κ2) * l[i];
                 sum += dE;
                 Eb[i] = dE;
