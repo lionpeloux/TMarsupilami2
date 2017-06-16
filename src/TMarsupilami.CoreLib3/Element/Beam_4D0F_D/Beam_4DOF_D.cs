@@ -946,16 +946,7 @@ namespace TMarsupilami.CoreLib3
         }
         private void UpdateInternalNodalForce()
         {
-            //RESULTANT FORCE : par les milieux des segments (manque les forces linéiques)
-            //Rint_x[0] = N_mid[0] * t[0] + V_mid[0];
-            //for (int i = 1; i < nv - 1; i++)
-            //{
-            //    var N = -N_mid[i - 1] * t_mid[i - 1] + N_mid[i] * t_mid[i];
-            //    Rint_x[i] = N - V_mid[i - 1] + V_mid[i];
-            //}
-            //Rint_x[nv - 1] = -N_mid[ne - 1] * t[nv - 1] - V_mid[ne - 1];
-
-            //(alternative) RESULTANT FORCE : par les noeuds
+            //RESULTANT OF INTERNAL FORCES
             for (int i = 0; i < nv; i++)
             {
                 Rint_x[i] = (-N_l[i] + N_r[i]) * mframes[i].ZAxis + (-V_l[i] + V_r[i]);
@@ -964,19 +955,13 @@ namespace TMarsupilami.CoreLib3
         private void UpdateResultantNodalForce()
         {
             // RESULTANT FORCE
-
-            // ADD APPLIED LOADS TO INTERNAL RESULTANT
-            R_x[0] = Rint_x[0] + Fext_g[0] + (0.5 * l[0]) * fext_g[0];
-            for (int i = 1; i < nv_h - 1; i++)
+            for (int i = 0; i < nv_h; i++)
             {
-                R_x[2 * i] = Rint_x[2 * i] 
-                           + Fr_g[i] + Fext_g[i] 
-                           + 0.5 * (fext_g[i - 1] * l[2 * i - 1] + fext_g[i] * l[2 * i]);
+                R_x[2 * i] = Rint_x[2 * i] + Fr_g[i] + Fext_g[i];
             }
-            R_x[nv - 1] = Rint_x[nv - 1] + Fext_g[nv_h - 1] + (0.5 * l[2 * nv_g - 1]) * fext_g[nv_g - 1];
             for (int i = 0; i < nv_g; i++)
             {
-                R_x[2 * i + 1] = Rint_x[2 * i + 1] + (0.5 * (l[2 * i] + l[2 * i + 1])) * fext_g[i];
+                R_x[2 * i + 1] = Rint_x[2 * i + 1];
             }
 
             OnReactionForceUpdating(Fr_g, R_x);
@@ -984,42 +969,8 @@ namespace TMarsupilami.CoreLib3
 
         private void VectorResultants()
         {
-            // reconstruction des efforts dans le repère global
-            MVector d1, d2, d3;
-            for (int i = 0; i < nv_g; i++)
-            {
-                // VERTEX
-
-                // 2i
-                d1 = mframes[2 * i].XAxis;
-                d2 = mframes[2 * i].YAxis;
-                κb_r[i] = κ1_r[i] * d1 + κ2_r[i] * d2;
-                M_r[i] = M1_r[i] * d1 + M2_r[i] * d2;
-
-                // 2i + 1
-                d1 = mframes[2 * i + 1].XAxis;
-                d2 = mframes[2 * i + 1].YAxis;
-                M_g[i] = M1_g[i] * d1 + M2_g[i] * d2;
-
-                // 2i + 2
-                d1 = mframes[2 * i + 2].XAxis;
-                d2 = mframes[2 * i + 2].YAxis;
-                κb_l[i + 1] = κ1_l[i + 1] * d1 + κ2_l[i + 1] * d2;
-                M_l[i + 1] = M1_l[i + 1] * d1 + M2_l[i + 1] * d2;
-
-                // EDGES
-
-                // 2i
-                d1 = mframes_mid[2 * i].XAxis;
-                d2 = mframes_mid[2 * i].YAxis;
-                κb_mid[2 * i] = κ1_mid[2 * i] * d1 + κ2_mid[2 * i] * d2;
-
-                // 2i + 1
-                d1 = mframes_mid[2 * i + 1].XAxis;
-                d2 = mframes_mid[2 * i + 1].YAxis;
-                κb_mid[2 * i + 1] = κ1_mid[2 * i + 1] * d1 + κ2_mid[2 * i + 1] * d2;
-
-            }
+            // mettre ici la reconstruction des efforts pour l'affichage 
+            // et non nécessaires au déroulement de la DR, pour alléger les calculs
         }
         private void Interpolate()
         {

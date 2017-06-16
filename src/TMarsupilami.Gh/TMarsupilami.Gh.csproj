@@ -131,6 +131,7 @@
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\Transform\Comp_OrientLink.cs" />
+    <Compile Include="Component\_Model\Bench\Comp_BenchSingleBeam.cs" />
     <Compile Include="Component\_Model\Comp_SingleBeamGeometry.cs" />
     <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D_SKDR2.cs" />
     <Compile Include="Component\_Model\Test\_Comp_CoreLib3_Beam4D_SKDR_Link.cs" />
