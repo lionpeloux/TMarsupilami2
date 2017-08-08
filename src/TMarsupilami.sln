@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMarsupilami.CoreLib3", "TM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMarsupilami.AlgLib", "TMarsupilami.AlgLib\TMarsupilami.AlgLib.csproj", "{6C920744-9F03-4338-B10F-6133704CE694}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMarsupilami.BenchProblem", "TMarsupilami.BenchProblem\TMarsupilami.BenchProblem.csproj", "{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,14 @@ Global
 		{6C920744-9F03-4338-B10F-6133704CE694}.Debug64|Any CPU.Build.0 = Debug|Any CPU
 		{6C920744-9F03-4338-B10F-6133704CE694}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C920744-9F03-4338-B10F-6133704CE694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}.Debug32|Any CPU.ActiveCfg = Debug|Any CPU
+		{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}.Debug32|Any CPU.Build.0 = Debug|Any CPU
+		{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}.Debug64|Any CPU.ActiveCfg = Debug|Any CPU
+		{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}.Debug64|Any CPU.Build.0 = Debug|Any CPU
+		{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
