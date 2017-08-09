@@ -126,8 +126,8 @@ namespace TMarsupilami.CoreLib3
         }
         public override void Calculate_θ()
         {
-            var v1 = b1.mframes[n1].XAxis;
-            var v2 = b2.mframes[n2].XAxis;
+            var v1 = b1.mframes[n1].YAxis;
+            var v2 = b2.mframes[n2].YAxis;
             M12 = -C * MVector.CrossProduct(v1, v2); ;
         }
 

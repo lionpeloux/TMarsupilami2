@@ -135,6 +135,7 @@
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\Transform\Comp_OrientLink.cs" />
+    <Compile Include="Component\_Model\Bench\Comp_Bench2DGrid.cs" />
     <Compile Include="Component\_Model\Bench\Comp_ReadSingleBeamProblem.cs" />
     <Compile Include="Component\_Model\Bench\Comp_WriteSingleBeamProblem.cs" />
     <Compile Include="Component\_Model\Bench\Comp_BenchSingleBeam.cs" />

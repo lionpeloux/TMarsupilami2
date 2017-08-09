@@ -256,6 +256,10 @@ namespace TMarsupilami.CoreLib3
 
         #endregion
 
+        public Section[] Sections { get { return sections; } }
+        public Material[] Materials { get { return materials; } }
+
+
         protected Beam(bool isClosed = false)
             : base(ElementStructure.Beam, 1)
         {

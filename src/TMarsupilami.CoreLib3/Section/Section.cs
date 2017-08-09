@@ -22,7 +22,10 @@ namespace TMarsupilami.CoreLib3
         private double _I1;             // area moment of inertia [m4] around first material axis (d1)
         private double _I2;             // area moment of inertia [m4] around second material axis (d2)
         private double _J;              // area moment of inertia [m4] around third material axis (d3)
-        
+
+        public double b1; // a dégager
+        public double b2; // a dégager
+
         #endregion
 
         #region PROPERTIES
@@ -94,6 +97,8 @@ namespace TMarsupilami.CoreLib3
         public static Section RectangularSection(double b1, double b2)
         {
             Section section_prop = new Section(SectionType.Rectangular);
+            section_prop.b1 = b1;
+            section_prop.b2 = b2;
 
             // outline
             section_prop.MaterialFrame = MFrame.XY;
