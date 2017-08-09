@@ -85,12 +85,12 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Grasshopper">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Common Files\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
+      <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="GH_IO">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Common Files\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\GH_IO.dll</HintPath>
+      <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\GH_IO.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -135,6 +135,8 @@
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\Transform\Comp_OrientLink.cs" />
+    <Compile Include="Component\_Model\Bench\Comp_ReadSingleBeamProblem.cs" />
+    <Compile Include="Component\_Model\Bench\Comp_WriteSingleBeamProblem.cs" />
     <Compile Include="Component\_Model\Bench\Comp_BenchSingleBeam.cs" />
     <Compile Include="Component\_Model\Comp_SingleBeamGeometry.cs" />
     <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D_SKDR2.cs" />
@@ -174,6 +176,11 @@
     <Compile Include="Type\GH_MPoint.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TMarsupilami.BenchProblem\TMarsupilami.BenchProblem.csproj">
+      <Project>{d66d99bc-1e4a-4b01-b869-ee366d23f2f6}</Project>
+      <Name>TMarsupilami.BenchProblem</Name>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\TMarsupilami.CoreLib2\TMarsupilami.CoreLib2.csproj">
       <Project>{3ffdb9ba-eae2-458a-975c-bd6ebe8346c9}</Project>
       <Name>TMarsupilami.CoreLib2</Name>
