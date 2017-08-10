@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TMarsupilami.CoreModel.Node">
+    <Position X="7.25" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CoreLib\Node.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TMarsupilami.CoreModel.Node3Dof">
+    <Position X="8.5" Y="3.75" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <InheritanceLine Type="TMarsupilami.CoreModel.Node" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8" Y="3.113" />
+        <Point X="8" Y="4.788" />
+        <Point X="8.5" Y="4.788" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>EAAAAACAAAAAAAAgAAAAAAAAAAAAAAAAAAAEEAAMIAA=</HashCode>
+      <FileName>CoreLib\Node3Dof.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Position" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="TMarsupilami.CoreModel.Node6Dof">
+    <Position X="10.75" Y="4.5" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <InheritanceLine Type="TMarsupilami.CoreModel.Node3Dof" FixedToPoint="true">
+      <Path>
+        <Point X="10.25" Y="4.812" />
+        <Point X="10.75" Y="4.812" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AgABAAAAgQAAAAAgAAAAAAABAAAAAAAQAAgAAAIAAAA=</HashCode>
+      <FileName>CoreLib\Node6Dof.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Orientation" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="TMarsupilami.CoreModel.Element">
+    <Position X="3.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CoreLib\Element.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Nodes" />
+    </ShowAsAssociation>
+  </Class>
+  <Struct Name="TMarsupilami.CoreModel.MPoint" Collapsed="true">
+    <Position X="13.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAIAAAAAAAAAAAAAAAAAAAABAAABgAQAAYAE=</HashCode>
+      <FileName>MathLib\Types\MPoint.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="TMarsupilami.CoreModel.MFrame" Collapsed="true">
+    <Position X="13.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>iAAAAQABAAIAAAAAAACAAAAAAAAAAAAAAAIAAAgAAAA=</HashCode>
+      <FileName>MathLib\Types\MFrame.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="TMarsupilami.CoreModel.MVector" Collapsed="true">
+    <Position X="13.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAABAAAAAAAAAAAAAAAAABgAQAAYAE=</HashCode>
+      <FileName>MathLib\Types\MVector.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
