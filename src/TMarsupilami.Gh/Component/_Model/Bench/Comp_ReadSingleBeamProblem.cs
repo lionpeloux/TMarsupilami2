@@ -6,6 +6,7 @@ using TMarsupilami.Gh.Parameter;
 using TMarsupilami.CoreLib3;
 using System.Diagnostics;
 using Rhino;
+<<<<<<< HEAD
 
 namespace TMarsupilami.Gh.Component
 {
@@ -48,6 +49,23 @@ namespace TMarsupilami.Gh.Component
         public override Guid ComponentGuid
         {
             get { return new Guid("{9941BCC8-326A-405D-80CD-0B604A9D23C1}"); }
+=======
+using TMarsupilami.BenchProblem;
+
+namespace TMarsupilami.Gh.Component
+{
+    public class Comp_ReadSingleBeamProblem : GH_Component
+    {
+
+        // CONSTRUCTOR
+        public Comp_ReadSingleBeamProblem()
+            : base("Read Single Beam Problem", "Read SBP", "Read a SingleBeamProblem from a json file", "TMarsupilami", "Bench")
+        {
+        } 
+        public override Guid ComponentGuid
+        {
+            get { return new Guid("{40D48E49-78CC-4051-93CC-B70E3A025235}"); }
+>>>>>>> Origin/NewShearThesis
         }
         public override GH_Exposure Exposure
         {
@@ -57,6 +75,7 @@ namespace TMarsupilami.Gh.Component
         // PARAMETERS
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+<<<<<<< HEAD
             pManager.AddParameter(new Param_MFrame(), "Rest position", "sections_0", "Beam's sections in rest position. MFrame z_axis is supposed to be aligned with d3 material vector.", GH_ParamAccess.list);
             pManager.AddParameter(new Param_MFrame(), "Initial position", "sections_i", "Beam's sections in initial position. MFrame z_axis is supposed to be aligned with d3 material vector.", GH_ParamAccess.list);
 
@@ -87,11 +106,19 @@ namespace TMarsupilami.Gh.Component
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.RegisterParam(new Param_MBeam(), "Beams", "B", "Beam elements.");
+=======
+            pManager.AddTextParameter("File Path", "path", "The path to the json file", GH_ParamAccess.item);
+        }
+        protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
+        {
+            pManager.RegisterParam(new Param_MBeam(), "Beams", "B", "Beam element", GH_ParamAccess.item);
+>>>>>>> Origin/NewShearThesis
         }
 
         // SOLVER
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+<<<<<<< HEAD
             frames_0.Clear();
             frames_i.Clear();
 
@@ -186,6 +213,35 @@ namespace TMarsupilami.Gh.Component
 
             bc_list = new List<Support>();
             switch (bc_start)
+=======
+            string path = "";
+            
+            if (!DA.GetData(0, ref path)) { return; }
+
+            var pb = SingleBeamProblem.DeSerialize(path);
+
+
+            var Ec_x_lim = 1e-10;
+            var Ec_θ_lim = 1e-6;
+
+            int n = pb.RestConfiguration.Count;
+            var sections = new List<Section>();
+            var materials = new List<Material>();
+
+            for (int i = 0; i < n - 1; i++)
+            {
+                sections.Add(Section.RectangularSection(pb.b1, pb.b2));
+            }
+
+            materials.Add(new Material(StandardMaterials.GFRP));
+
+            // INIT
+            var beam = new Beam_4DOF_D(pb.RestConfiguration, pb.ActualConfiguration, sections, materials);
+            var elements = new Beam[1] { beam };
+
+            var bc_list = new List<Support>();
+            switch (pb.Start)
+>>>>>>> Origin/NewShearThesis
             {
                 case (int)SupportCondition.Free:
                     break;
@@ -196,8 +252,13 @@ namespace TMarsupilami.Gh.Component
                     Support.AddPinnedSupport(elements[0], Boundary.Start);
                     break;
             }
+<<<<<<< HEAD
             switch (bc_end)
             {                            
+=======
+            switch (pb.End)
+            {
+>>>>>>> Origin/NewShearThesis
                 case (int)SupportCondition.Free:
                     break;
                 case (int)SupportCondition.Clamped:
@@ -209,6 +270,7 @@ namespace TMarsupilami.Gh.Component
             }
 
 
+<<<<<<< HEAD
 
             int nh_mid = elements[0].Nvh / 2;
 
@@ -249,6 +311,25 @@ namespace TMarsupilami.Gh.Component
         {
             Rhino.RhinoApp.WriteLine("Ec_x[ENDED = " + solver.CurrentIteration_x + "] = " + string.Format("{0:E8}", solver.Ec_x));
             Rhino.RhinoApp.WriteLine("Ec_θ[ENDED = " + solver.CurrentIteration_θ + "] = " + string.Format("{0:E8}", solver.Ec_θ));
+=======
+            // Add Some Loadds
+            int nh_mid = elements[0].Nvh / 2;
+            var loads = new List<BeamVectorLoad>();
+            loads.Add(BeamVectorLoad.Create_Fext(new MVector(0, 0, 100), nh_mid, beam, true));
+
+            beam.Load(loads);
+
+            var solver = new KDRSolver(elements, bc_list, new List<Link>(), 1, Ec_x_lim, Ec_θ_lim);
+            solver.OnEnergyPeak_x += Nothing;
+            solver.OnConvergence += Nothing;
+            solver.OnNotConvergence += Nothing;
+
+            DA.SetData(0, beam);        
+        }
+
+        private static void Nothing(KDRSolver solver)
+        {
+>>>>>>> Origin/NewShearThesis
         }
     }
 

@@ -1,21 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D66D99BC-1E4A-4B01-B869-EE366D23F2F6}</ProjectGuid>
+    <ProjectGuid>{833592C8-DB6F-480F-B9DB-CB07871687CA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TMarsupilami.BenchProblem</RootNamespace>
-    <AssemblyName>TMarsupilami.BenchProblem</AssemblyName>
+    <RootNamespace>TMarsupilami.CoreModel</RootNamespace>
+    <AssemblyName>TMarsupilami.CoreModel</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,14 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,31 +41,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="CoreLib\Element.cs" />
+    <Compile Include="MathLib\Types\ISurface.cs" />
+    <Compile Include="MathLib\Centerline.cs" />
+    <Compile Include="MathLib\CircumscribedCurvature.cs" />
+    <Compile Include="MathLib\InscribedCurvature.cs" />
+    <Compile Include="MathLib\Curvature.cs" />
+    <Compile Include="MathLib\Types\MFrame.cs" />
+    <Compile Include="MathLib\Types\MPoint.cs" />
+    <Compile Include="MathLib\Types\MVector.cs" />
+    <Compile Include="MathLib\ParallelTransport.cs" />
+    <Compile Include="CoreLib\Node.cs" />
+    <Compile Include="CoreLib\Node3Dof.cs" />
+    <Compile Include="CoreLib\Node6Dof.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SingleBeamProblem.cs" />
+    <Compile Include="MathLib\ReflexionParallelTransport.cs" />
+    <Compile Include="MathLib\RotationParallelTransport.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TMarsupilami.CoreLib3\TMarsupilami.CoreLib3.csproj">
-      <Project>{f59abb60-f582-470f-9a12-2d36b677c224}</Project>
-      <Name>TMarsupilami.CoreLib3</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\TMarsupilami.MathLib\TMarsupilami.MathLib.csproj">
-      <Project>{716ab6ea-8f46-443f-b6de-a0bc33022739}</Project>
-      <Name>TMarsupilami.MathLib</Name>
-    </ProjectReference>
+    <None Include="CoreLib\CoreLib.cd" />
+    <None Include="MathLib\Types\MathLib.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -52,6 +52,7 @@ namespace TMarsupilami.Gh.Component
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddParameter(new Param_MFrame(), "Material Frames", "F", "", GH_ParamAccess.list);
+            pManager.AddBrepParameter("Envelope 3D", "brep", "Envelope 3D", GH_ParamAccess.list);
         }
         protected override void SolveInstance(IGH_DataAccess DA)
         {
@@ -81,9 +82,65 @@ namespace TMarsupilami.Gh.Component
 
 
             DA.SetDataList(0, beam.Get_MaterialFrames(config));
+            DA.SetDataList(1, Envelope3D(beam, config));
 
 
         }
 
+
+        private List<Brep> Envelope3D(Beam_4DOF_D beam, Configuration config)
+        {
+            var frames = beam.Get_MaterialFrames(config);
+            var sections = beam.Sections;
+
+            var points = new Point3d[beam.Nv];
+            for (int i = 0; i < beam.Nv; i++)
+            {
+                points[i] = frames[i].Origin.Cast();
+            }
+
+            var centerlineCurve = Curve.CreateInterpolatedCurve(points, 3, CurveKnotStyle.ChordSquareRoot, frames[0].ZAxis.Cast(), frames[beam.Nv - 1].ZAxis.Cast());
+
+            var param = new double[beam.Nvh-2];
+            for (int i = 1; i < beam.Nvh-1; i++)
+            {
+                centerlineCurve.ClosestPoint(points[2 * i], out param[i - 1]);
+            }
+
+            var segmentCurves = centerlineCurve.Split(param);
+            var envelope = new List<Brep>();
+
+            var sweep = new Rhino.Geometry.SweepOneRail();
+            sweep.ClosedSweep = false;
+            sweep.SetToRoadlikeTop();
+
+            for (int i = 0; i < beam.Nvh-1; i++)
+            {
+                var b1 = sections[i].b1;
+                var b2 = sections[i].b2;
+
+                var xsections = new Curve[2];
+                xsections[0] = GetRectangularSection(frames[2*i], b1, b2);
+                xsections[1] = GetRectangularSection(frames[2*i + 2], b1, b2);
+
+                var breps = sweep.PerformSweep(segmentCurves[i], xsections);
+                envelope.AddRange(breps);
+
+            }
+
+            return envelope;
+        }
+
+        private Curve GetRectangularSection(MFrame frame, double b1, double b2)
+        {
+            var p1 = (frame.Origin - b1 / 2 * frame.XAxis - b2 / 2 * frame.YAxis).Cast();
+            var p2 = (frame.Origin + b1 / 2 * frame.XAxis - b2 / 2 * frame.YAxis).Cast();
+            var p3 = (frame.Origin + b1 / 2 * frame.XAxis + b2 / 2 * frame.YAxis).Cast();
+            var p4 = (frame.Origin - b1 / 2 * frame.XAxis + b2 / 2 * frame.YAxis).Cast();
+            var polyline = new PolylineCurve(new Point3d[5] { p1, p2, p3, p4, p1});
+
+            return polyline;
+
+        }
     }
 }

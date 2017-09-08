@@ -222,7 +222,7 @@ namespace TMarsupilami.Gh.Component
             List<Link> links = new List<Link>();
 
             //links.Add(Link.CreateElasticPinnedLink(beam1, n1, beam2, n2, 1e10));
-            //links.Add(Link.CreateElasticSwivelLink(beam1, n1, beam2, n2, 1e10, 1e8));
+            links.Add(Link.CreateElasticSwivelLink(beam1, n1, beam2, n2, 1e10, 1e8));
 
 
 

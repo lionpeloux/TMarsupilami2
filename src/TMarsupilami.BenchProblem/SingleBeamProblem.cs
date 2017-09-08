@@ -25,12 +25,12 @@ namespace TMarsupilami.BenchProblem
         public List<MFrame> ActualConfiguration { get;  set; }
 
         // Rectangular Cross-Section
-        public double b1 { get; private set; }
-        public double b2 { get; private set; }
+        public double b1 { get; set; }
+        public double b2 { get; set; }
 
         // Material
-        public double E { get; private set; }
-        public double G { get; private set; }
+        public double E { get; set; }
+        public double G { get; set; }
 
         public SingleBeamProblem()
         {
@@ -49,10 +49,11 @@ namespace TMarsupilami.BenchProblem
             this.G = G;
         }
 
-        public static void Serialize(SingleBeamProblem problem, string path)
+        public static string Serialize(SingleBeamProblem problem, string path)
         {
             string output = JsonConvert.SerializeObject(problem, Formatting.Indented);
             File.WriteAllText(path, output);
+            return output;
         }
         public static SingleBeamProblem DeSerialize(string path)
         {

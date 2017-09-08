@@ -68,13 +68,13 @@ namespace TMarsupilami.CoreLib3
             }
             else
             {
-                F12 = -K * u12;
+                F12 = - K * u12;
             }
         }
         public override void Transfer_Rx()
         {
-            b1.Fr_g[n1/2] = F12;
-            b2.Fr_g[n2/2] = -F12;
+            b1.Fr_g[n1/2] = - F12;
+            b2.Fr_g[n2 / 2] = F12;
         }
         public override void Transfer_Mx()
         {
@@ -126,20 +126,20 @@ namespace TMarsupilami.CoreLib3
         }
         public override void Calculate_θ()
         {
-            var v1 = b1.mframes[n1].XAxis;
-            var v2 = b2.mframes[n2].XAxis;
+            var v1 = b1.mframes[n1].YAxis;
+            var v2 = b2.mframes[n2].YAxis;
             M12 = -C * MVector.CrossProduct(v1, v2); ;
         }
 
         public override void Transfer_Rx()
         {
-            b1.Fr_g[n1 / 2] = F12;
-            b2.Fr_g[n2 / 2] = -F12;
+            b1.Fr_g[n1 / 2] = -F12;
+            b2.Fr_g[n2 / 2] = F12;
         }
         public override void Transfer_Rθ()
         {
-            b1.Mr_m[n1_h] = b1.ToMaterialCoordinateSystem(M12, n1_h);
-            b2.Mr_m[n2_h] = b1.ToMaterialCoordinateSystem(-M12, n2_h);
+            b1.Mr_m[n1_h] = b1.ToMaterialCoordinateSystem(-M12, n1_h);
+            b2.Mr_m[n2_h] = b1.ToMaterialCoordinateSystem(M12, n2_h);
         }
 
         public override void Transfer_Mx()
