@@ -13,7 +13,8 @@ namespace TMarsupilami.CoreLib3
         Steel,
         Aluminium,
         Timber,
-        GFRP
+        GFRP,
+        Baptiste
     }
 
     public sealed class Material : IDeepCopy<Material>
@@ -125,6 +126,15 @@ namespace TMarsupilami.CoreLib3
                     E = 26e9;
                     ν = 0.28;
                     G = 3e9;
+                    α = 1.1e-5;
+                    return;
+
+                case StandardMaterials.Baptiste:
+                    Name = "Standard GFRP";
+                    ρ = 1800;
+                    E = 25e9;
+                    ν = 0.25;
+                    G = 10e9;
                     α = 1.1e-5;
                     return;
             }

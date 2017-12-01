@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="TMarsupilami.CoreModel.Node">
-    <Position X="7.25" Y="1.75" Width="1.5" />
+    <Position X="12.5" Y="6" Width="1.5" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
@@ -11,15 +11,15 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TMarsupilami.CoreModel.Node3Dof">
-    <Position X="8.5" Y="3.75" Width="1.75" />
+    <Position X="13.75" Y="8" Width="1.75" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <InheritanceLine Type="TMarsupilami.CoreModel.Node" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="8" Y="3.113" />
-        <Point X="8" Y="4.788" />
-        <Point X="8.5" Y="4.788" />
+        <Point X="13.25" Y="7.363" />
+        <Point X="13.25" Y="9.038" />
+        <Point X="13.75" Y="9.038" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -31,14 +31,11 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="TMarsupilami.CoreModel.Node6Dof">
-    <Position X="10.75" Y="4.5" Width="1.75" />
-    <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
+    <Position X="16" Y="8.75" Width="1.75" />
     <InheritanceLine Type="TMarsupilami.CoreModel.Node3Dof" FixedToPoint="true">
       <Path>
-        <Point X="10.25" Y="4.812" />
-        <Point X="10.75" Y="4.812" />
+        <Point X="15.5" Y="9.179" />
+        <Point X="16" Y="9.179" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -50,7 +47,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="TMarsupilami.CoreModel.Element">
-    <Position X="3.5" Y="1.75" Width="1.5" />
+    <Position X="9" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CoreLib\Element.cs</FileName>
@@ -59,22 +56,32 @@
       <Property Name="Nodes" />
     </ShowAsAssociation>
   </Class>
+  <Class Name="TMarsupilami.CoreModel.Joint">
+    <Position X="12.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Joint.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Nodes" />
+    </ShowAsAssociation>
+  </Class>
   <Struct Name="TMarsupilami.CoreModel.MPoint" Collapsed="true">
-    <Position X="13.75" Y="3.75" Width="1.5" />
+    <Position X="19" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAAAAAAIAAAAAAAAAAAAAAAAAAAABAAABgAQAAYAE=</HashCode>
       <FileName>MathLib\Types\MPoint.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="TMarsupilami.CoreModel.MFrame" Collapsed="true">
-    <Position X="13.75" Y="4.5" Width="1.5" />
+    <Position X="19" Y="8.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>iAAAAQABAAIAAAAAAACAAAAAAAAAAAAAAAIAAAgAAAA=</HashCode>
       <FileName>MathLib\Types\MFrame.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="TMarsupilami.CoreModel.MVector" Collapsed="true">
-    <Position X="13.75" Y="3" Width="1.5" />
+    <Position X="19" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAQAAAAABAAAAAAAAAAAAAAAAABgAQAAYAE=</HashCode>
       <FileName>MathLib\Types\MVector.cs</FileName>

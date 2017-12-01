@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoreLib\Element.cs" />
+    <Compile Include="Joint.cs" />
     <Compile Include="MathLib\Types\ISurface.cs" />
     <Compile Include="MathLib\Centerline.cs" />
     <Compile Include="MathLib\CircumscribedCurvature.cs" />
