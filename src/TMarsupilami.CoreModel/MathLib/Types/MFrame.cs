@@ -12,34 +12,13 @@ namespace TMarsupilami.CoreModel
         private MVector yaxis;
         private MVector zaxis;
 
-        public MPoint Origin
+        public int XAxis
         {
-            get => origin;
-            set
+            get
             {
-                origin = value;
+                throw new System.NotImplementedException();
             }
-        }
 
-        public MVector XAxis
-        {
-            get => default(MVector);
-            set
-            {
-            }
-        }
-
-        public MVector YAxis
-        {
-            get => default(MVector);
-            set
-            {
-            }
-        }
-
-        public MVector ZAxis
-        {
-            get => default(MVector);
             set
             {
             }
