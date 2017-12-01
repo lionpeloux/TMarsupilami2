@@ -172,7 +172,9 @@ namespace TMarsupilami.Gh.Component
                         }
                     }
 
-                    materials = new List<Material>() { new Material(StandardMaterials.GFRP) };
+                    materials = new List<Material>() { new Material(StandardMaterials.Baptiste) };
+                    RhinoApp.WriteLine("E = " + string.Format("{0:E3}", materials[0].E));
+                    RhinoApp.WriteLine("E = " + string.Format("{0:E3}", materials[0].G));
                     DR_Relax(iteration_max);
                 }
 
