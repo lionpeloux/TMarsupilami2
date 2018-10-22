@@ -36,7 +36,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -71,28 +71,26 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GH_IO">
+      <HintPath>C:\Program Files\Rhino 6\Plug-ins\Grasshopper\GH_IO.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Grasshopper">
+      <HintPath>C:\Program Files\Rhino 6\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RhinoCommon">
-      <HintPath>C:\Program Files\Rhinoceros 5 (64-bit)\System\RhinoCommon.dll</HintPath>
+      <HintPath>C:\Program Files\Rhino 6\System\RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="Grasshopper">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GH_IO">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\GH_IO.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component\CoreLib\Display\Comp_DisplayBeam_Geometry.cs" />
@@ -136,8 +134,6 @@
     <Compile Include="Component\MathLib\ParallelTransport\Comp_ZParallelTransportFrame_Rotation.cs" />
     <Compile Include="Component\MathLib\Transform\Comp_OrientLink.cs" />
     <Compile Include="Component\_Model\Bench\Comp_Bench2DGrid.cs" />
-    <Compile Include="Component\_Model\Bench\Comp_ReadSingleBeamProblem.cs" />
-    <Compile Include="Component\_Model\Bench\Comp_WriteSingleBeamProblem.cs" />
     <Compile Include="Component\_Model\Bench\Comp_BenchSingleBeam.cs" />
     <Compile Include="Component\_Model\Comp_SingleBeamGeometry.cs" />
     <Compile Include="Component\_Model\Test\_Comp_CoreLib2_Beam4D_SKDR2.cs" />
@@ -193,7 +189,6 @@
     <ProjectReference Include="..\TMarsupilami.MathLib\TMarsupilami.MathLib.csproj">
       <Project>{716ab6ea-8f46-443f-b6de-a0bc33022739}</Project>
       <Name>TMarsupilami.MathLib</Name>
-      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -331,7 +326,13 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"</PostBuildEvent>
+    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"
+xcopy "$(TargetDir)TMarsupilami.Gh.gha"  "C:\Users\Lionel\AppData\Roaming\Grasshopper\Libraries\$(SolutionName)\" /Y
+xcopy "$(TargetDir)TMarsupilami.Gh.dll"  "C:\Users\Lionel\AppData\Roaming\Grasshopper\Libraries\$(SolutionName)\" /Y
+xcopy "$(TargetDir)TMarsupilami.Event.dll"  "C:\Users\Lionel\AppData\Roaming\Grasshopper\Libraries\$(SolutionName)\" /Y
+xcopy "$(TargetDir)TMarsupilami.MathLib.dll"  "C:\Users\Lionel\AppData\Roaming\Grasshopper\Libraries\$(SolutionName)\" /Y
+xcopy "$(TargetDir)TMarsupilami.CoreLib3.dll"  "C:\Users\Lionel\AppData\Roaming\Grasshopper\Libraries\$(SolutionName)\" /Y
+xcopy "$(TargetDir)TMarsupilami.CoreLib2.dll"  "C:\Users\Lionel\AppData\Roaming\Grasshopper\Libraries\$(SolutionName)\" /Y</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug32|AnyCPU' ">
     <StartArguments>
